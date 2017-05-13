@@ -1,0 +1,9 @@
+hello world
+this is a multi-line
+file to test how
+things work with
+ranges and stdio
+and byLine and lines
+and such. Frustrating.
+I hope I get it
+soon.
