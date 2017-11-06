@@ -7,9 +7,10 @@ import std.range;
 import std.functional;
 import std.conv;
 
-alias curry!(std.algorithm.reduce!((a, b) => a + b), 0UL) addn;
+// partial used to be called curry. This alias is no longer necessary, as sum works.
+//alias partial!(std.algorithm.reduce!((a, b) => a + b), 0UL) addn;
 
-void main(string args[]) {
+void main(string[] args) {
 	StopWatch sw;
 	ulong limit = 1000;
 	ulong result;
@@ -20,7 +21,7 @@ void main(string args[]) {
 	sw.start();
 
 	result = iota(1, limit).filter!(a => a % 3 == 0 || a % 5 == 0)
-		.addn();
+		.sum();
 	
 	//iota(3, limit, 3)
 	//.setUnion(iota(5, limit, 5))
@@ -32,3 +33,4 @@ void main(string args[]) {
 	writeln("The sum multiples of 3 and 5 below ", limit, " is: ", result);
 	writeln("finished in ", sw.peek.msecs(), " milliseconds.");
 }
+

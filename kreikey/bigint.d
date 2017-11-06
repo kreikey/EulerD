@@ -15,18 +15,7 @@ private:
 
 	alias mant this;
 
-	this(this) {
-		mant = mant.dup;
-	}
-	unittest {
-		BigInt a = "777";
-		BigInt b = "888";
 
-		auto c = a;
-		assert(c.toString() == "777");
-		a = b;
-		assert(a.toString() == "888");
-	}
 
 	BigInt addAbs(BigInt rhs) {
 		BigInt sum = BigInt();
@@ -49,6 +38,7 @@ private:
 		return sum;
 	}
 	unittest {
+
 		BigInt a = BigInt(947436711);
 		BigInt b = BigInt(3245879);		
 		BigInt c = BigInt();
@@ -338,7 +328,7 @@ void divMod(BigInt rhs, ref BigInt quo, ref BigInt mod) {
 
 		} while (littleEnd-- > 0);
 
-		quo.mant.reverse;
+		std.algorithm.reverse(quo.mant);
 
 		// Fix up mod by taking negatives into account
 
@@ -371,7 +361,7 @@ public:
 		this.length = source.length;
 		this[] = cast(byte[])(source);
 		this[] -= '0';
-		this.reverse;
+		std.algorithm.reverse(this.mant);
 
 		if (this.length >= 1 && allZeros)
 			this.length = 1;
@@ -454,7 +444,20 @@ public:
 		this.length = source.length;
 	}
 	
-	BigInt add(BigInt rhs) {
+	this(this) {
+		mant = mant.dup;
+	}
+	unittest {
+		BigInt a = "777";
+		BigInt b = "888";
+
+		auto c = a;
+		assert(c.toString() == "777");
+		a = b;
+		assert(a.toString() == "888");
+	}
+
+  BigInt add(BigInt rhs) {
 		BigInt sum = BigInt();
 
 		if (this.sign == rhs.sign) {
@@ -848,19 +851,17 @@ public:
 			this = this.mod(rhs);
 	}
 
-/*	string mantissa() @property const {
-		//return cast(string)((mant[] + '0').dup.reverse);
-		char[] str;
-
-		//str = cast(char[])(mant[] + '0');
-
-		return str.reverse.idup;
+	string mantissa() @property const {
+    char[] mantcp = cast(char[])mant.dup; 
+    mantcp[] += '0';
+    std.algorithm.reverse(mantcp);
+    return mantcp.idup;
 	}
 	unittest {
 
 	}
-*/
-    string toString() const {
+
+  string toString() const {
 		byte[] str;
 		str.length = mant.length;
 		str[] = mant[] + '0';
@@ -869,7 +870,9 @@ public:
 			str ~= '-';
 		}
 
-		return cast(string)(str.reverse);
+    std.algorithm.reverse(str);
+
+		return cast(string)(str);
 	}	
 	unittest {
 		BigInt num = BigInt(321);
@@ -984,10 +987,13 @@ void subtract(ref int[] digits, int[] subtrahend) {
 }
 
 int[] toReverseIntArr(char[] cArr) {
-	return cArr.map!(a => cast(int)(a - '0')).array.reverse;
+  int[] iArr = cArr.map!(a => cast(int)(a - '0')).array();
+	std.algorithm.reverse(iArr);
+  return iArr;
 }
 
 char[] toReverseCharArr(int[] iArr) {
-	char[] cArr;
-	return iArr.map!(n => cast(char)(n + '0')).array.reverse;
+	char[] cArr = iArr.map!(n => cast(char)(n + '0')).array();
+  std.algorithm.reverse(cArr);
+	return cArr;
 }

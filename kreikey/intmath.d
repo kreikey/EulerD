@@ -1,6 +1,8 @@
 module kreikey.intmath;
 
 import kreikey.bigint;
+import std.algorithm;
+import std.stdio;
 
 long[] getFactors(long number) {
 	static long[][long] factorsCache;
@@ -26,7 +28,8 @@ long[] getFactors(long number) {
 		fac++;
 	}
 
-	factors ~= factorsBig.reverse;
+  std.algorithm.reverse(factorsBig);
+	factors ~= factorsBig;
 	factorsCache[number] = factors;
 
 	return factors;
@@ -194,5 +197,8 @@ Factor maxMultiplicity(Factor a, Factor b) {
 }
 
 bool isPrime(long number) {
-	return primeFactors(number).length == 1;
+  long[] factors = primeFactors(number); 
+  //writeln(factors);
+	return factors.length == 1;
 }
+
