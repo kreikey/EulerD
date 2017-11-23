@@ -1,12 +1,14 @@
 module kreikey.primes;
+import std.traits;
 
-final class Primes {
+final class Primes(T)
+if (isIntegral!T) {
 private:
-	ulong num;
-	ulong ndx;
-	ulong root;
-	ulong nextSquare;
-	ulong[] primes;
+	T num;
+	T ndx;
+	T root;
+	T nextSquare;
+	T[] primes;
 
 	bool isPrime() {
 		if (num < 2)
@@ -63,7 +65,7 @@ public:
 		ndx++;
 	}
 
-	ulong front() @property {
+	T front() @property {
 		return num;
 	}
 
@@ -77,8 +79,8 @@ public:
 		return ret;
 	}
 
-	ulong opIndex(ulong i) {
-		ulong ret;
+	T opIndex(uint i) {
+		T ret;
 
 		if (i < primes.length) {
 			ndx = i;
@@ -86,7 +88,7 @@ public:
 			ret = num;
 		} else {
 			num = primes[$ - 1];
-			ndx = primes.length;
+			ndx = cast(T)primes.length;
 			do {
 				popFront();
 			} while (ndx <= i);

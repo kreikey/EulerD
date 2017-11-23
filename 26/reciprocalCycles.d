@@ -9,7 +9,7 @@ import reciprocals2;
 
 import std.range;
 
-void main(string args[]) {
+void main(string[] args) {
 	StopWatch sw;
 	ulong end = 999;
 	ulong start = 1;
