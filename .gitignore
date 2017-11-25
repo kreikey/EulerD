@@ -1,0 +1,3 @@
+*.o
+.dutyl.configFile
+tags
