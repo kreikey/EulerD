@@ -42,8 +42,6 @@ void main(string[] args) {
   }
 
   writeln(mostPrimes.length);
-
-  pns.popFront();
   sw.stop();
 
   writeln("The polynomial that generates the most primes is: ");
