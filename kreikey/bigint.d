@@ -107,6 +107,26 @@ private:
 		assert(c.toString() == "0");
 	}
 
+  BigInt incAbs() {
+    int carry;
+    int n;
+    
+    this[0] += 1;
+    n = this[0];
+
+    while (n > 9) {
+      n -= 10;
+    }
+
+
+    for (int i = 0; i < this.length; i++) {
+      if (this[i] > 9) {
+        this[i] -= 10;
+        carry = 1;
+      }
+    }
+  }
+
 	int cmpAbs(const BigInt rhs) const {
 		if (this.length < rhs.length)
 			return -1;
