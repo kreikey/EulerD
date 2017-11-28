@@ -7,7 +7,7 @@ import std.range;
 import std.conv;
 import std.math;
 import kreikey.primes;
-import kreikey.intmath;
+//import kreikey.intmath;
 
 bool delegate(int) isPrime;
 
@@ -85,12 +85,10 @@ bool delegate(int) isPrimeInit() {
       return false;
 
     if (number > p.front) {
-      foreach(z; p.until!(x => x >= number)) {
+      foreach(z; p.until!(x => x >= number)(No.openRight)) {
         savedPrimes[z] = pndx++;
         //savedPrimes ~= z;
       }
-      savedPrimes[p.front] = pndx++;
-      //savedPrimes ~= p.front;
     }
 
     if ((number in savedPrimes) !is null)
