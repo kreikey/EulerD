@@ -7,15 +7,24 @@ import std.string;
 import std.stdio;
 import std.math;
 import std.range;
+import std.traits;
+
+mixin template RvalueRef() {
+  alias T = typeof(this);
+  static assert (is(T == struct));
+
+  @nogc @safe
+  ref const(T) byRef() const pure nothrow return 
+  {
+    return this;
+  }
+}
 
 struct BigInt {
 private:
-	byte[] mant = [];		// Blank default initializer allows us to build numbers digit by digit.
+	byte[] mant = [0];
 	bool sign = false;
-
 	alias mant this;
-
-
 
 	BigInt addAbs(BigInt rhs) {
 		BigInt sum = BigInt();
@@ -107,24 +116,38 @@ private:
 		assert(c.toString() == "0");
 	}
 
-  BigInt incAbs() {
-    int carry;
-    int n;
+  void incAbs() {
+    int carry = 0;
     
     this[0] += 1;
-    n = this[0];
 
-    while (n > 9) {
-      n -= 10;
-    }
-
-
-    for (int i = 0; i < this.length; i++) {
-      if (this[i] > 9) {
-        this[i] -= 10;
+    foreach (ref n; this) {
+      n += carry;
+      if (n == 10) {
+        n = 0;
         carry = 1;
+      } else {
+        break;
       }
     }
+
+    if (carry == 1) {
+      this ~= 1;
+    }
+  }
+  unittest {
+    BigInt a = BigInt(0);
+    a.incAbs();
+    //writeln(a);
+    assert(a.toString() == "1");
+    a = BigInt(9);
+    a.incAbs();
+    //writeln(a);
+    assert(a.toString() == "10");
+    a = BigInt(999);
+    a.incAbs();
+    //writeln(a);
+    assert(a.toString() == "1000");
   }
 
 	int cmpAbs(const BigInt rhs) const {
@@ -171,6 +194,8 @@ private:
 		byte n;
 		ulong m;
 
+    //writefln("Karatsuba; lhs: %s, rhs: %s", this, rhs);
+
 		if (this.length < 2 || rhs.length < 2) {
 			if (this.length < rhs.length) {
 				pro.mant = rhs.dup;
@@ -184,6 +209,7 @@ private:
 		} 
 
 		m = this.length > rhs.length ? this.length / 2 : rhs.length / 2;
+    //writefln("m: %s", m);
 
 		// Split and handle out-of-bounds indices
 		highLeft = m >= this.length ? BigInt(0) : BigInt(this[m .. $]);
@@ -302,7 +328,7 @@ private:
 void divMod(BigInt rhs, ref BigInt quo, ref BigInt mod) {
 		BigInt acc;
 		BigInt divid;
-		byte[] quoMant;
+		//byte[] quoMant;
 		byte dig;
 		int littleEnd, bigEnd;
 
@@ -330,6 +356,9 @@ void divMod(BigInt rhs, ref BigInt quo, ref BigInt mod) {
 
 		divid = BigInt(this[littleEnd .. bigEnd]);
 		
+    // We're building up the quotient digit-by-digit, so the length of the mantissa must be 0
+    quo.length = 0;
+
 		do {
 			dig = 0;
 			acc = rhs;
@@ -387,6 +416,7 @@ public:
 			this.length = 1;
 	}
 	unittest {
+    //writeln("this(string source) unittest:");
 		BigInt num = BigInt("100");
 		assert(num.mant == [0, 0, 1]);
 		assert(num.sign == false);
@@ -418,6 +448,10 @@ public:
 		}
 	}
 	unittest {
+    //writeln("this(long source) unittest:");
+    BigInt q = BigInt(0);
+    assert(q.mant == [0]);
+
 		BigInt num = BigInt(100);
 		assert(num.mant == [0, 0, 1]);
 		assert(num.sign == false);
@@ -463,8 +497,26 @@ public:
 		this.mant = source;
 		this.length = source.length;
 	}
-	
+  unittest {
+    //writeln("this(byte[] source) unittest:");
+	  auto c = BigInt("68630377364883");
+    auto d = BigInt(c.mant);
+    BigInt e = c;
+    c[5] = 4;
+    assert(c.mant == d.mant);
+    assert(c.mant != e.mant);
+    assert(c.mant is d.mant);
+    assert(c.mant !is e.mant);
+    //writefln("c: %s, d: %s", c, d);
+    //writefln("c.mant is d.mant? %s", c.mant is d.mant);
+    //c[0] = 5;
+    //writefln("c: %s, e: %s", c, e);
+    //writefln("c.mant is e.mant? %s", c.mant is e.mant);
+    //writeln("end unittest");
+  }
+
 	this(this) {
+    //writefln("postblit called!");
 		mant = mant.dup;
 	}
 	unittest {
@@ -594,6 +646,8 @@ public:
 	}
 
 	BigInt mul(BigInt rhs) {
+    //writefln("multiply. lhs: %s rhs: %s", this, rhs);
+    //writefln("lhs is rhs? %s", this is rhs);
 		BigInt pro = this.karatsuba(rhs);
 
 		if (pro[$ - 1] == 0)
@@ -664,7 +718,9 @@ public:
 		auto g = BigInt(-8271);
 		auto h = BigInt(0);
 
-		auto z = a.div(b);
+		auto z = a.div(b);  // if we initialize to 0, this unittest fails. Why?
+    // bug fixed. DivMod builds up its mantissa digit by digit, so it's mantissa length
+    // must initially be 0. DivMod now sets it to 0 before building the mantissa.
 		//writeln(z);
 		assert(z.toString() == "39");
 		z = d.div(e);
@@ -719,32 +775,44 @@ public:
 		assert(z.toString() == "0");
 	}
 
-	BigInt pow(BigInt rhs) {
-		auto pow = BigInt();
-		// We need a way to *efficiently* increment a BigInt. It needs to work for positive and negative.
-		// We need to overload the increment and decrement operators. It needs to make no copies.
-		// Pre-increment and pre-decrement can satisfy this. Post needs to make a copy.
+	//BigInt pow(BigInt rhs) {
+		//auto pow = BigInt();
+		//// We need a way to *efficiently* increment a BigInt. It needs to work for positive and negative.
+		//// We need to overload the increment and decrement operators. It needs to make no copies.
+		//// Pre-increment and pre-decrement can satisfy this. Post needs to make a copy.
 
-		return pow;
+		//return pow;
+	//}
+
+	BigInt powFast(T)(T exp)
+  if (isIntegral!T || is(T == BigInt)) {
+    uint remainder = 0;
+
+    if (exp == 0) {
+      return BigInt(1);
+    } else if (exp == 1) {
+      return this;
+// If I make it fully generic like this, I need to provide an efficient divMod function that won't calculate divMod twice.
+    // I.e. I need to make divMod cache the result of the last operation and query whether we're using the same operands as last time.
+    } else {
+      remainder = exp % 2;
+      exp /= 2;
+      return powFast(exp + remainder) * powFast(exp);
+    }
 	}
-
-	BigInt pow(ulong rhs) {
-		BigInt product;
-		ulong counter = 1;
-
-		if (rhs == 0) {
-			product = BigInt(0);
-			return product;
-		}
-
-		product = this;
-
-		while (counter++ < rhs) {
-			product = this.mul(product);
-		}
-
-		return product;
-	}
+  unittest {
+    BigInt a = 2;
+    assert(a.toString() == "2");
+    BigInt b = 5;
+    assert(b.toString() == "5");
+    BigInt c = 3;
+    BigInt z = a.powFast(13);
+    assert(z.toString() == "8192");
+    z = b.powFast(13);
+    assert(z.toString() == "1220703125");
+    BigInt y = c.powFast(29);
+    assert(y.toString() == "68630377364883");
+  }
 
 
 /*	BigInt opSlice()(size_t start, size_t end) {
@@ -770,13 +838,13 @@ public:
 			return this.div(rhs);
 		else static if (op == "%")
 			return this.mod(rhs);
-		//else static if (op == "^^")
-			//return this.pow(rhs);
+    else static if (op == "^^")
+      return this.powFast(rhs);
 	}
 
 	BigInt opBinary(string op)(ulong rhs) {
 		static if (op == "^^") {
-			return this.pow(rhs);
+			return this.powFast(rhs);
 		}
 	}
 
@@ -858,6 +926,11 @@ public:
 		assert(h >= f);
 	}
 
+  void opAssign(T)(T rhs)
+  if (isIntegral!T) {
+    this = BigInt(rhs);
+  }
+
 	void opOpAssign(string op)(BigInt rhs) {
 		static if (op == "+")
 			this = this.add(rhs);
@@ -872,13 +945,15 @@ public:
 	}
 
 	string mantissa() @property const {
-    char[] mantcp = cast(char[])mant.dup; 
-    mantcp[] += '0';
-    std.algorithm.reverse(mantcp);
-    return mantcp.idup;
+    char[] mantissa = this.mant.map!(a => cast(char)(a + '0')).array();
+    std.algorithm.reverse(mantissa);
+    return cast(immutable)mantissa;
 	}
 	unittest {
-
+    auto a = BigInt(12345);
+    assert(a.mantissa == "12345");
+    a = BigInt(54321);
+    assert(a.mantissa == "54321");
 	}
 
   string toString() const {
@@ -901,6 +976,8 @@ public:
 		BigInt num2 = BigInt(-536);
 		assert(strip(num2.toString()) == "-536");
 	}
+
+  mixin RvalueRef;
 }
 
 
@@ -1016,4 +1093,9 @@ char[] toReverseCharArr(int[] iArr) {
 	char[] cArr = iArr.map!(n => cast(char)(n + '0')).array();
   std.algorithm.reverse(cArr);
 	return cArr;
+}
+
+BigInt printReturn(BigInt x) {
+  writefln("intermediate result: %s", x);
+  return x;
 }
