@@ -28,21 +28,17 @@ private:
 
 	BigInt addAbs(BigInt rhs) {
 		BigInt sum = BigInt();
-		int carry;
+		int carry = 0;
 
 		sum.length = this.length > rhs.length ? this.length : rhs.length;
-		sum[0 .. this.length] = this.dup;
+		sum[0 .. this.length] = this[];
 		sum[0 .. rhs.length] += rhs[];
-
-		foreach(ref n; sum) {
-			n += carry;
-			carry = n / 10;
-		}
+    sum[1 .. $] += sum[0 .. $-1] / 10;
+    carry = sum[$-1] / 10;
+		sum[] %= 10;
 
 		if (carry)
 			sum ~= 1;
-
-		sum[] %= 10;
 
 		return sum;
 	}
@@ -92,8 +88,9 @@ private:
 		ninesComp.length = this.length;
 		ninesComp[] = 9;
 		ninesComp[0 .. rhs.length] -= rhs[];
-		diff = this.addAbs(ninesComp);
-		diff = diff.addAbs(BigInt(1));
+		diff = this
+      .addAbs(ninesComp)
+      .incAbs();
 		do diff.length--;
 		while(diff[$ - 1] == 0 && diff.length > 1);
 
@@ -116,24 +113,26 @@ private:
 		assert(c.toString() == "0");
 	}
 
-  void incAbs() {
+  ref BigInt incAbs() {
     int carry = 0;
-    
+    //writeln(this); 
     this[0] += 1;
 
-    foreach (ref n; this) {
-      n += carry;
-      if (n == 10) {
-        n = 0;
+    foreach (ref d; this) {
+      d += carry;
+      if (d == 10) {
+        d = 0;
         carry = 1;
       } else {
+        carry = 0;
         break;
       }
     }
 
-    if (carry == 1) {
+    if (carry) {
       this ~= 1;
     }
+    return this;
   }
   unittest {
     BigInt a = BigInt(0);
@@ -149,6 +148,17 @@ private:
     //writeln(a);
     assert(a.toString() == "1000");
   }
+
+  //ref BigInt decAbs() {
+    //int borrow = 0;
+
+    //foreach (ref d; this) {
+      //d--;
+      //if (d) {
+        
+      //}
+    //}
+  //}
 
 	int cmpAbs(const BigInt rhs) const {
 		if (this.length < rhs.length)
@@ -183,7 +193,6 @@ private:
 	}
 
 	BigInt karatsuba(BigInt rhs) {
-		BigInt pro = BigInt();
 		BigInt lowLeft = BigInt();
 		BigInt highLeft = BigInt();
 		BigInt lowRight = BigInt();
@@ -194,22 +203,14 @@ private:
 		byte n;
 		ulong m;
 
-    //writefln("Karatsuba; lhs: %s, rhs: %s", this, rhs);
-
-		if (this.length < 2 || rhs.length < 2) {
-			if (this.length < rhs.length) {
-				pro.mant = rhs.dup;
-				n = this[0];
-			} else {
-				pro.mant = this.dup;
-				n = rhs[0];
-			}
-
-			return pro.mulSingleDigit(n);
-		} 
+    // Take care of base case where one or both operands are of length 1
+    if (this.length == 1) {
+      return rhs.mulSingleDigit(this[0]);
+    } else if (rhs.length == 1) {
+      return this.mulSingleDigit(rhs[0]);
+    }
 
 		m = this.length > rhs.length ? this.length / 2 : rhs.length / 2;
-    //writefln("m: %s", m);
 
 		// Split and handle out-of-bounds indices
 		highLeft = m >= this.length ? BigInt(0) : BigInt(this[m .. $]);
@@ -227,14 +228,12 @@ private:
 		z0 = lowLeft.karatsuba(lowRight);
 		z1 = lowLeft.addAbs(highLeft).karatsuba(lowRight.addAbs(highRight));
 
-		pro = z2.mulPow10(2 * m)
+		return z2.mulPow10(2 * m)
 				.addAbs(z1
 					.subAbs(z2)
 					.subAbs(z0)
 					.mulPow10(m))
 				.addAbs(z0);
-
-		return pro;
 	}
 
 	// Multiplies by a power of 10
@@ -566,6 +565,7 @@ public:
 		e = b.add(a);
 		assert(e.toString() == "2986");
 		e = a.add(d);
+    //writeln(e);
 		assert(e.toString() == "2510");
 		e = d.add(a);
 		assert(e.toString() == "2510");
@@ -699,6 +699,12 @@ public:
 		b = BigInt("40000000000000001");
 		c = a.mul(b);
 		assert(c.toString() == "1200000000000000030000000000000000");
+    a = BigInt(5);
+    b = BigInt(7);
+    c = a.mul(b);
+    assert(c.toString() == "35");
+    c = b.mul(a);
+    assert(c.toString() == "35");
 	}
 
 	BigInt div(BigInt rhs) {
@@ -788,17 +794,19 @@ public:
   if (isIntegral!T || is(T == BigInt)) {
     uint remainder = 0;
 
-    if (exp == 0) {
+    if (exp < 0) {
+      throw new Exception("It's an integer library, not a fraction or floating point library. No negative exponents allowed!");
+    } else if (exp == 0) {
       return BigInt(1);
     } else if (exp == 1) {
       return this;
 // If I make it fully generic like this, I need to provide an efficient divMod function that won't calculate divMod twice.
     // I.e. I need to make divMod cache the result of the last operation and query whether we're using the same operands as last time.
-    } else {
-      remainder = exp % 2;
-      exp /= 2;
-      return powFast(exp + remainder) * powFast(exp);
     }
+
+    remainder = exp % 2;
+    exp /= 2;
+    return powFast(exp + remainder) * powFast(exp);
 	}
   unittest {
     BigInt a = 2;
@@ -812,6 +820,9 @@ public:
     assert(z.toString() == "1220703125");
     BigInt y = c.powFast(29);
     assert(y.toString() == "68630377364883");
+    BigInt e = 13;
+    assert(e.powFast(11).toString() == "1792160394037");
+    assert(e.powFast(14).toString() == "3937376385699289");
   }
 
 
@@ -1095,7 +1106,4 @@ char[] toReverseCharArr(int[] iArr) {
 	return cArr;
 }
 
-BigInt printReturn(BigInt x) {
-  writefln("intermediate result: %s", x);
-  return x;
-}
+

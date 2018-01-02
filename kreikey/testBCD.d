@@ -10,6 +10,9 @@ void main() {
   BigInt n = 3;
   auto q = n ^^ 29;
   writeln(q);
+  writeln(n);
+  n.powFast(29);
+  writeln(n);
 
   assert(q.toString == "68630377364883");
   //BigInt a = 81;
