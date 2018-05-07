@@ -149,16 +149,50 @@ private:
     assert(a.toString() == "1000");
   }
 
-  //ref BigInt decAbs() {
-    //int borrow = 0;
+  ref BigInt decAbs() {
+    bool borrow = false;
 
-    //foreach (ref d; this) {
-      //d--;
-      //if (d) {
-        
-      //}
-    //}
-  //}
+    if (this.cmpAbs(BigInt(1)) < 0)
+        throw new Exception("can't call decAbs() on a number whose absolute value is less than 1");
+
+    ulong i = 0;
+
+    do {
+      if (this[i] > 0) {
+        this[i]--;
+        borrow = false;
+      } else {
+        this[i] = 9;
+        borrow = true;
+      }
+      i++;
+    } while (borrow);
+
+    if (this[$ - 1] == 0 && this.length > 1)
+      this.length--;
+
+    return this;
+  }
+  unittest {
+    BigInt a = BigInt(2);
+    a.decAbs();
+    assert(a.toString() == "1");
+    a.decAbs();
+    assert(a.toString() == "0");
+    BigInt b = BigInt(1000);
+    b.decAbs();
+    assert(b.toString() == "999");
+    b.decAbs();
+    assert(b.toString() == "998");
+    BigInt c = BigInt(11);
+    c.decAbs();
+    assert(c.toString() == "10");
+    c.decAbs();
+    assert(c.toString() == "9");
+    BigInt d = BigInt(-7);
+    d.decAbs();
+    assert(d.toString() == "-6");
+  }
 
 	int cmpAbs(const BigInt rhs) const {
 		if (this.length < rhs.length)
@@ -645,6 +679,82 @@ public:
 		assert(e.toString() == "-655");	
 	}
 
+  ref BigInt inc() {
+    if (this.sign) {
+      this.decAbs();
+    } else {
+      this.incAbs();
+    }
+
+    if (this[$ - 1] == 0)
+      this.sign = false;
+
+    return this;
+  }
+  unittest {
+    BigInt a = BigInt(555);
+    a.inc();
+    assert(a.toString() == "556");
+    BigInt b = BigInt(999);
+    b.inc();
+    assert(b.toString() == "1000");
+    BigInt c = BigInt(-10);
+    c.inc();
+    assert(c.toString() == "-9");
+    BigInt d = BigInt(-1);
+    d.inc();
+    assert(d.toString() == "0");
+    d.inc();
+    assert(d.toString() == "1");
+    d.inc();
+    assert(d.toString() == "2");
+    BigInt e = BigInt(-1000);
+    e.inc();
+    assert(e.toString() == "-999");
+    BigInt f = BigInt(9);
+    f.inc();
+    assert(f.toString() == "10");
+  }
+
+  ref BigInt dec() {
+    if (this.sign) {
+      this.incAbs();
+    } else if (this[$ - 1] == 0) {
+      this.incAbs();
+      this.sign = true;
+    } else {
+      this.decAbs();
+    }
+
+    if (this[$ - 1] == 0)
+      this.sign = false;
+
+    return this;
+  }
+  unittest {
+    BigInt a = BigInt(2);
+    a.dec();
+    assert(a.toString() == "1");
+    a.dec();
+    assert(a.toString() == "0");
+    a.dec();
+    assert(a.toString() == "-1");
+    a.dec();
+    assert(a.toString() == "-2");
+    BigInt b = BigInt(-9);
+    b.dec();
+    assert(b.toString() == "-10");
+    BigInt c = BigInt(10);
+    c.dec();
+    assert(c.toString() == "9");
+    BigInt d = BigInt(1000);
+    d.dec();
+    assert(d.toString() == "999");
+    BigInt e = BigInt(-999);
+    e.dec();
+    assert(e.toString() == "-1000");
+  }
+
 	BigInt mul(BigInt rhs) {
     //writefln("multiply. lhs: %s rhs: %s", this, rhs);
     //writefln("lhs is rhs? %s", this is rhs);
@@ -792,7 +902,7 @@ public:
 
 	BigInt powFast(T)(T exp)
   if (isIntegral!T || is(T == BigInt)) {
-    uint remainder = 0;
+    T remainder = 0;
 
     if (exp < 0) {
       throw new Exception("It's an integer library, not a fraction or floating point library. No negative exponents allowed!");
@@ -838,26 +948,104 @@ public:
 		return this.mant.length;
 	}
 */
-	BigInt opBinary(string op)(BigInt rhs) {
-		static if (op == "+")
-			return this.add(rhs);
-		else static if (op == "-")
-			return this.sub(rhs);
-		else static if (op == "*")
-			return this.mul(rhs);
-		else static if (op == "/")
-			return this.div(rhs);
-		else static if (op == "%")
-			return this.mod(rhs);
+
+  BigInt opUnary(string op)() {
+    static if (op == "++")
+      return this.inc();
+    else static if (op == "--")
+      return this.dec();
+  }
+  unittest {
+    BigInt a = BigInt(-2);
+    ++a;
+    assert(a.toString() == "-1");
+    a++;
+    assert((a++).toString() == "0");
+    assert(a.toString() == "1");
+    a++;
+    assert(a.toString() == "2");
+    assert((--a).toString() == "1");
+    a--;
+    assert(a.toString() == "0");
+    --a;
+    assert(a.toString() == "-1");
+    a--;
+    assert(a.toString() == "-2");
+    BigInt b = BigInt(9);
+    b++;
+    assert(b.toString() == "10");
+    assert((--b).toString() == "9");
+    assert((b--).toString() == "9");
+    assert(b.toString() == "8");
+    b++;
+    assert((++b).toString() == "10");
+    BigInt c = BigInt(-9);
+    assert((--c).toString() == "-10");
+    c++;
+    assert(c.toString() == "-9");
+  }
+
+  BigInt opBinary(string op, T)(T rhs)
+  if (isIntegral!T) {
+    static if (op == "^^")
+      return this.powFast(rhs);
+    else
+      return opBinary!op(BigInt(rhs));
+  }
+
+  //BigInt opBinary(string op)(T rhs)
+  //if (isIntegral!T) {
+  //}
+
+  BigInt opBinary(string op)(BigInt rhs) {
+    static if (op == "+")
+      return this.add(rhs);
+    else static if (op == "-")
+      return this.sub(rhs);
+    else static if (op == "*")
+      return this.mul(rhs);
+    else static if (op == "/")
+      return this.div(rhs);
+    else static if (op == "%")
+      return this.mod(rhs);
     else static if (op == "^^")
       return this.powFast(rhs);
-	}
+  }
 
-	BigInt opBinary(string op)(ulong rhs) {
-		static if (op == "^^") {
-			return this.powFast(rhs);
-		}
-	}
+	//BigInt opBinary(string op)(ulong rhs) {
+		//static if (op == "^^") {
+			//return this.powFast(rhs);
+		//}
+	//}
+
+    //static if (is(T == BigInt)) {
+      //static if (op == "+")
+        //return this.add(rhs);
+      //else static if (op == "-")
+        //return this.sub(rhs);
+      //else static if (op == "*")
+        //return this.mul(rhs);
+      //else static if (op == "/")
+        //return this.div(rhs);
+      //else static if (op == "%")
+        //return this.mod(rhs);
+    //} else {
+      //static if (op == "+")
+        //return this.add(BigInt(rhs));
+      //else static if (op == "-")
+        //return this.sub(BigInt(rhs));
+      //else static if (op == "*")
+        //return this.mul(BigInt(rhs));
+      //else static if (op == "/")
+        //return this.div(BigInt(rhs));
+      //else static if (op == "%")
+        //return this.mod(BigInt(rhs));
+    //}
+
+  bool opEquals(T)(T rhs) 
+  if (isIntegral!T) {
+    return opEquals((BigInt(rhs)).byRef());
+  }
 
 	bool opEquals()(auto ref const BigInt rhs) const {
 		if (this.mant == [0] && rhs.mant == [0]) {
@@ -893,6 +1081,11 @@ public:
 		assert(e == g);
 		assert(d == h);
 	}
+
+  int opCmp(T)(T rhs) const
+  if (isIntegral!T) {
+    return this.opCmp((BigInt(rhs)).byRef());
+  }
 
 	int opCmp(ref const BigInt rhs) const {
 		int res;
@@ -942,17 +1135,38 @@ public:
     this = BigInt(rhs);
   }
 
-	void opOpAssign(string op)(BigInt rhs) {
-		static if (op == "+")
-			this = this.add(rhs);
-		else static if (op == "-")
-			this = this.sub(rhs);
-		else static if (op == "*")
-			this = this.mul(rhs);
-		else static if (op == "/")
-			this = this.div(rhs);
-		else static if (op == "%")
-			this = this.mod(rhs);
+  //void opOpAssign(string op, T)(T rhs)
+  //if (isIntegral!T) {
+    //BigInt value = BigInt(rhs);
+    //opOpAssign!op(value);
+  //}
+  
+	void opOpAssign(string op, T)(T rhs)
+  if (is(T == BigInt) /* || isIntegral!T */ ) {
+    //static if (is(T == BigInt)) {
+      static if (op == "+")
+        this = this.add(rhs);
+      else static if (op == "-")
+        this = this.sub(rhs);
+      else static if (op == "*")
+        this = this.mul(rhs);
+      else static if (op == "/")
+        this = this.div(rhs);
+      else static if (op == "%")
+        this = this.mod(rhs);
+    //} else {
+      //BigInt val = BigInt(rhs);
+      //static if (op == "+")
+        //this = this.add(val);
+      //else static if (op == "-")
+        //this = this.sub(val);
+      //else static if (op == "*")
+        //this = this.mul(val);
+      //else static if (op == "/")
+        //this = this.div(val);
+      //else static if (op == "%")
+        //this = this.mod(val);
+    //}
 	}
 
 	string mantissa() @property const {
@@ -982,10 +1196,10 @@ public:
 	}	
 	unittest {
 		BigInt num = BigInt(321);
-		assert(strip(num.toString()) == "321");
+		assert(num.toString() == "321");
 
 		BigInt num2 = BigInt(-536);
-		assert(strip(num2.toString()) == "-536");
+		assert(num2.toString() == "-536");
 	}
 
   mixin RvalueRef;
