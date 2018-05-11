@@ -8,15 +8,16 @@ import core.memory;
 
 void main() {
   BigInt n = 3;
+  writeln(n);
   auto q = n ^^ 29;
   writeln(q);
-  writeln(n);
-  n.powFast(29);
-  writeln(n);
 
   assert(q.toString == "68630377364883");
-  //BigInt a = 81;
-  //BigInt b = 81;
-  //writeln(a * b);
+  BigInt m = 29;
+  q = n ^^ m;
+  assert(q.toString() == "68630377364883");
+  BigInt a = 81;
+  BigInt b = 81;
+  writeln(a * b);
 }
 
