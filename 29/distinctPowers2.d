@@ -16,23 +16,19 @@ void main(string[] args) {
 
   writeln("distinct powers");
 
-  BigInt[][] powersMatrix;
-  BigInt[] row;
-  BigInt res;
-
   sw.start();
 
-  foreach(base; 2 .. n + 1) {
-    row = [];
-    foreach(exponent; 2 .. n + 1) {
-      res = BigInt(base) ^^ exponent;
-      row ~= res;
-    }
-    powersMatrix ~= row;
-  }
-
-  powersMatrix.multiwayUnion.count.writeln();
+  iota(2, n + 1)
+    .map!(a => iota(2, n + 1)
+        .map!(b => BigInt(a) ^^ b)
+        .array())
+    .array
+    .multiwayUnion
+    .count
+    .writeln();
 
   sw.stop();
+
   writefln("finished in %s milliseconds", sw.peek.total!"msecs"());
 }
+
