@@ -19,5 +19,6 @@ void main() {
   BigInt a = 81;
   BigInt b = 81;
   writeln(a * b);
+  writeln(++(a * b));
 }
 

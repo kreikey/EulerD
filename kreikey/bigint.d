@@ -78,6 +78,63 @@ private:
 		assert(c.toString() == "10");
 	}
 
+  static byte[] addAbs2(byte[] left, byte[] right) {
+    byte[] sum;
+    int i = 0;
+
+    byte[] shorter;
+    byte[] longer;
+
+    if (left.length < right.length) {
+      shorter = left;
+      longer = right;
+    } else {
+      shorter = right;
+      longer = left;
+    }
+
+    ulong len = longer.length;
+    byte carry = '\0';
+
+    sum.reserve(len + 1);
+    
+    do {
+      sum ~= cast(byte)(shorter[i] + longer[i] + carry);
+      if (sum[i] > 9) {
+        carry = 1;
+        sum[i] -= 10;
+      } else {
+        carry = 0;
+      }
+    } while (++i < shorter.length);
+
+    while (i < longer.length) {
+      sum ~= cast(byte)(longer[i] + carry);
+      if (sum[i] > 9) {
+        carry = 1;
+        sum[i] -= 10;
+      } else {
+        carry = 0;
+      }
+      i++;
+    }
+
+    if (carry) {
+      sum ~= carry;
+    }
+
+    return sum;
+  }
+  unittest {
+    byte[] s = addAbs2([1, 3, 8, 2, 9], [4, 7, 3, 2]);
+    //writeln(s);
+    assert(s == [5, 0, 2, 5, 9]);
+    s = addAbs2([1, 3, 8, 2, 9], [4, 7, 3, 2]);
+    s = addAbs2([1, 3, 8, 2, 9], [4, 7, 3, 2, 7]);
+    //writeln(s);
+    assert(s == [5, 0, 2, 5, 6, 1]);
+  }
+
 	BigInt subAbs(BigInt rhs) {
 		BigInt diff = BigInt();
 		BigInt ninesComp = BigInt();
@@ -112,6 +169,18 @@ private:
 		c = a.subAbs(b);
 		assert(c.toString() == "0");
 	}
+
+  static byte[] subAbs2(byte[] left, byte[] right) {
+    byte[] diff;
+    int i = 0;
+
+		if (cmpAbs2(left, right) < 0)
+			throw new Exception("Subtrahend of absolute subtraction is greater than minuend");
+
+
+
+    return diff;
+  }
 
   ref BigInt incAbs() {
     int carry = 0;
@@ -224,6 +293,38 @@ private:
 		assert(b.cmpAbs(e) == 0);
 		assert(c.cmpAbs(f) > 0);
 		assert(f.cmpAbs(c) < 0);
+	}
+
+  static int cmpAbs2(byte[] left, byte[] right) {
+    if (left.length < right.length)
+      return -1;
+    else if (left.length > right.length)
+      return 1;
+
+    foreach (a, b; lockstep(left, right))
+      if (a < b)
+        return -1;
+      else if (a > b)
+        return 1;
+
+    return 0;
+  }
+	unittest{
+		byte[] a = [2, 3, 4];
+		byte[] b = [9, 6, 9];
+		byte[] c = [1, 2, 9, 3];
+		byte[] d = [4, 5];
+		byte[] e = [9, 6, 9];
+		byte[] f = [1, 1, 9, 9];
+
+		assert(cmpAbs2(a, b) < 0);
+		assert(cmpAbs2(b, a) > 0);
+		assert(cmpAbs2(c, d) > 0);
+		assert(cmpAbs2(d, c) < 0);
+		assert(cmpAbs2(c, d) > 0);
+		assert(cmpAbs2(b, e) == 0);
+		assert(cmpAbs2(c, f) > 0);
+		assert(cmpAbs2(f, c) < 0);
 	}
 
 	BigInt karatsuba(BigInt rhs) {
@@ -928,29 +1029,7 @@ public:
 		assert(z.toString() == "0");
 	}
 
-	//BigInt pow(BigInt rhs) {
-		//auto pow = BigInt();
-		//// We need a way to *efficiently* increment a BigInt. It needs to work for positive and negative.
-		//// We need to overload the increment and decrement operators. It needs to make no copies.
-		//// Pre-increment and pre-decrement can satisfy this. Post needs to make a copy.
-
-		//return pow;
-	//}
-
-/*	BigInt opSlice()(size_t start, size_t end) {
-		BigInt slice = this;
-		slice.mant = this.mant[start .. end];
-		writeln("yup, we called opSlice.");
-		return slice;
-	}
-
-	ulong opDollar()() {
-		writeln("yup, we called opDollar.");
-		return this.mant.length;
-	}
-*/
-
-  BigInt opUnary(string op)() {
+  ref BigInt opUnary(string op)() {
     static if (op == "++")
       return this.inc();
     else static if (op == "--")
@@ -994,10 +1073,6 @@ public:
       return opBinary!op(BigInt(rhs));
   }
 
-  //BigInt opBinary(string op)(T rhs)
-  //if (isIntegral!T) {
-  //}
-
   BigInt opBinary(string op)(BigInt rhs) {
     static if (op == "+")
       return this.add(rhs);
@@ -1012,36 +1087,6 @@ public:
     else static if (op == "^^")
       return this.powFast(rhs);
   }
-
-	//BigInt opBinary(string op)(ulong rhs) {
-		//static if (op == "^^") {
-			//return this.powFast(rhs);
-		//}
-	//}
-
-    //static if (is(T == BigInt)) {
-      //static if (op == "+")
-        //return this.add(rhs);
-      //else static if (op == "-")
-        //return this.sub(rhs);
-      //else static if (op == "*")
-        //return this.mul(rhs);
-      //else static if (op == "/")
-        //return this.div(rhs);
-      //else static if (op == "%")
-        //return this.mod(rhs);
-    //} else {
-      //static if (op == "+")
-        //return this.add(BigInt(rhs));
-      //else static if (op == "-")
-        //return this.sub(BigInt(rhs));
-      //else static if (op == "*")
-        //return this.mul(BigInt(rhs));
-      //else static if (op == "/")
-        //return this.div(BigInt(rhs));
-      //else static if (op == "%")
-        //return this.mod(BigInt(rhs));
-    //}
 
   bool opEquals(T)(T rhs) 
   if (isIntegral!T) {
@@ -1143,8 +1188,7 @@ public:
   }
   
 	void opOpAssign(string op, T)(T rhs)
-  if (is(T == BigInt) /* || isIntegral!T */ ) {
-    //static if (is(T == BigInt)) {
+  if (is(T == BigInt)) {
       static if (op == "+")
         this = this.add(rhs);
       else static if (op == "-")
@@ -1155,19 +1199,6 @@ public:
         this = this.div(rhs);
       else static if (op == "%")
         this = this.mod(rhs);
-    //} else {
-      //BigInt val = BigInt(rhs);
-      //static if (op == "+")
-        //this = this.add(val);
-      //else static if (op == "-")
-        //this = this.sub(val);
-      //else static if (op == "*")
-        //this = this.mul(val);
-      //else static if (op == "/")
-        //this = this.div(val);
-      //else static if (op == "%")
-        //this = this.mod(val);
-    //}
 	}
 
 	string mantissa() @property const {
