@@ -78,38 +78,30 @@ private:
 		assert(c.toString() == "10");
 	}
 
-  static byte[] addAbs2(byte[] left, byte[] right) {
+  static byte[] addAbs2(byte[] big, byte[] little) {
+    // TODO: assume left is bigger than right and take care of left/right comparison in the calling function.
+    // Make the code smaller and more orthogonal. Also rename parameters to reflect this fact.
     byte[] sum;
     int i = 0;
+    byte carry = 0;
 
-    byte[] shorter;
-    byte[] longer;
+    if (cmpAbs2(big, little) < 0)
+      throw new Exception("the left operand needs to be bigger than the right operand");
 
-    if (left.length < right.length) {
-      shorter = left;
-      longer = right;
-    } else {
-      shorter = right;
-      longer = left;
-    }
-
-    ulong len = longer.length;
-    byte carry = '\0';
-
-    sum.reserve(len + 1);
+    sum.reserve(big.length + 1);
     
     do {
-      sum ~= cast(byte)(shorter[i] + longer[i] + carry);
+      sum ~= cast(byte)(little[i] + big[i] + carry);
       if (sum[i] > 9) {
         carry = 1;
         sum[i] -= 10;
       } else {
         carry = 0;
       }
-    } while (++i < shorter.length);
+    } while (++i < little.length);
 
-    while (i < longer.length) {
-      sum ~= cast(byte)(longer[i] + carry);
+    while (i < big.length) {
+      sum ~= cast(byte)(big[i] + carry);
       if (sum[i] > 9) {
         carry = 1;
         sum[i] -= 10;
@@ -130,7 +122,7 @@ private:
     //writeln(s);
     assert(s == [5, 0, 2, 5, 9]);
     s = addAbs2([1, 3, 8, 2, 9], [4, 7, 3, 2]);
-    s = addAbs2([1, 3, 8, 2, 9], [4, 7, 3, 2, 7]);
+    s = addAbs2([4, 7, 3, 2, 7], [1, 3, 8, 2, 9]);
     //writeln(s);
     assert(s == [5, 0, 2, 5, 6, 1]);
   }
@@ -139,8 +131,8 @@ private:
 		BigInt diff = BigInt();
 		BigInt ninesComp = BigInt();
 
-		if (this.cmpAbs(rhs) < 0)
-			throw new Exception("Subtrahend of absolute subtraction is greater than minuend");
+		//if (this.cmpAbs(rhs) < 0)
+			//throw new Exception("Subtrahend of absolute subtraction is greater than minuend");
 
 		ninesComp.mant.length = this.mant.length;
 		ninesComp.mant[] = 9;
@@ -170,16 +162,53 @@ private:
 		assert(c.toString() == "0");
 	}
 
-  static byte[] subAbs2(byte[] left, byte[] right) {
+  static byte[] subAbs2(byte[] big, byte[] little) {
     byte[] diff;
-    int i = 0;
+    byte borrow = 0;
+    byte i = 0;
 
-		if (cmpAbs2(left, right) < 0)
-			throw new Exception("Subtrahend of absolute subtraction is greater than minuend");
+		//if (cmpAbs2(big, little) < 0)
+			//throw new Exception("Subtrahend of absolute subtraction is greater than minuend");
 
+    diff.reserve(big.length);
 
+    do {
+      diff ~= cast(byte)(big[i] - little[i] - borrow);
+      if (diff[i] < 0) {
+        diff[i] += 10;
+        borrow = 1;
+      } else {
+        borrow = 0;
+      }
+    } while(++i < little.length);
+
+    while(i < big.length) {
+      diff ~= cast(byte)(big[i] - borrow);
+      if (diff[i] < 0) {
+        diff[i] += 10;
+        borrow = 1;
+      } else {
+        borrow = 0;
+      }
+      i++;
+    }
+
+    while (diff[$-1] == 0 && diff.length > 1)
+      diff.length--;
 
     return diff;
+  }
+  unittest {
+    byte[] a = [0, 0, 1];
+    byte[] b = [1, 1];
+
+    assert(subAbs2(a, b) == [9, 8]);
+    a = [1];
+    b = [1];
+    assert(subAbs2(a, b) == [0]);
+    a = [0, 0, 1];
+    b = [9, 9];
+    assert(subAbs2(a, b) == [1]);
   }
 
   ref BigInt incAbs() {
