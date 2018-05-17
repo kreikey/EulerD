@@ -85,8 +85,8 @@ private:
     int i = 0;
     byte carry = 0;
 
-    if (cmpAbs2(big, little) < 0)
-      throw new Exception("the left operand needs to be bigger than the right operand");
+    //if (cmpAbs2(big, little) < 0)
+      //throw new Exception("the left operand needs to be bigger than the right operand");
 
     sum.reserve(big.length + 1);
     
@@ -730,20 +730,21 @@ public:
 	}
 
   BigInt add(BigInt rhs) {
-		BigInt sum = BigInt();
+		BigInt sum;
+
+    int cmpRes = cmpAbs2(this.mant, rhs.mant);
+    byte[] big = cmpRes < 0 ? rhs.mant : lhs.mant;
+    byte[] little = cmpRes >= 0 ? rhs.mant : lhs.mant;
 
 		if (this.sign == rhs.sign) {
-			sum = this.addAbs(rhs);
+			sum.mant = addAbs2(this.mant, rhs.mant);
 			sum.sign = this.sign;
-		} else {
-			if (this.cmpAbs(rhs) > 0) {
-				sum = this.subAbs(rhs);
+		} else
+      sum.mant = subAbs2(this.mant, rhs.mant);
+			if (cmpAbs2(this.mant, rhs.mant) > 0)
 				sum.sign = this.sign;
-			} else if (this.cmpAbs(rhs) < 0) {
-				sum = rhs.subAbs(this);
+			else if (cmpAbs2(this.mant, rhs.mant) < 0)
 				sum.sign = rhs.sign;
-			}
-		}
 
 		if (sum.mant[$ - 1] == 0)
 			sum.sign = false;
