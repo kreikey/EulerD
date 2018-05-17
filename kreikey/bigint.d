@@ -43,7 +43,6 @@ private:
 		return sum;
 	}
 	unittest {
-
 		BigInt a = BigInt(947436711);
 		BigInt b = BigInt(3245879);		
 		BigInt c = BigInt();
@@ -79,8 +78,6 @@ private:
 	}
 
   static byte[] addAbs2(byte[] big, byte[] little) {
-    // TODO: assume left is bigger than right and take care of left/right comparison in the calling function.
-    // Make the code smaller and more orthogonal. Also rename parameters to reflect this fact.
     byte[] sum;
     int i = 0;
     byte carry = 0;
@@ -122,7 +119,7 @@ private:
     //writeln(s);
     assert(s == [5, 0, 2, 5, 9]);
     s = addAbs2([1, 3, 8, 2, 9], [4, 7, 3, 2]);
-    s = addAbs2([4, 7, 3, 2, 7], [1, 3, 8, 2, 9]);
+    s = addAbs2([1, 3, 8, 2, 9], [4, 7, 3, 2, 7]);
     //writeln(s);
     assert(s == [5, 0, 2, 5, 6, 1]);
   }
@@ -330,7 +327,7 @@ private:
     else if (left.length > right.length)
       return 1;
 
-    foreach (a, b; lockstep(left, right))
+    foreach (a, b; lockstep(left.retro(), right.retro()))
       if (a < b)
         return -1;
       else if (a > b)
@@ -352,8 +349,8 @@ private:
 		assert(cmpAbs2(d, c) < 0);
 		assert(cmpAbs2(c, d) > 0);
 		assert(cmpAbs2(b, e) == 0);
-		assert(cmpAbs2(c, f) > 0);
-		assert(cmpAbs2(f, c) < 0);
+		assert(cmpAbs2(c, f) < 0);
+		assert(cmpAbs2(f, c) > 0);
 	}
 
 	BigInt karatsuba(BigInt rhs) {
@@ -733,17 +730,17 @@ public:
 		BigInt sum;
 
     int cmpRes = cmpAbs2(this.mant, rhs.mant);
-    byte[] big = cmpRes < 0 ? rhs.mant : lhs.mant;
-    byte[] little = cmpRes >= 0 ? rhs.mant : lhs.mant;
+    byte[] big = cmpRes < 0 ? rhs.mant : this.mant;
+    byte[] little = cmpRes >= 0 ? rhs.mant : this.mant;
 
 		if (this.sign == rhs.sign) {
-			sum.mant = addAbs2(this.mant, rhs.mant);
+			sum.mant = addAbs2(big, little);
 			sum.sign = this.sign;
 		} else
-      sum.mant = subAbs2(this.mant, rhs.mant);
-			if (cmpAbs2(this.mant, rhs.mant) > 0)
+      sum.mant = subAbs2(big, little);
+			if (cmpRes > 0)
 				sum.sign = this.sign;
-			else if (cmpAbs2(this.mant, rhs.mant) < 0)
+			else if (cmpRes < 0)
 				sum.sign = rhs.sign;
 
 		if (sum.mant[$ - 1] == 0)
