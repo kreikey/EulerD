@@ -736,12 +736,10 @@ public:
 		if (this.sign == rhs.sign) {
 			sum.mant = addAbs2(big, little);
 			sum.sign = this.sign;
-		} else
+		} else {
       sum.mant = subAbs2(big, little);
-			if (cmpRes > 0)
-				sum.sign = this.sign;
-			else if (cmpRes < 0)
-				sum.sign = rhs.sign;
+      sum.sign = cmpRes > 0 ? this.sign : rhs.sign;
+    }
 
 		if (sum.mant[$ - 1] == 0)
 			sum.sign = false;
@@ -789,16 +787,15 @@ public:
 	BigInt sub(BigInt rhs) {
 		BigInt diff = BigInt();
 
+    int cmpRes = cmpAbs2(this.mant, rhs.mant);
+    byte[] big = cmpRes < 0 ? rhs.mant : this.mant;
+    byte[] little = cmpRes >= 0 ? rhs.mant : this.mant;
+
 		if (this.sign == rhs.sign) {
-			if (this.cmpAbs(rhs) > 0) {
-				diff = this.subAbs(rhs);
-				diff.sign = this.sign;
-			} else if (this.cmpAbs(rhs) < 0) {
-				diff = rhs.subAbs(this);
-				diff.sign = !this.sign;
-			}
+      diff.mant = subAbs2(big, little);
+      diff.sign = cmpRes > 0 ? this.sign : !this.sign;
 		} else {
-			diff = this.addAbs(rhs);
+			diff.mant = addAbs2(big, little);
 			diff.sign = this.sign;
 		}
 	
