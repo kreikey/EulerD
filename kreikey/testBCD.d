@@ -20,5 +20,8 @@ void main() {
   BigInt b = 81;
   writeln(a * b);
   writeln(++(a * b));
+  byte[] somedigs = [1, 2, 3, 4, 5];
+  //writeln(somedigs.toString());
+  writeln(somedigs);
 }
 

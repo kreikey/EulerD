@@ -42,40 +42,40 @@ private:
 
 		return sum;
 	}
-	//unittest {
-		//BigInt a = BigInt(947436711);
-		//BigInt b = BigInt(3245879);		
-		//BigInt c = BigInt();
+  unittest {
+    BigInt a = BigInt(947436711);
+    BigInt b = BigInt(3245879);		
+    BigInt c = BigInt();
 
-		//c = a.addAbs(b);
-		//assert(c.toString() == "950682590");
-		//c = b.addAbs(a);
-		//assert(c.toString() == "950682590");
-		//BigInt d = BigInt(999);
-		//BigInt e = BigInt(1);
-		//c = d.addAbs(e);
-		//assert(c.toString() == "1000");
-		//c = e.addAbs(d);
-		//assert(c.toString() == "1000");
-		//a = BigInt(1);
-		//b = BigInt(1);
-		//c = a.addAbs(b);
-		//assert(c.toString() == "2");
-		//a = BigInt(0);
-		//b = BigInt(0);
-		//assert(a.mant == [0]);
-		//assert(b.mant == [0]);
-		//c = a.addAbs(b);
-		//assert(c.toString() == "0");
-		//a = BigInt(0);
-		//b = BigInt(1);
-		//c = a.addAbs(b);
-		//assert(c.toString() == "1");
-		//a = BigInt(9);
-		//b = BigInt(1);
-		//c = a.addAbs(b);
-		//assert(c.toString() == "10");
-	//}
+    c = a.addAbsOld(b);
+    assert(c.toString() == "950682590");
+    c = b.addAbsOld(a);
+    assert(c.toString() == "950682590");
+    BigInt d = BigInt(999);
+    BigInt e = BigInt(1);
+    c = d.addAbsOld(e);
+    assert(c.toString() == "1000");
+    c = e.addAbsOld(d);
+    assert(c.toString() == "1000");
+    a = BigInt(1);
+    b = BigInt(1);
+    c = a.addAbsOld(b);
+    assert(c.toString() == "2");
+    a = BigInt(0);
+    b = BigInt(0);
+    assert(a.mant == [0]);
+    assert(b.mant == [0]);
+    c = a.addAbsOld(b);
+    assert(c.toString() == "0");
+    a = BigInt(0);
+    b = BigInt(1);
+    c = a.addAbsOld(b);
+    assert(c.toString() == "1");
+    a = BigInt(9);
+    b = BigInt(1);
+    c = a.addAbsOld(b);
+    assert(c.toString() == "10");
+  }
 
   static byte[] addAbs(byte[] big, byte[] little) {
     byte[] sum;
@@ -147,15 +147,15 @@ private:
 		BigInt b = BigInt(3245879);
 		BigInt a = BigInt(950682590);
 
-		c = a.subAbs(b);
+		c = a.subAbsOld(b);
 		assert(c.toString() == "947436711");
 		a = BigInt(20);
 		b = BigInt(20);
-		c = a.subAbs(b);
+		c = a.subAbsOld(b);
 		assert(c.toString() == "0");
 		a = BigInt(0);
 		b = BigInt(0);
-		c = a.subAbs(b);
+		c = a.subAbsOld(b);
 		assert(c.toString() == "0");
 	}
 
@@ -374,46 +374,41 @@ private:
 		m = lhs.length > rhs.length ? lhs.length / 2 : rhs.length / 2;
 
 		// Split and handle out-of-bounds indices
-		highLeft = m >= lhs.length ? [0] : lhs[m .. $];
+		highLeft = m >= lhs.length ? cast(byte[])[0] : lhs[m .. $];
 		lowLeft = m >= lhs.length ? lhs : lhs[0 .. m];
-		highRight = m >= rhs.length ? [0] : rhs[m .. $];
+		highRight = m >= rhs.length ? cast(byte[])[0] : rhs[m .. $];
 		lowRight = m >= rhs.length ? rhs : rhs[0 .. m];
 
 		// Handle leading zeros
-		while (lowLeft.mant[$ - 1] == 0 && lowLeft.mant.length > 1)
-			lowLeft.mant.length--;
-		while(lowRight.mant[$ - 1] == 0 && lowRight.mant.length > 1)
-			lowRight.mant.length--;
+		while (lowLeft[$ - 1] == 0 && lowLeft.length > 1)
+			lowLeft.length--;
+		while(lowRight[$ - 1] == 0 && lowRight.length > 1)
+			lowRight.length--;
 
-		z2 = highLeft.karatsuba(highRight);
-		z0 = lowLeft.karatsuba(lowRight);
-		z1 = lowLeft.addAbs(highLeft).karatsuba(lowRight.addAbs(highRight));
+		z2 = karatsuba(highLeft, highRight);
+		z0 = karatsuba(lowLeft, lowRight);
+		z1 = karatsuba(addAbs(lowLeft, highLeft), addAbs(lowRight, highRight));
 
-		return z2.mulPow10(2 * m)
-				.addAbs(z1
-					.subAbs(z2)
-					.subAbs(z0)
-					.mulPow10(m))
-				.addAbs(z0);
+		return addAbs(mulPow10(subAbs2(subAbs2(addAbs(mulPow10(z2, 2 * m), z1), z2), z0), m), z0);
 	}
 
 	// Multiplies by a power of 10
-	BigInt mulPow10(ulong n) {
-		BigInt copy = this;
+	static byte[] mulPow10(byte[] lhs, ulong n) {
+		byte[] copy = lhs.dup;
 
 		if (n < 1) {
 			throw new Exception("mulPow10(num) is not supported for num < 1");
 		}
 
-		if (this.mant[$ - 1] == 0)
+		if (copy[$ - 1] == 0)
 			return copy;
 
-		copy.mant.length += n;
+		copy.length += n;
 
-		foreach(i; retro(iota(n, copy.mant.length)))
-			copy.mant[i] = copy.mant[i - n];
+		foreach(i; retro(iota(n, copy.length)))
+			copy[i] = copy[i - n];
 
-		copy.mant[0 .. n] = 0;
+		copy[0 .. n] = 0;
 
 		return copy;
 	}
@@ -433,25 +428,25 @@ private:
 		assert(c.toString() == "2000");
 	}
 
-	BigInt mulSingleDigit(byte n) {
-		BigInt pro = this;
+	static byte[] mulSingleDigit(byte[] lhs, byte n) {
+		byte[] pro = lhs;
 		byte carry;
 
-		pro.mant[] *= n;
+		pro[] *= n;
 
-		foreach (ref a; pro.mant) {
+		foreach (ref a; pro) {
 			a += carry;
 			carry = a / 10;
 		}
 
 		if (carry)
-			pro.mant ~= carry;
+			pro ~= carry;
 
-		pro.mant[] %= 10;
+		pro[] %= 10;
 
 		// In case we've multiplied by a zero, set length to one.
-		if (pro.mant[$ - 1] == 0)
-			pro.mant.length = 1;
+		if (pro[$ - 1] == 0)
+			pro.length = 1;
 
 		return pro;
 	}
@@ -466,23 +461,23 @@ private:
 		byte y = 9;
 		byte z = 3;
 
-		assert(a.mulSingleDigit(x).toString() == "93728");
+		assert(BigInt(mulSingleDigit(a.mant, x)).toString() == "93728");
 		//writeln(a.mulSingleDigit(y).toString());
-		assert(a.mulSingleDigit(y).toString() == "210888");
-		assert(a.mulSingleDigit(z).toString() == "70296");
-		assert(b.mulSingleDigit(x).toString() == "349052");
-		assert(b.mulSingleDigit(y).toString() == "785367");
-		assert(b.mulSingleDigit(z).toString() == "261789");
-		assert(c.mulSingleDigit(x).toString() == "-131144");
-		assert(c.mulSingleDigit(y).toString() == "-295074");
-		assert(c.mulSingleDigit(z).toString() == "-98358");
-		assert(d.mulSingleDigit(w).toString() == "0");
-		assert(d.mulSingleDigit(x).toString() == "0");
-		assert(d.mulSingleDigit(y).toString() == "0");
-		assert(d.mulSingleDigit(z).toString() == "0");
-		assert(a.mulSingleDigit(w).toString() == "0");
-		assert(b.mulSingleDigit(w).toString() == "0");
-		assert(c.mulSingleDigit(w).toString() == "-0");
+		assert(BigInt(mulSingleDigit(a.mant, y)).toString() == "210888");
+		assert(BigInt(mulSingleDigit(a.mant, z)).toString() == "70296");
+		assert(BigInt(mulSingleDigit(b.mant, x)).toString() == "349052");
+		assert(BigInt(mulSingleDigit(b.mant, y)).toString() == "785367");
+		assert(BigInt(mulSingleDigit(b.mant, z)).toString() == "261789");
+		assert(BigInt(mulSingleDigit(c.mant, x)).toString() == "-131144");
+		assert(BigInt(mulSingleDigit(c.mant, y)).toString() == "-295074");
+		assert(BigInt(mulSingleDigit(c.mant, z)).toString() == "-98358");
+		assert(BigInt(mulSingleDigit(d.mant, w)).toString() == "0");
+		assert(BigInt(mulSingleDigit(d.mant, x)).toString() == "0");
+		assert(BigInt(mulSingleDigit(d.mant, y)).toString() == "0");
+		assert(BigInt(mulSingleDigit(d.mant, z)).toString() == "0");
+		assert(BigInt(mulSingleDigit(a.mant, w)).toString() == "0");
+		assert(BigInt(mulSingleDigit(b.mant, w)).toString() == "0");
+		assert(BigInt(mulSingleDigit(c.mant, w)).toString() == "-0");
 	}
 
   void divMod(BigInt rhs, ref BigInt quo, ref BigInt mod) {
@@ -528,7 +523,7 @@ private:
 			}
 
 			quo.mant ~= dig;
-			mod = divid.subAbs(acc.subAbs(rhs));
+			mod = divid.subAbsOld(acc.subAbsOld(rhs));
 
 			if (littleEnd > 0) { 
 				divid = mod.mulPow10(1).addAbs(BigInt(this.mant[littleEnd - 1]));
