@@ -26,7 +26,7 @@ private:
 	bool sign = false;
 	//alias mant this;
 
-	BigInt addAbs(BigInt rhs) {
+	BigInt addAbsOld(BigInt rhs) {
 		BigInt sum = BigInt();
 		int carry = 0;
 
@@ -42,42 +42,42 @@ private:
 
 		return sum;
 	}
-	unittest {
-		BigInt a = BigInt(947436711);
-		BigInt b = BigInt(3245879);		
-		BigInt c = BigInt();
+	//unittest {
+		//BigInt a = BigInt(947436711);
+		//BigInt b = BigInt(3245879);		
+		//BigInt c = BigInt();
 
-		c = a.addAbs(b);
-		assert(c.toString() == "950682590");
-		c = b.addAbs(a);
-		assert(c.toString() == "950682590");
-		BigInt d = BigInt(999);
-		BigInt e = BigInt(1);
-		c = d.addAbs(e);
-		assert(c.toString() == "1000");
-		c = e.addAbs(d);
-		assert(c.toString() == "1000");
-		a = BigInt(1);
-		b = BigInt(1);
-		c = a.addAbs(b);
-		assert(c.toString() == "2");
-		a = BigInt(0);
-		b = BigInt(0);
-		assert(a.mant == [0]);
-		assert(b.mant == [0]);
-		c = a.addAbs(b);
-		assert(c.toString() == "0");
-		a = BigInt(0);
-		b = BigInt(1);
-		c = a.addAbs(b);
-		assert(c.toString() == "1");
-		a = BigInt(9);
-		b = BigInt(1);
-		c = a.addAbs(b);
-		assert(c.toString() == "10");
-	}
+		//c = a.addAbs(b);
+		//assert(c.toString() == "950682590");
+		//c = b.addAbs(a);
+		//assert(c.toString() == "950682590");
+		//BigInt d = BigInt(999);
+		//BigInt e = BigInt(1);
+		//c = d.addAbs(e);
+		//assert(c.toString() == "1000");
+		//c = e.addAbs(d);
+		//assert(c.toString() == "1000");
+		//a = BigInt(1);
+		//b = BigInt(1);
+		//c = a.addAbs(b);
+		//assert(c.toString() == "2");
+		//a = BigInt(0);
+		//b = BigInt(0);
+		//assert(a.mant == [0]);
+		//assert(b.mant == [0]);
+		//c = a.addAbs(b);
+		//assert(c.toString() == "0");
+		//a = BigInt(0);
+		//b = BigInt(1);
+		//c = a.addAbs(b);
+		//assert(c.toString() == "1");
+		//a = BigInt(9);
+		//b = BigInt(1);
+		//c = a.addAbs(b);
+		//assert(c.toString() == "10");
+	//}
 
-  static byte[] addAbs2(byte[] big, byte[] little) {
+  static byte[] addAbs(byte[] big, byte[] little) {
     byte[] sum;
     int i = 0;
     byte carry = 0;
@@ -115,16 +115,16 @@ private:
     return sum;
   }
   unittest {
-    byte[] s = addAbs2([1, 3, 8, 2, 9], [4, 7, 3, 2]);
+    byte[] s = addAbs([1, 3, 8, 2, 9], [4, 7, 3, 2]);
     //writeln(s);
     assert(s == [5, 0, 2, 5, 9]);
-    s = addAbs2([1, 3, 8, 2, 9], [4, 7, 3, 2]);
-    s = addAbs2([1, 3, 8, 2, 9], [4, 7, 3, 2, 7]);
+    s = addAbs([1, 3, 8, 2, 9], [4, 7, 3, 2]);
+    s = addAbs([1, 3, 8, 2, 9], [4, 7, 3, 2, 7]);
     //writeln(s);
     assert(s == [5, 0, 2, 5, 6, 1]);
   }
 
-	BigInt subAbs(BigInt rhs) {
+	BigInt subAbsOld(BigInt rhs) {
 		BigInt diff = BigInt();
 		BigInt ninesComp = BigInt();
 
@@ -135,7 +135,7 @@ private:
 		ninesComp.mant[] = 9;
 		ninesComp.mant[0 .. rhs.mant.length] -= rhs.mant[];
 		diff = this
-      .addAbs(ninesComp)
+      .addAbsOld(ninesComp)
       .incAbs();
 		do diff.mant.length--;
 		while(diff.mant[$ - 1] == 0 && diff.mant.length > 1);
@@ -353,31 +353,31 @@ private:
 		assert(cmpAbs2(f, c) > 0);
 	}
 
-	BigInt karatsuba(BigInt rhs) {
-		BigInt lowLeft = BigInt();
-		BigInt highLeft = BigInt();
-		BigInt lowRight = BigInt();
-		BigInt highRight = BigInt();
-		BigInt z0 = BigInt();
-		BigInt z1 = BigInt();
-		BigInt z2 = BigInt();
+	static byte[] karatsuba(byte[] lhs, byte[] rhs) {
+		byte[] lowLeft;
+		byte[] highLeft;
+		byte[] lowRight;
+		byte[] highRight;
+		byte[] z0;
+		byte[] z1;
+		byte[] z2;
 		byte n;
 		ulong m;
 
     // Take care of base case where one or both operands are of length 1
-    if (this.mant.length == 1) {
-      return rhs.mulSingleDigit(this.mant[0]);
-    } else if (rhs.mant.length == 1) {
-      return this.mulSingleDigit(rhs.mant[0]);
+    if (lhs.length == 1) {
+      return mulSingleDigit(rhs, lhs[0]);
+    } else if (rhs.length == 1) {
+      return mulSingleDigit(lhs, rhs[0]);
     }
 
-		m = this.mant.length > rhs.mant.length ? this.mant.length / 2 : rhs.mant.length / 2;
+		m = lhs.length > rhs.length ? lhs.length / 2 : rhs.length / 2;
 
 		// Split and handle out-of-bounds indices
-		highLeft = m >= this.mant.length ? BigInt(0) : BigInt(this.mant[m .. $]);
-		lowLeft = m >= this.mant.length ? this : BigInt(this.mant[0 .. m]);
-		highRight = m >= rhs.mant.length ? BigInt(0) : BigInt(rhs.mant[m .. $]);
-		lowRight = m >= rhs.mant.length ? rhs : BigInt(rhs.mant[0 .. m]);
+		highLeft = m >= lhs.length ? [0] : lhs[m .. $];
+		lowLeft = m >= lhs.length ? lhs : lhs[0 .. m];
+		highRight = m >= rhs.length ? [0] : rhs[m .. $];
+		lowRight = m >= rhs.length ? rhs : rhs[0 .. m];
 
 		// Handle leading zeros
 		while (lowLeft.mant[$ - 1] == 0 && lowLeft.mant.length > 1)
