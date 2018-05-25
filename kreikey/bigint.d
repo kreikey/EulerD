@@ -170,7 +170,7 @@ private:
 		assert(c.toString() == "0");
 	}
 
-  static byte[] subAbs2(byte[] big, byte[] little) {
+  static byte[] subAbs(byte[] big, byte[] little) {
     byte[] diff;
     byte borrow = 0;
     byte i = 0;
@@ -210,13 +210,13 @@ private:
     byte[] a = [0, 0, 1];
     byte[] b = [1, 1];
 
-    assert(subAbs2(a, b) == [9, 8]);
+    assert(subAbs(a, b) == [9, 8]);
     a = [1];
     b = [1];
-    assert(subAbs2(a, b) == [0]);
+    assert(subAbs(a, b) == [0]);
     a = [0, 0, 1];
     b = [9, 9];
-    assert(subAbs2(a, b) == [1]);
+    assert(subAbs(a, b) == [1]);
   }
 
   ref BigInt incAbs() {
@@ -375,7 +375,7 @@ private:
 		byte n;
 		ulong m;
 
-    writefln("lhs: %s; rhs: %s;", lhs, rhs);
+    //writefln("lhs: %s; rhs: %s;", lhs, rhs);
 
     // Take care of base case where one or both operands are of length 1
     if (lhs.length == 1) {
@@ -385,7 +385,7 @@ private:
     }
 
 		m = lhs.length > rhs.length ? lhs.length / 2 : rhs.length / 2;
-    writefln("m: %s", m);
+    //writefln("m: %s", m);
 
 		// Split and handle out-of-bounds indices
 		highLeft = m >= lhs.length ? cast(byte[])[0] : lhs[m .. $];
@@ -399,23 +399,23 @@ private:
 		while(lowRight[$ - 1] == 0 && lowRight.length > 1)
 			lowRight.length--;
 
-    writefln("lowleft: %s highleft %s", lowLeft, highLeft);
-    writefln("lowRight: %s highRight %s", lowRight, highRight);
+    //writefln("lowleft: %s highleft %s", lowLeft, highLeft);
+    //writefln("lowRight: %s highRight %s", lowRight, highRight);
 
 		z2 = karatsuba(highLeft, highRight);
 		z0 = karatsuba(lowLeft, lowRight);
 		z1 = karatsuba(addAbs(lowLeft, highLeft), addAbs(lowRight, highRight));
 
-    writefln("z0: %s, z1: %s, z2: %s", z0, z1, z2);
+    //writefln("z0: %s, z1: %s, z2: %s", z0, z1, z2);
 
-		return addAbs(
-        mulPow10(subAbs2(
-            subAbs2(
-              addAbs(mulPow10(z2, 2 * m), z1)
-              , z2)
-            , z0)
-          , m)
-        , z0);
+		//return z2.mulPow10(2 * m)
+				//.addAbs(z1
+					//.subAbs(z2)
+					//.subAbs(z0)
+					//.mulPow10(m))
+				//.addAbs(z0);
+
+		return addAbs(addAbs(mulPow10(z2, 2 * m), mulPow10(subAbs(subAbs(z1, z2), z0), m)), z0);
 	}
 
 	// Multiplies by a power of 10
@@ -479,7 +479,7 @@ private:
 	unittest {
 		auto a = BigInt(23432);
 		auto b = BigInt(87263);
-		auto c = BigInt(-32786);
+		auto c = BigInt(-32786); 
 		auto d = BigInt(0);
 		BigInt r;
 		byte w = 0;
@@ -489,14 +489,14 @@ private:
 
 		assert(BigInt(mulSingleDigit(a.mant, x)).toString() == "93728");
 		//writeln(a.mulSingleDigit(y).toString());
-    writeln(BigInt(mulSingleDigit(a.mant, y)));
+    //writeln(BigInt(mulSingleDigit(a.mant, y)));
     // current result is 843552 rather than 210888. Why?
 		assert(BigInt(mulSingleDigit(a.mant, y)).toString() == "210888");
 		assert(BigInt(mulSingleDigit(a.mant, z)).toString() == "70296");
 		assert(BigInt(mulSingleDigit(b.mant, x)).toString() == "349052");
 		assert(BigInt(mulSingleDigit(b.mant, y)).toString() == "785367");
 		assert(BigInt(mulSingleDigit(b.mant, z)).toString() == "261789");
-		assert(BigInt(mulSingleDigit(c.mant, x)).toString() == "131144");
+		assert(BigInt(mulSingleDigit(c.mant, x)).toString() == "131144"); // the sign is ignored for practical reasons. 
 		assert(BigInt(mulSingleDigit(c.mant, y)).toString() == "295074");
 		assert(BigInt(mulSingleDigit(c.mant, z)).toString() == "98358");
 		assert(BigInt(mulSingleDigit(d.mant, w)).toString() == "0");
@@ -573,11 +573,11 @@ private:
 			mod.sign = this.sign;
   }
 
-  BigInt powFast(T)(T exp, int iter)
+  BigInt powFast(T)(T exp)
   if (isIntegral!T || is(T == BigInt)) {
     T remainder = 0;
     BigInt left, right;
-    int currentIter = iter;
+    //int currentIter = iter;
 
     if (exp < 0) {
       throw new Exception("It's an integer library, not a fraction or floating point library. No negative exponents allowed!");
@@ -595,29 +595,29 @@ private:
     exp /= 2;
     //writefln("exp: %s", exp);
     //writefln("this: %s", this);
-    left = powFast(exp, ++iter);
-    right = powFast((exp + remainder), ++iter);
-    writefln("this: %s, powfast: %s * %s; iter: %s", this, left, right, currentIter);
+    left = powFast(exp);
+    right = powFast(exp + remainder);
+    //writefln("this: %s, powfast: %s * %s; iter: %s", this, left, right, currentIter);
     //return powFast(exp, iter) * powFast(exp + remainder, iter);
     return left * right;
   }
-  //unittest {
-    //BigInt a = 2;
-    //assert(a.toString() == "2");
-    //BigInt b = 5;
-    //assert(b.toString() == "5");
-    //BigInt c = 3;
-    //BigInt z = a.powFast(13, 0);
-    //writefln("pow result: %s", z);
-    //assert(z.toString() == "8192");
-    //z = b.powFast(13, 0);
-    //assert(z.toString() == "1220703125");
-    //BigInt y = c.powFast(29, 0);
-    //assert(y.toString() == "68630377364883");
-    //BigInt e = 13;
-    //assert(e.powFast(11, 0).toString() == "1792160394037");
-    //assert(e.powFast(14, 0).toString() == "3937376385699289");
-  //}
+  unittest {
+    BigInt a = 2;
+    assert(a.toString() == "2");
+    BigInt b = 5;
+    assert(b.toString() == "5");
+    BigInt c = 3;
+    BigInt z = a.powFast(13);
+    writefln("pow result: %s", z);
+    assert(z.toString() == "8192");
+    z = b.powFast(13);
+    assert(z.toString() == "1220703125");
+    BigInt y = c.powFast(29);
+    assert(y.toString() == "68630377364883");
+    BigInt e = 13;
+    assert(e.powFast(11).toString() == "1792160394037");
+    assert(e.powFast(14).toString() == "3937376385699289");
+  }
 
 public:
 	this(string source) nothrow {
@@ -760,7 +760,7 @@ public:
 		assert(a.toString() == "888");
 	}
 
-  BigInt add(BigInt rhs) {
+  BigInt add()(auto ref BigInt rhs) {
 		BigInt sum;
 
     int cmpRes = cmpAbs2(this.mant, rhs.mant);
@@ -771,7 +771,7 @@ public:
 			sum.mant = addAbs(big, little);
 			sum.sign = this.sign;
 		} else {
-      sum.mant = subAbs2(big, little);
+      sum.mant = subAbs(big, little);
       sum.sign = cmpRes > 0 ? this.sign : rhs.sign;
     }
 
@@ -818,7 +818,7 @@ public:
 		assert(e.toString() == "1091");		
 	}
 
-	BigInt sub(BigInt rhs) {
+	BigInt sub()(auto ref BigInt rhs) {
 		BigInt diff = BigInt();
 
     int cmpRes = cmpAbs2(this.mant, rhs.mant);
@@ -826,7 +826,7 @@ public:
     byte[] little = cmpRes >= 0 ? rhs.mant : this.mant;
 
 		if (this.sign == rhs.sign) {
-      diff.mant = subAbs2(big, little);
+      diff.mant = subAbs(big, little);
       diff.sign = cmpRes > 0 ? this.sign : !this.sign;
 		} else {
 			diff.mant = addAbs(big, little);
@@ -951,7 +951,7 @@ public:
     assert(e.toString() == "-1000");
   }
 
-	BigInt mul(BigInt rhs) {
+	BigInt mul()(auto ref BigInt rhs) {
     //writefln("multiply. lhs: %s rhs: %s", this, rhs);
     //writefln("lhs is rhs? %s", this is rhs);
 		BigInt pro;
@@ -973,7 +973,7 @@ public:
 		a = BigInt(20);
 		b = BigInt(100);
 		c = a.mul(b);
-    writefln("mul: %s * %s = %s", a, b, c);
+    //writefln("mul: %s * %s = %s", a, b, c);
 		assert(c.toString() == "2000");
 		a = BigInt(23);
 		b = BigInt(468725);
@@ -1019,7 +1019,7 @@ public:
     assert(c.toString() == "8192");
 	}
 
-	BigInt div(BigInt rhs) {
+	BigInt div()(auto ref BigInt rhs) {
 		BigInt quo = BigInt();
 		BigInt mod = BigInt();
 
@@ -1060,7 +1060,7 @@ public:
 		}*/
 	}
 
-	BigInt mod(BigInt rhs) {
+	BigInt mod()(auto ref BigInt rhs) {
 		BigInt mod = BigInt();
 		BigInt quo = BigInt();
 
@@ -1134,10 +1134,10 @@ public:
     static if (op == "^^")
       return this.powFast(rhs);
     else
-      return opBinary!op(BigInt(rhs));
+      return opBinary!op(BigInt(rhs).byRef());
   }
 
-  BigInt opBinary(string op)(BigInt rhs) {
+  BigInt opBinary(string op)(auto ref BigInt rhs) {
     static if (op == "+")
       return this.add(rhs);
     else static if (op == "-")
