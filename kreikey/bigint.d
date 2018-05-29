@@ -8,6 +8,7 @@ import std.stdio;
 import std.math;
 import std.range;
 import std.traits;
+import std.typecons;
 
 mixin template RvalueRef() {
   alias T = typeof(this);
@@ -84,7 +85,7 @@ private:
     int i = 0;
     byte carry = 0;
 
-    //if (cmpAbs2(big, little) < 0)
+    //if (cmpAbs(big, little) < 0)
       //throw new Exception("the left operand needs to be bigger than the right operand");
 
     if (rhs.length > lhs.length) {
@@ -139,7 +140,7 @@ private:
 		BigInt diff = BigInt();
 		BigInt ninesComp = BigInt();
 
-		//if (this.cmpAbs(rhs) < 0)
+		//if (this.cmpAbsOld(rhs) < 0)
 			//throw new Exception("Subtrahend of absolute subtraction is greater than minuend");
 
 		ninesComp.mant.length = this.mant.length;
@@ -175,7 +176,7 @@ private:
     byte borrow = 0;
     byte i = 0;
 
-		//if (cmpAbs2(big, little) < 0)
+		//if (cmpAbs(big, little) < 0)
 			//throw new Exception("Subtrahend of absolute subtraction is greater than minuend");
 
     diff.reserve(big.length);
@@ -258,7 +259,7 @@ private:
   ref BigInt decAbs() {
     bool borrow = false;
 
-    if (this.cmpAbs(BigInt(1)) < 0)
+    if (this.cmpAbsOld(BigInt(1)) < 0)
         throw new Exception("can't call decAbs() on a number whose absolute value is less than 1");
 
     ulong i = 0;
@@ -300,7 +301,7 @@ private:
     assert(d.toString() == "-6");
   }
 
-	int cmpAbs(const BigInt rhs) const {
+	int cmpAbsOld(const BigInt rhs) const {
 		if (this.mant.length < rhs.mant.length)
 			return -1;
 		else if (this.mant.length > rhs.mant.length)
@@ -322,17 +323,17 @@ private:
 		BigInt e = BigInt(-969);
 		BigInt f = BigInt(1199);
 
-		assert(a.cmpAbs(b) < 0);
-		assert(b.cmpAbs(a) > 0);
-		assert(c.cmpAbs(d) > 0);
-		assert(d.cmpAbs(c) < 0);
-		assert(c.cmpAbs(d) > 0);
-		assert(b.cmpAbs(e) == 0);
-		assert(c.cmpAbs(f) > 0);
-		assert(f.cmpAbs(c) < 0);
+		assert(a.cmpAbsOld(b) < 0);
+		assert(b.cmpAbsOld(a) > 0);
+		assert(c.cmpAbsOld(d) > 0);
+		assert(d.cmpAbsOld(c) < 0);
+		assert(c.cmpAbsOld(d) > 0);
+		assert(b.cmpAbsOld(e) == 0);
+		assert(c.cmpAbsOld(f) > 0);
+		assert(f.cmpAbsOld(c) < 0);
 	}
 
-  static int cmpAbs2(byte[] left, byte[] right) {
+  static int cmpAbs(byte[] left, byte[] right) {
     if (left.length < right.length)
       return -1;
     else if (left.length > right.length)
@@ -354,14 +355,14 @@ private:
 		byte[] e = [9, 6, 9];
 		byte[] f = [1, 1, 9, 9];
 
-		assert(cmpAbs2(a, b) < 0);
-		assert(cmpAbs2(b, a) > 0);
-		assert(cmpAbs2(c, d) > 0);
-		assert(cmpAbs2(d, c) < 0);
-		assert(cmpAbs2(c, d) > 0);
-		assert(cmpAbs2(b, e) == 0);
-		assert(cmpAbs2(c, f) < 0);
-		assert(cmpAbs2(f, c) > 0);
+		assert(cmpAbs(a, b) < 0);
+		assert(cmpAbs(b, a) > 0);
+		assert(cmpAbs(c, d) > 0);
+		assert(cmpAbs(d, c) < 0);
+		assert(cmpAbs(c, d) > 0);
+		assert(cmpAbs(b, e) == 0);
+		assert(cmpAbs(c, f) < 0);
+		assert(cmpAbs(f, c) > 0);
 	}
 
 	static byte[] karatsuba(byte[] lhs, byte[] rhs) {
@@ -415,7 +416,16 @@ private:
 					//.mulPow10(m))
 				//.addAbs(z0);
 
-		return addAbs(addAbs(mulPow10(z2, 2 * m), mulPow10(subAbs(subAbs(z1, z2), z0), m)), z0);
+		return addAbs(
+        addAbs(
+          mulPow10(z2, 2 * m), 
+          mulPow10(
+            subAbs(
+              subAbs(z1, z2),
+              z0),
+            m)
+          ),
+        z0);
 	}
 
 	// Multiplies by a power of 10
@@ -508,19 +518,21 @@ private:
 		assert(BigInt(mulSingleDigit(c.mant, w)).toString() == "0");
 	}
 
-  void divMod(BigInt rhs, ref BigInt quo, ref BigInt mod) {
-		BigInt acc;
-		BigInt divid;
+  Tuple!(byte[], byte[]) divMod(byte[] lhs, byte[] rhs) {
+		byte[] acc;
+		byte[] divid;
+    byte[] quo;
+    byte[] rem;
 		//byte[] quoMant;
 		byte dig;
 		int littleEnd, bigEnd;
 
-		if (rhs == BigInt(0))
+		if (rhs == [0])
 			throw new Exception("Divide by zero error.");
-		if (this.cmpAbs(rhs) < 0) {
-			quo = BigInt(0);
-			mod = rhs;
-			return;
+		if (cmpAbs(lhs, rhs) < 0) {
+			quo = [0];
+			rem = rhs;
+			return Tuple!(byte[], byte[])(quo, rem);
 		}
 
 		// Needs to examine the lengths of each number and act accordingly.
@@ -528,49 +540,47 @@ private:
 		// Division might yield 0, but it should *never* crash like it does now.
 		// Modulus by a bigger number should yield the number itself.
 		
-		littleEnd = cast(int)(this.mant.length - rhs.mant.length);
+		littleEnd = cast(int)(lhs.length - rhs.length);
 		littleEnd = littleEnd > 0 ? littleEnd : 0;
-		bigEnd = cast(int)(this.mant.length);
+		bigEnd = cast(int)(lhs.length);
 
-		if (rhs.cmpAbs(BigInt(this.mant[littleEnd .. bigEnd])) > 0 && littleEnd > 0) {
+		if (cmpAbs(rhs, lhs[littleEnd .. bigEnd]) > 0 && littleEnd > 0) {
 			littleEnd--;
 		}
 
-		divid = BigInt(this.mant[littleEnd .. bigEnd]);
+		divid = lhs[littleEnd .. bigEnd];
 		
     // We're building up the quotient digit-by-digit, so the length of the mantissa must be 0
-    quo.mant.length = 0;
+    quo.length = 0;
 
 		do {
 			dig = 0;
 			acc = rhs;
 
-			while (acc.cmpAbs(divid) <= 0) {
+			while (cmpAbs(acc, divid) <= 0) {
 				dig++;
-				acc = acc.addAbsOld(rhs);
+				acc = addAbs(acc, rhs);
 			}
 
-			quo.mant ~= dig;
-			mod = divid.subAbsOld(acc.subAbsOld(rhs));
+			quo ~= dig;
+			rem = subAbs(divid, subAbs(acc, rhs));
 
 			if (littleEnd > 0) { 
-				divid = BigInt(mulPow10(mod.mant, 1)).addAbsOld(BigInt(this.mant[littleEnd - 1]));
+				divid = addAbs(mulPow10(rem, 1), [lhs[littleEnd - 1]]);   // This looks quite clunky. What we probably want is an accumulate function.
 			}
 
 		} while (littleEnd-- > 0);
 
-		std.algorithm.reverse(quo.mant);
+		std.algorithm.reverse(quo);
 
-		// Fix up mod by taking negatives into account
+    // It's probably better to return a (BigInt, BigInt) pair rather than a pair of byte[]s because I need to calculate signs somewhere.
+    // If I calculate divMod in one place, I might as well calculate the signs in the same place.
+    // Now, I could theoretically calculate them in div() and mod() respectively, but then I would need to look at the signs of the operands.
+    // Actually, that might be just as good. Then when I implement caching of the last divMod operation, I could take that into account.
+    // I could look only at the byte[]s of each cached operand, then consider the signs of the actual operand.
+    // Or I would just look at the BigInt operands.
 
-		if (quo.mant[$ - 1] == 0)
-			quo.sign = false;
-		else
-			quo.sign = this.sign != rhs.sign;
-		if (mod.mant[$ - 1] == 0)
-			mod.sign = false;
-		else
-			mod.sign = this.sign;
+    return Tuple!(byte[], byte[])(quo, rem);
   }
 
   BigInt powFast(T)(T exp)
@@ -608,7 +618,7 @@ private:
     assert(b.toString() == "5");
     BigInt c = 3;
     BigInt z = a.powFast(13);
-    writefln("pow result: %s", z);
+    //writefln("pow result: %s", z);
     assert(z.toString() == "8192");
     z = b.powFast(13);
     assert(z.toString() == "1220703125");
@@ -763,7 +773,7 @@ public:
   BigInt add()(auto ref BigInt rhs) {
 		BigInt sum;
 
-    int cmpRes = cmpAbs2(this.mant, rhs.mant);
+    int cmpRes = cmpAbs(this.mant, rhs.mant);
     byte[] big = cmpRes < 0 ? rhs.mant : this.mant;
     byte[] little = cmpRes >= 0 ? rhs.mant : this.mant;
 
@@ -821,7 +831,7 @@ public:
 	BigInt sub()(auto ref BigInt rhs) {
 		BigInt diff = BigInt();
 
-    int cmpRes = cmpAbs2(this.mant, rhs.mant);
+    int cmpRes = cmpAbs(this.mant, rhs.mant);
     byte[] big = cmpRes < 0 ? rhs.mant : this.mant;
     byte[] little = cmpRes >= 0 ? rhs.mant : this.mant;
 
@@ -1021,9 +1031,14 @@ public:
 
 	BigInt div()(auto ref BigInt rhs) {
 		BigInt quo = BigInt();
-		BigInt mod = BigInt();
 
-		this.divMod(rhs, quo, mod);
+		auto result = divMod(this.mant, rhs.mant);
+    quo.mant = result[0];
+
+		if (quo.mant[$ - 1] == 0)
+			quo.sign = false;
+		else
+			quo.sign = this.sign != rhs.sign;
 
 		return quo;
 	}
@@ -1061,12 +1076,17 @@ public:
 	}
 
 	BigInt mod()(auto ref BigInt rhs) {
-		BigInt mod = BigInt();
-		BigInt quo = BigInt();
+		BigInt rem = BigInt();
 
-		this.divMod(rhs, quo, mod);
+		auto result = divMod(this.mant, rhs.mant);
+    rem.mant = result[1];
 
-		return mod;
+		if (rem.mant[$ - 1] == 0)
+			rem.sign = false;
+		else
+			rem.sign = this.sign;
+
+		return rem;
 	}
 	unittest {
 		auto a = BigInt(476);
@@ -1137,7 +1157,7 @@ public:
       return opBinary!op(BigInt(rhs).byRef());
   }
 
-  BigInt opBinary(string op)(auto ref BigInt rhs) {
+  BigInt opBinary(string op)(auto const ref BigInt rhs) {
     static if (op == "+")
       return this.add(rhs);
     else static if (op == "-")
@@ -1208,7 +1228,7 @@ public:
 			else
 				res = 1;
 		} else {
-			res = this.cmpAbs(rhs);
+			res = this.cmpAbsOld(rhs);
 
 			if (this.sign) {
 				res = -res;

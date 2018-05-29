@@ -25,7 +25,7 @@ void main(string[] args) {
   foreach(base; 2 .. n + 1) {
     row = [];
     foreach(exponent; 2 .. n + 1) {
-      res = BigInt(base) ^^ exponent;
+      res = BigInt(base) ^^ BigInt(exponent);
       row ~= res;
     }
     powersMatrix ~= row;
