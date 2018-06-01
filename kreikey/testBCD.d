@@ -23,5 +23,27 @@ void main() {
   byte[] somedigs = [1, 2, 3, 4, 5];
   //writeln(somedigs.toString());
   writeln(somedigs);
+  //const(BigInt) num = 357834;
+  //writeln(num);
+
+  //writeln("const test!!!");
+  //const bool yesno = false;
+  //bool thequestion = yesno;
+  //writeln(thequestion);
+  //writeln(typeof(thequestion).stringof);
+  //thequestion = true;
+  //writeln(thequestion);
+  //const int x = 25;
+  //int y = x;
+  //y = 45;
+  //writefln("x: %s; y: %s", x, y);
+  //writefln("typeof x: %s; typeof y: %s", typeof(x).stringof, typeof(y).stringof);
+  //int[] nums1 = [5, 7, 9, 2342, 3, 6, 11];
+  //const(int[]) nums2 = [44, 6, 8, 31, 21, 90];
+  //const(int[]) nums3 = nums2;
+  //const(int[]) nums4;
+  //nums4 = nums2;
+  //nums1[3] = 1;
+  //writeln(nums4);
 }
 
