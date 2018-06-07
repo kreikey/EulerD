@@ -25,12 +25,6 @@ struct BigInt {
 private:
 	byte[] mant = [0];
 	bool sign = false;
-	//alias mant this;
-  //static bool divModCached = false;
-  //static byte[] lastDivisor;
-  //static byte[] lastDividend;
-  //static byte[] lastQuotient;
-  //static byte[] lastRemainder;
 
 	BigInt addAbsOld(BigInt rhs) {
 		BigInt sum = BigInt();
@@ -515,21 +509,8 @@ private:
     byte[] quo;
     byte[] rem;
 		byte[] acc;
-		//byte[] divid;
-		//byte[] quoMant;
 		byte dig;
 		int littleEnd, bigEnd;
-
-    //BigInt.divModCached = true;
-    //if (BigInt.divModCached) {
-      //if (lhs == BigInt.lastDividend && rhs == BigInt.lastDivisor) {
-        //// It is potentially dangerous to return the static cached digit arrays as fodder for new BigInt instances.
-        //// I justify it by reasoning that no client code will ever manipulate the digits, and no library code will ever 
-        //// do so on the result of a divMod operation without first copying the digits. It's not necessary to copy here,
-        //// and it's a performance optimization not to do so.
-        //return Tuple!(byte[], byte[])(BigInt.lastQuotient, BigInt.lastRemainder);
-      //}
-    //}
 
 		if (rhs == [0])
 			throw new Exception("Divide by zero error.");
@@ -583,12 +564,6 @@ private:
     // Actually, that might be just as good. Then when I implement caching of the last divMod operation, I could take that into account.
     // I could look only at the byte[]s of each cached operand, then consider the signs of the actual operand.
     // Or I would just look at the BigInt operands.
-
-    //BigInt.divModCached = true;
-    //BigInt.lastQuotient = quo.dup;
-    //BigInt.lastRemainder = rem.dup;
-    //BigInt.lastDividend = lhs.dup;
-    //BigInt.lastDivisor = rhs.dup;
 
     return Tuple!(byte[], byte[])(quo, rem);
   }
