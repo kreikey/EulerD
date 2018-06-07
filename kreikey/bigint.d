@@ -603,26 +603,14 @@ private:
     } else if (exp == 0) {
       return BigInt(1);
     } else if (exp == 1) {
-      BigInt result;
-      result.mant = this.mant.dup;
-      result.sign = this.sign;
+      BigInt result = BigInt(this.mant.dup, this.sign);
       return result;
   // If I make it fully generic like this, I need to provide an efficient divMod function that won't calculate divMod twice.
     // I.e. I need to make divMod cache the result of the last operation and query whether we're using the same operands as last time.
     }
 
-    //static if (isIntegral!T) {
-      halfExp = exp / 2;
-      ////writefln("remainder: %s", remainder);
-      ////writefln("exp: %s", exp);
-      ////writefln("this: %s", this);
-    //} else static if (is(T == BigInt)) {
-      //auto quoRem = divMod(exp.mant, [2]);
-      //halfExp.mant = quoRem[0];
-      //halfExp.sign = this.sign;
-      //remainder.mant = quoRem[1];
-      //remainder.sign = this.sign;
-    //}
+    halfExp = exp / 2;
+
     static if (is(T == BigInt)) {
       remainder = BigInt.lastRemainder;
     } else {
@@ -922,7 +910,7 @@ private:
     auto result = divMod(this.mant, rhs.mant);
     quo = BigInt(result[0], result[0][$-1] == 0 ? false : (this.sign != rhs.sign));
     BigInt.lastQuotient = BigInt(quo.mant, quo.sign);
-    BigInt.lastRemainder = BigInt(result[1], this.sign);
+    BigInt.lastRemainder = BigInt(result[1], result[1][$-1] == 0 ? false : this.sign);
 
 		return quo;
 	}
@@ -934,6 +922,9 @@ private:
 		auto f = BigInt(100);
 		auto g = BigInt(-8271);
 		auto h = BigInt(0);
+    auto i = BigInt(-15);
+    auto j = BigInt(16);
+    auto k = BigInt(5);
 
 		auto z = a.div(b);  // if we initialize to 0, this unittest fails. Why?
     // bug fixed. DivMod builds up its mantissa digit by digit, so it's mantissa length
@@ -952,6 +943,10 @@ private:
 		assert(z.toString() == "-2877967795720");
 		z = f.div(a);
 		assert(z.toString() == "0");
+    z = i.div(j);
+    assert(z.toString() == "0");
+    z = i.div(k);
+    assert(BigInt.lastRemainder.toString() == "0");
 		/*try {
 			z = g.div(h);
 		} catch(Exception err) {
@@ -963,7 +958,7 @@ private:
     BigInt rem;
 
     auto result = divMod(this.mant, rhs.mant);
-    rem = BigInt(result[1], this.sign);
+    rem = BigInt(result[1], result[1][$-1] == 0 ? false : this.sign);
     BigInt.lastQuotient = BigInt(result[0], result[0][$-1] == 0 ? false : (this.sign != rhs.sign));
     BigInt.lastRemainder = BigInt(rem.mant, rem.sign);
 
@@ -979,6 +974,9 @@ private:
 		auto g = BigInt(120);
 		auto h = BigInt(-8271);
 		auto i = BigInt(0);
+    auto j = BigInt(-15);
+    auto k = BigInt(-5);
+    auto l = BigInt(16);
 
 		auto z = a.mod(b);
 		assert(z.toString() == "8");
@@ -992,6 +990,10 @@ private:
 		assert(z.toString() == "-2381302");		
 		z = g.mod(b);
 		assert(z.toString() == "0");
+    z = j.mod(k);
+    assert(z.toString() == "0");
+    z = j.mod(l);
+    assert(BigInt.lastQuotient.toString() == "0");
 	}
 
 public:
