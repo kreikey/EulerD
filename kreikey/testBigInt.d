@@ -5,6 +5,8 @@ import std.datetime;
 import kreikey.bigint;
 import core.stdc.stdlib;
 import core.memory;
+import std.algorithm;
+import std.range;
 
 void main() {
   BigInt n = 3;
@@ -67,6 +69,21 @@ void main() {
   writeln(c % d);
   writeln((-0) / 5);
   writeln((-0) % 5);
+  writeln((-15) % 16);
   // Conclusion: The remainder takes the sign of the dividend.
+
+  //auto arr = iota(1, 10).array();
+  //iota(1, 10).reduce!((a, b) => a + b).writeln();
+  //int count = 0;
+  //BigInt last = 0;
+  //arr.each!((a) {
+      ////writeln(a);
+      ////writeln(b);
+      //if (a != last)
+        //count++;
+      //last = a;
+      //return count;
+      //});
+  //writeln(count);
 }
 
