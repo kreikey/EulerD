@@ -1,3 +1,4 @@
 *.o
 .dutyl.configFile
 tags
+.DS_Store

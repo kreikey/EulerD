@@ -3,7 +3,7 @@ module kreikey.bigint;
 import std.algorithm;
 import std.array;
 import std.string;
-//import std.conv;
+import std.conv;
 import std.stdio;
 import std.math;
 import std.range;
@@ -25,167 +25,206 @@ struct BigInt {
 private:
 	byte[] mant = [0];
 	bool sign = false;
+  static bool debugThis = false;
 
-	BigInt addAbsOld(BigInt rhs) {
-		BigInt sum = BigInt();
-		int carry = 0;
+  //static byte[] addAbsInPlace(byte[] lhs, const(byte[]) rhs) {
+    //uint i = 0;
+    //uint carry = 0;
 
-		sum.mant.length = this.mant.length > rhs.mant.length ? this.mant.length : rhs.mant.length;
-		sum.mant[0 .. this.mant.length] = this.mant[];
-		sum.mant[0 .. rhs.mant.length] += rhs.mant[];
-    sum.mant[1 .. $] += sum.mant[0 .. $-1] / 10;
-    carry = sum.mant[$-1] / 10;
-		sum.mant[] %= 10;
+    //lhs.length = (lhs.length > rhs.length ? lhs.length : rhs.length) + 1;
+    
+    //while (i < rhs.length) {
+      //lhs[i] += rhs[i] + carry;
+      //if (lhs[i] > 9) {
+        //lhs[i] -= 10;
+        //carry = 1;
+      //} else {
+        //carry = 0;
+      //}
+      //i++;
+    //}
 
-		if (carry)
-			sum.mant ~= 1;
+    //while (carry) {
+      //lhs[i] += carry;
+      //if (lhs[i] == 10) {
+        //lhs[i] = 0;
+        //carry = 1;
+      //} else {
+        //carry = 0;
+      //}
+      //i++;
+    //}
 
-		return sum;
-	}
+    //if (lhs[$-1] == 0)
+      //lhs.length--;
+
+    //return lhs;
+  //}
+  //unittest {
+    //byte[] s = addAbsInPlace([1, 3, 8, 2, 9], [4, 7, 3, 2]);
+    //assert(s == [5, 0, 2, 5, 9]);
+    //s = addAbsInPlace([1, 3, 8, 2, 9], [4, 7, 3, 2]);
+    //s = addAbsInPlace([1, 3, 8, 2, 9], [4, 7, 3, 2, 7]);
+    //assert(s == [5, 0, 2, 5, 6, 1]);
+    //s = addAbsInPlace([4, 7, 3, 2], [1, 3, 8, 2, 9]);
+    //assert(s == [5, 0, 2, 5, 9]);
+    //s = addAbsInPlace([0], [0]);
+    //assert(s == [0]);
+    //s = addAbsInPlace([9], [1]);
+    //assert(s == [0, 1]);
+  //}
+
+  static byte[] addAbsInPlace(byte[] lhs, const(byte[]) rhs) {
+    uint carry = 0;
+
+    lhs.length = lhs.length > rhs.length ? lhs.length : rhs.length;
+    lhs[0 .. rhs.length] += rhs[];
+    lhs[1 .. $] += lhs[0 .. $-1] / 10;
+    carry = lhs[$-1] / 10;
+    lhs[] %= 10;
+    //lhs = carry ? lhs ~ 1 : lhs;
+    if (carry)
+      lhs ~= 1;
+
+    return lhs;
+  }
   unittest {
-    BigInt a = BigInt(947436711);
-    BigInt b = BigInt(3245879);		
-    BigInt c = BigInt();
-
-    c = a.addAbsOld(b);
-    assert(c.toString() == "950682590");
-    c = b.addAbsOld(a);
-    assert(c.toString() == "950682590");
-    BigInt d = BigInt(999);
-    BigInt e = BigInt(1);
-    c = d.addAbsOld(e);
-    assert(c.toString() == "1000");
-    c = e.addAbsOld(d);
-    assert(c.toString() == "1000");
-    a = BigInt(1);
-    b = BigInt(1);
-    c = a.addAbsOld(b);
-    assert(c.toString() == "2");
-    a = BigInt(0);
-    b = BigInt(0);
-    assert(a.mant == [0]);
-    assert(b.mant == [0]);
-    c = a.addAbsOld(b);
-    assert(c.toString() == "0");
-    a = BigInt(0);
-    b = BigInt(1);
-    c = a.addAbsOld(b);
-    assert(c.toString() == "1");
-    a = BigInt(9);
-    b = BigInt(1);
-    c = a.addAbsOld(b);
-    assert(c.toString() == "10");
+    writeln("addAbsInPlace unittest");
+    byte[] s = addAbsInPlace([1, 3, 8, 2, 9], [4, 7, 3, 2]);
+    assert(s == [5, 0, 2, 5, 9]);
+    s = addAbsInPlace([1, 3, 8, 2, 9], [4, 7, 3, 2]);
+    s = addAbsInPlace([1, 3, 8, 2, 9], [4, 7, 3, 2, 7]);
+    assert(s == [5, 0, 2, 5, 6, 1]);
+    s = addAbsInPlace([4, 7, 3, 2], [1, 3, 8, 2, 9]);
+    assert(s == [5, 0, 2, 5, 9]);
+    s = addAbsInPlace([0], [0]);
+    assert(s == [0]);
+    s = addAbsInPlace([9], [1]);
+    assert(s == [0, 1]);
+    writeln("addAbsInPlace unittest passed");
   }
 
   static byte[] addAbs(const(byte[]) lhs, const(byte[]) rhs) {
-    const(byte[]) big = rhs.length > lhs.length ? rhs : lhs;
-    const(byte[]) little = rhs.length <= lhs.length? rhs : lhs;
-    byte[] sum;
-    int i = 0;
-    byte carry = 0;
+    return addAbsInPlace(lhs.dup, rhs);
+  }
+  unittest {
+    writeln("addAbs unittest");
+    byte[] a = [1, 1, 7, 6, 3, 4, 7, 4, 9];
+    byte[] b = [9, 7, 8, 5, 4, 2, 3];
+    byte[] c = [0];
 
-    //if (cmpAbs(big, little) < 0)
-      //throw new Exception("the left operand needs to be bigger than the right operand");
+    c = addAbs(a, b);
+    assert(c == [0, 9, 5, 2, 8, 6, 0, 5, 9]);
+    c = addAbs(b, a);
+    assert(c == [0, 9, 5, 2, 8, 6, 0, 5, 9]);
+    byte[] d = [9, 9, 9];
+    byte[] e = [1];
+    c = addAbs(d, e);
+    assert(c == [0, 0, 0, 1]);
+    c = addAbs(e, d);
+    assert(c == [0, 0, 0, 1]);
+    a = [1];
+    b = [1];
+    c = addAbs(a, b);
+    assert(c == [2]);
+    a = [0];
+    b = [0];
+    assert(a == [0]);
+    assert(b == [0]);
+    c = addAbs(a, b);
+    assert(c == [0]);
+    a = [0];
+    b = [1];
+    c = addAbs(a, b);
+    assert(c == [1]);
+    a = [9];
+    b = [1];
+    c = addAbs(a, b);
+    assert(c == [0, 1]);
+    writeln("addAbs unittest passed");
+  }
 
-    sum.reserve(big.length + 1);
-    //writefln("%s %s", little, big);
-    
-    do {
-      sum ~= cast(byte)(little[i] + big[i] + carry);
-      if (sum[i] > 9) {
+  static byte[] addDigit(const(byte[]) lhs, uint dig) {
+    return addDigitInPlace(lhs.dup, dig);
+  }
+  static byte[] addDigitInPlace(byte[] lhs, uint dig) {
+    uint carry = 0;
+    uint i = 0;
+
+    if (BigInt.debugThis)
+      writefln("lhs: %s dig: %s", lhs.toReverseString(), dig);
+
+    lhs[i] += dig;
+    if (lhs[i] > 9) {
+      lhs[i] -= 10;
+      carry = 1;
+    } else {
+      carry = 0;
+    }
+    i++;
+
+    while (i < lhs.length) {
+      lhs[i] += carry;
+      if (lhs[i] > 9) {
+        lhs[i] -= 10;
         carry = 1;
-        sum[i] -= 10;
-      } else {
-        carry = 0;
-      }
-    } while (++i < little.length);
-
-    while (i < big.length) {
-      sum ~= cast(byte)(big[i] + carry);
-      if (sum[i] > 9) {
-        carry = 1;
-        sum[i] -= 10;
       } else {
         carry = 0;
       }
       i++;
     }
+    if (carry)
+      lhs ~= 1;
 
-    if (carry) {
-      sum ~= carry;
-    }
+    if (BigInt.debugThis)
+      writefln("result: %s", lhs.toReverseString());
 
-    return sum;
-  }
-  unittest {
-    byte[] s = addAbs([1, 3, 8, 2, 9], [4, 7, 3, 2]);
-    //writeln(s);
-    assert(s == [5, 0, 2, 5, 9]);
-    s = addAbs([1, 3, 8, 2, 9], [4, 7, 3, 2]);
-    s = addAbs([1, 3, 8, 2, 9], [4, 7, 3, 2, 7]);
-    //writeln(s);
-    assert(s == [5, 0, 2, 5, 6, 1]);
+    return lhs;
   }
 
-	BigInt subAbsOld(BigInt rhs) {
-		BigInt diff = BigInt();
-		BigInt ninesComp = BigInt();
+  //static byte[] subAbsInPlace(byte[] lhs, const(byte[]) rhs) {
+    //byte[] ninesComp = [];
 
-		//if (this.cmpAbsOld(rhs) < 0)
-			//throw new Exception("Subtrahend of absolute subtraction is greater than minuend");
+    ////if (lhs.cmpAbs(rhs) < 0)
+      ////throw new Exception("Subtrahend of absolute subtraction is greater than minuend");
 
-		ninesComp.mant.length = this.mant.length;
-		ninesComp.mant[] = 9;
-		ninesComp.mant[0 .. rhs.mant.length] -= rhs.mant[];
-		diff = this
-      .addAbsOld(ninesComp)
-      .incAbs();
-		do diff.mant.length--;
-		while(diff.mant[$ - 1] == 0 && diff.mant.length > 1);
+    //ninesComp.length = lhs.length;
+    //ninesComp[] = 9;
+    //ninesComp[0 .. rhs.length] -= rhs[];
+    //lhs = incAbs(addAbsInPlace(lhs, ninesComp));
+    //do lhs.length--;
+    //while(lhs[$ - 1] == 0 && lhs.length > 1);
 
-		return diff;
-	}
-	unittest {
-		BigInt c = BigInt();
-		BigInt b = BigInt(3245879);
-		BigInt a = BigInt(950682590);
+    //return lhs;
+  //}
+  //unittest {
+    //byte[] a = [0, 0, 1];
+    //byte[] b = [1, 1];
 
-		c = a.subAbsOld(b);
-		assert(c.toString() == "947436711");
-		a = BigInt(20);
-		b = BigInt(20);
-		c = a.subAbsOld(b);
-		assert(c.toString() == "0");
-		a = BigInt(0);
-		b = BigInt(0);
-		c = a.subAbsOld(b);
-		assert(c.toString() == "0");
-	}
+    //a = subAbsInPlace(a, b);
+    //assert(a == [9, 8]);
+    //a = [1];
+    //b = [1];
+    //a = subAbsInPlace(a, b);
+    //assert(a == [0]);
+    //a = [0, 0, 1];
+    //b = [9, 9];
+    //a = subAbsInPlace(a, b);
+    //assert(a == [1]);
+  //}  
 
-  static byte[] subAbs(const(byte[]) big, const(byte[]) little) {
-    byte[] diff;
-    byte borrow = 0;
-    byte i = 0;
+  static byte[] subAbsInPlace(byte[] lhs, const(byte[]) rhs) {
+    //byte[] diff;
+    ulong i = 0;
+    uint borrow = 0;
 
-		//if (cmpAbs(big, little) < 0)
-			//throw new Exception("Subtrahend of absolute subtraction is greater than minuend");
+    //if (cmpAbs(lhs, rhs) < 0)
+      //throw new Exception("Subtrahend of absolute subtraction is greater than minuend");
 
-    diff.reserve(big.length);
-
-    do {
-      diff ~= cast(byte)(big[i] - little[i] - borrow);
-      if (diff[i] < 0) {
-        diff[i] += 10;
-        borrow = 1;
-      } else {
-        borrow = 0;
-      }
-    } while(++i < little.length);
-
-    while(i < big.length) {
-      diff ~= cast(byte)(big[i] - borrow);
-      if (diff[i] < 0) {
-        diff[i] += 10;
+    foreach (ref a, b; lockstep(lhs, rhs)) {
+      a -= b + borrow;
+      if (a < 0) {
+        a += 10;
         borrow = 1;
       } else {
         borrow = 0;
@@ -193,34 +232,71 @@ private:
       i++;
     }
 
-    while (diff[$-1] == 0 && diff.length > 1)
-      diff.length--;
+    while(borrow) {
+      lhs[i] -= borrow;
+      if (lhs[i] < 0) {
+        lhs[i] += 10;
+        borrow = 1;
+      } else {
+        borrow = 0;
+      }
+      i++;
+    }
 
-    return diff;
+    while (lhs[$-1] == 0 && lhs.length > 1)
+      lhs.length--;
+
+    return lhs;
   }
   unittest {
+    writeln("subAbsInPlace unittest");
     byte[] a = [0, 0, 1];
     byte[] b = [1, 1];
 
-    assert(subAbs(a, b) == [9, 8]);
+    a = subAbsInPlace(a, b);
+    assert(a == [9, 8]);
     a = [1];
     b = [1];
-    assert(subAbs(a, b) == [0]);
+    a = subAbsInPlace(a, b);
+    assert(a == [0]);
     a = [0, 0, 1];
     b = [9, 9];
-    assert(subAbs(a, b) == [1]);
+    a = subAbsInPlace(a, b);
+    assert(a == [1]);
+    writeln("subAbsInPlace unittest passed");
   }
 
-  ref BigInt incAbs() {
-    int carry = 0;
-    //writeln(this); 
-    this.mant[0] += 1;
+  static byte[] subAbs(const(byte[]) lhs, const(byte[]) rhs) {
+    byte[] difference = lhs.dup;
+    difference = subAbsInPlace(difference, rhs);
+    return difference;
+  }
+  unittest {
+    writeln("subAbs unittest");
+    byte[] c = [0];
+    byte[] b = [9, 7, 8, 5, 4, 2, 3];
+    byte[] a = [0, 9, 5, 2, 8, 6, 0, 5, 9];
 
-    foreach (ref d; this.mant) {
+    c = subAbs(a, b);
+    assert(c == [1, 1, 7, 6, 3, 4, 7, 4, 9]);
+    a = [0, 2];
+    b = [0, 2];
+    c = subAbs(a, b);
+    assert(c == [0]);
+    a = [0];
+    b = [0];
+    c = subAbs(a, b);
+    assert(c == [0]);
+    writeln("subAbs unittest passed");
+  }
+
+  static byte[] incAbs(byte[] lhs) {
+    int carry = 1;
+
+    foreach (ref d; lhs) {
       d += carry;
       if (d == 10) {
         d = 0;
-        carry = 1;
       } else {
         carry = 0;
         break;
@@ -228,68 +304,69 @@ private:
     }
 
     if (carry) {
-      this.mant ~= 1;
+      lhs ~= 1;
     }
-    return this;
+    return lhs;
   }
   unittest {
-    BigInt a = BigInt(0);
-    a.incAbs();
-    //writeln(a);
-    assert(a.toString() == "1");
-    a = BigInt(9);
-    a.incAbs();
-    //writeln(a);
-    assert(a.toString() == "10");
-    a = BigInt(999);
-    a.incAbs();
-    //writeln(a);
-    assert(a.toString() == "1000");
+    writeln("incAbs unittest");
+    byte[] a = [0];
+    a = incAbs(a);
+    assert(a == [1]);
+    a = [9];
+    a = incAbs(a);
+    assert(a == [0, 1]);
+    a = [9, 9, 9];
+    a = incAbs(a);
+    assert(a == [0, 0, 0, 1]);
+    writeln("incAbs unittest passed");
   }
 
-  ref BigInt decAbs() {
+  static byte[] decAbs(byte[] lhs) {
     bool borrow = false;
 
-    if (this.cmpAbsOld(BigInt(1)) < 0)
-        throw new Exception("can't call decAbs() on a number whose absolute value is less than 1");
+    //if (lhs.cmpAbsOld(BigInt(1)) < 0)
+        //throw new Exception("can't call decAbs() on a number whose absolute value is less than 1");
 
     ulong i = 0;
 
     do {
-      if (this.mant[i] > 0) {
-        this.mant[i]--;
+      if (lhs[i] > 0) {
+        lhs[i]--;
         borrow = false;
       } else {
-        this.mant[i] = 9;
+        lhs[i] = 9;
         borrow = true;
       }
       i++;
     } while (borrow);
 
-    if (this.mant[$ - 1] == 0 && this.mant.length > 1)
-      this.mant.length--;
+    if (lhs[$ - 1] == 0 && lhs.length > 1)
+      lhs.length--;
 
-    return this;
+    return lhs;
   }
   unittest {
-    BigInt a = BigInt(2);
-    a.decAbs();
-    assert(a.toString() == "1");
-    a.decAbs();
-    assert(a.toString() == "0");
-    BigInt b = BigInt(1000);
-    b.decAbs();
-    assert(b.toString() == "999");
-    b.decAbs();
-    assert(b.toString() == "998");
-    BigInt c = BigInt(11);
-    c.decAbs();
-    assert(c.toString() == "10");
-    c.decAbs();
-    assert(c.toString() == "9");
-    BigInt d = BigInt(-7);
-    d.decAbs();
-    assert(d.toString() == "-6");
+    writeln("decAbs unittest");
+    byte[] a = [2];
+    a = decAbs(a);
+    assert(a == [1]);
+    a = decAbs(a);
+    assert(a == [0]);
+    byte[] b = [0, 0, 0, 1];
+    b = decAbs(b);
+    assert(b == [9, 9, 9]);
+    b = decAbs(b);
+    assert(b == [8, 9, 9]);
+    byte[] c = [1, 1];
+    c = decAbs(c);
+    assert(c == [0, 1]);
+    c = decAbs(c);
+    assert(c == [9]);
+    byte[] d = [7];
+    d = decAbs(d);
+    assert(d == [6]);
+    writeln("decAbs unittest passed");
   }
 
 	int cmpAbsOld(const(BigInt) rhs) const {
@@ -306,7 +383,8 @@ private:
 
 		return 0;
 	}
-	unittest{
+	unittest {
+    writeln("cmpAbsOld unittest");
 		BigInt a = BigInt(234);
 		BigInt b = BigInt(969);
 		BigInt c = BigInt(-1293);
@@ -322,6 +400,7 @@ private:
 		assert(b.cmpAbsOld(e) == 0);
 		assert(c.cmpAbsOld(f) > 0);
 		assert(f.cmpAbsOld(c) < 0);
+    writeln("cmpAbsOld unittest passed");
 	}
 
   static int cmpAbs(const(byte[]) left, const(byte[]) right) {
@@ -338,7 +417,8 @@ private:
 
     return 0;
   }
-	unittest{
+	unittest {
+    writeln("cmpAbs unittest");
 		byte[] a = [2, 3, 4];
 		byte[] b = [9, 6, 9];
 		byte[] c = [1, 2, 9, 3];
@@ -354,6 +434,7 @@ private:
 		assert(cmpAbs(b, e) == 0);
 		assert(cmpAbs(c, f) < 0);
 		assert(cmpAbs(f, c) > 0);
+    writeln("cmpAbs unittest passed");
 	}
 
 	static byte[] karatsuba(const(byte)[] lhs, const(byte)[] rhs) {
@@ -396,59 +477,127 @@ private:
 
     //writefln("z0: %s, z1: %s, z2: %s", z0, z1, z2);
 
-		//return z2.mulPow10(2 * m)
+		//return z2.shiftBig(2 * m)
 				//.addAbs(z1
 					//.subAbs(z2)
 					//.subAbs(z0)
-					//.mulPow10(m))
+					//.shiftBig(m))
 				//.addAbs(z0);
 
-		return addAbs(
-      addAbs(
-        mulPow10(z2, 2 * m), 
-        mulPow10(
-          subAbs(
-            subAbs(z1, z2),
+		return addAbsInPlace(
+      addAbsInPlace(
+        shiftBig(z2, 2 * m), 
+        shiftBig(
+          subAbsInPlace(
+            subAbsInPlace(z1, z2),
             z0),
           m)),
       z0);
 	}
 
+  static byte[] shiftBigInPlace(byte[] lhs, ulong n) {
+    if (lhs[$ - 1] == 0)
+      return lhs;
+
+    lhs.length += n;
+
+    for (ulong i = lhs.length; i > n; i--) {
+      lhs[i - 1] = lhs[i - n - 1];
+    }
+
+    lhs[0 .. n] = 0;
+
+    return lhs;
+  }
+  unittest {
+    writeln("shiftBigInPlace unittest");
+    byte[] a = "1234".toReverseBytes();
+    byte[] b = "4000".toReverseBytes();
+
+    a = shiftBigInPlace(a, 5);
+    assert(a.toReverseString() == "123400000");
+    b = shiftBigInPlace(b, 2);
+    assert(b.toReverseString() == "400000");
+    a = shiftBigInPlace(a, 1);
+    assert(a.toReverseString() == "1234000000");
+    a = "20".toReverseBytes();
+    a = shiftBigInPlace(a, 2);
+    assert(a.toReverseString() == "2000");
+    writeln("shiftBigInPlace unittest passed");
+  }
+
 	// Multiplies by a power of 10
-	static byte[] mulPow10(byte[] lhs, ulong n) {
-		byte[] copy = lhs.dup;
-
-		if (n < 1) {
-			throw new Exception("mulPow10(num) is not supported for num < 1");
-		}
-
-		if (copy[$ - 1] == 0)
-			return copy;
-
-		copy.length += n;
-
-		foreach(i; retro(iota(n, copy.length)))
-			copy[i] = copy[i - n];
-
-		copy[0 .. n] = 0;
-
-		return copy;
+	static byte[] shiftBig(byte[] lhs, ulong n) {
+    return shiftBigInPlace(lhs.dup, n);
 	}
-	unittest {
-		auto a = BigInt(1234);
-		auto b = BigInt(4000);
-		BigInt c;
+  unittest {
+    writeln("shiftBig unittest");
+    auto a = BigInt(1234);
+    auto b = BigInt(4000);
+    BigInt c;
 
-		c = BigInt(mulPow10(a.mant, 5), a.sign);
-		assert(c.toString() == "123400000");
-		c = BigInt(mulPow10(b.mant, 2), b.sign);
-		assert(c.toString() == "400000");
-		c = BigInt(mulPow10(a.mant, 1), a.sign);
-		assert(c.toString() == "12340");
-		a = BigInt(20);
-		c = BigInt(mulPow10(a.mant, 2), a.sign);
-		assert(c.toString() == "2000");
-	}
+    c = BigInt(shiftBig(a.mant, 5), a.sign);
+    assert(c.toString() == "123400000");
+    c = BigInt(shiftBig(b.mant, 2), b.sign);
+    assert(c.toString() == "400000");
+    c = BigInt(shiftBig(a.mant, 1), a.sign);
+    assert(c.toString() == "12340");
+    a = BigInt(20);
+    c = BigInt(shiftBig(a.mant, 2), a.sign);
+    assert(c.toString() == "2000");
+    writeln("shiftBig unittest passed");
+  }
+
+  static byte[] shiftLittleInPlace(byte[] lhs, ulong n) {
+    if (lhs[$ - 1] == 0)
+      return lhs;
+
+    if (n >= lhs.length) {
+      lhs.length = 1;
+      lhs[0] = 0;
+      return lhs;
+    }
+
+    for (ulong i = 0; i < lhs.length - n; i++) {
+      lhs[i] = lhs[i + n];
+    }
+
+    lhs.length = lhs.length - n;
+
+    return lhs;
+  }
+
+	static byte[] shiftLittle(byte[] lhs, ulong n) {
+    return shiftLittleInPlace(lhs.dup, n);
+  }
+  unittest {
+    writeln("shiftLittleInPlace unittest");
+    auto a = BigInt(123400000);
+    auto b = BigInt(400000);
+    BigInt c;
+
+    c = BigInt(shiftLittle(b.mant, 2), b.sign);
+    assert(c.toString() == "4000");
+    c = BigInt(shiftLittle(a.mant, 1), a.sign);
+    assert(c.toString() == "12340000");
+    c = BigInt(shiftLittle(a.mant, 2), a.sign);
+    assert(c.toString() == "1234000");
+    c = BigInt(shiftLittle(a.mant, 3), a.sign);
+    assert(c.toString() == "123400");
+    c = BigInt(shiftLittle(a.mant, 4), a.sign);
+    assert(c.toString() == "12340");
+    c = BigInt(shiftLittle(a.mant, 5), a.sign);
+    assert(c.toString() == "1234");
+    c = BigInt(shiftLittle(a.mant, 6), a.sign);
+    assert(c.toString() == "123");
+    c = BigInt(shiftLittle(a.mant, 7), a.sign);
+    assert(c.toString() == "12");
+    c = BigInt(shiftLittle(a.mant, 8), a.sign);
+    assert(c.toString() == "1");
+    c = BigInt(shiftLittle(a.mant, 9), a.sign);
+    assert(c.toString() == "0");
+    writeln("shiftLittleInPlace unittest passed");
+  }
 
 	static byte[] mulSingleDigit(const(byte[]) lhs, const(byte) n) {
 		byte[] pro = lhs.dup;
@@ -473,6 +622,7 @@ private:
 		return pro;
 	}
 	unittest {
+    writeln("mulSingleDigit unittest");
 		auto a = BigInt(23432);
 		auto b = BigInt(87263);
 		auto c = BigInt(-32786); 
@@ -484,15 +634,12 @@ private:
 		byte z = 3;
 
 		assert(BigInt(mulSingleDigit(a.mant, x), a.sign).toString() == "93728");
-		//writeln(a.mulSingleDigit(y).toString());
-    //writeln(BigInt(mulSingleDigit(a.mant, y)));
-    // current result is 843552 rather than 210888. Why?
 		assert(BigInt(mulSingleDigit(a.mant, y), a.sign).toString() == "210888");
 		assert(BigInt(mulSingleDigit(a.mant, z), a.sign).toString() == "70296");
 		assert(BigInt(mulSingleDigit(b.mant, x), a.sign).toString() == "349052");
 		assert(BigInt(mulSingleDigit(b.mant, y), a.sign).toString() == "785367");
 		assert(BigInt(mulSingleDigit(b.mant, z), a.sign).toString() == "261789");
-		assert(BigInt(mulSingleDigit(c.mant, x), a.sign).toString() == "131144"); // the sign is ignored for practical reasons. 
+		assert(BigInt(mulSingleDigit(c.mant, x), a.sign).toString() == "131144");
 		assert(BigInt(mulSingleDigit(c.mant, y), a.sign).toString() == "295074");
 		assert(BigInt(mulSingleDigit(c.mant, z), a.sign).toString() == "98358");
 		assert(BigInt(mulSingleDigit(d.mant, w), a.sign).toString() == "0");
@@ -502,6 +649,7 @@ private:
 		assert(BigInt(mulSingleDigit(a.mant, w), a.sign).toString() == "0");
 		assert(BigInt(mulSingleDigit(b.mant, w), a.sign).toString() == "0");
 		assert(BigInt(mulSingleDigit(c.mant, w), a.sign).toString() == "0");
+    writeln("mulSingleDigit unittest passed");
 	}
 
   Tuple!(byte[], byte[]) divMod(const(byte)[] lhs, const(byte)[] rhs) const {
@@ -511,18 +659,15 @@ private:
 		byte[] acc;
 		byte dig;
 		int littleEnd, bigEnd;
-
+    
 		if (rhs == [0])
 			throw new Exception("Divide by zero error.");
 		if (cmpAbs(lhs, rhs) < 0) {
-      //quo = [0];
-			//rem = rhs;
-			return Tuple!(byte[], byte[])([0], rhs.dup);
+			return Tuple!(byte[], byte[])([0], lhs.dup);
 		}
 
 		// Needs to examine the lengths of each number and act accordingly.
 		// We want this to work regardless of which side has the bigger number.
-		// Division might yield 0, but it should *never* crash like it does now.
 		// Modulus by a bigger number should yield the number itself.
 		
 		littleEnd = cast(int)(lhs.length - rhs.length);
@@ -533,8 +678,8 @@ private:
 			littleEnd--;
 		}
 
-		const(byte)[] divid = lhs[littleEnd .. bigEnd];
-		
+		byte[] divid = lhs[littleEnd .. bigEnd].dup;
+
     // We're building up the quotient digit-by-digit, so the length of the mantissa must be 0
     quo.length = 0;
 
@@ -551,7 +696,7 @@ private:
 			rem = subAbs(divid, subAbs(acc, rhs));
 
 			if (littleEnd > 0) { 
-				divid = addAbs(mulPow10(rem, 1), [lhs[littleEnd - 1]]);   // This looks quite clunky. What we probably want is an accumulate function.
+				divid = addDigit(shiftBig(rem, 1), lhs[littleEnd - 1]);
 			}
 
 		} while (littleEnd-- > 0);
@@ -565,38 +710,59 @@ private:
     // I could look only at the byte[]s of each cached operand, then consider the signs of the actual operand.
     // Or I would just look at the BigInt operands.
 
+    BigInt.debugThis = false;
+
     return Tuple!(byte[], byte[])(quo, rem);
   }
 
   BigInt powFast(T)(auto ref const(T) exp) const
   if (isIntegral!T || is(T == BigInt)) {
-    T remainder = 0;
-    T halfExp;
+    const(byte)[] powInternal(T)(auto ref const(T) exp) 
+    if (isIntegral!T || is(T == BigInt)) {
+      T rem = 0;
+      T halfExp;
 
-    if (exp < 0) {
-      throw new Exception("It's an integer library, not a fraction or floating point library. No negative exponents allowed!");
-    } else if (exp == 0) {
-      return BigInt(1);
-    } else if (exp == 1) {
-      BigInt result = BigInt(this.mant.dup, this.sign);
-      return result;
-  // If I make it fully generic like this, I need to provide an efficient divMod function that won't calculate divMod twice.
-    // I.e. I need to make divMod cache the result of the last operation and query whether we're using the same operands as last time.
+      if (exp < 0) {
+        throw new Exception("It's an integer library, not a fraction or floating point library. No negative exponents allowed!");
+      } else if (exp == 0) {
+        return [1];
+      } else if (exp == 1) {
+        return this.mant;
+      }
+
+      halfExp = exp / 2;
+      static if (is(T == BigInt))
+        rem = BigInt.lastRemainder;
+      else
+        rem = exp % 2;
+
+      static if (is(T == BigInt)) {
+        const(byte)[] left = powInternal(halfExp.byRef());
+        const(byte)[] right = powInternal(BigInt(addAbsInPlace(halfExp.mant, rem.mant), false).byRef());
+      } else {
+        const(byte)[] left = powInternal(halfExp);
+        const(byte)[] right = powInternal(halfExp + rem);
+      }
+
+      return karatsuba(left, right);
     }
-
-    halfExp = exp / 2;
 
     static if (is(T == BigInt)) {
-      remainder = BigInt.lastRemainder;
+      // How do I make this more efficient? Copying a BigInt with the * operator is not acceptable. Karatsuba() should be used instead.
+      //BigInt result;
+      //result = BigInt(result.mant, (this.sign && exp % 2));
+      bool odd = exp % 2 == 1 ? true : false;
+      bool sign = this.sign && odd;
+      //result.sign = this.sign && odd;
+      //result.mant = powInternal(exp);
+      BigInt result = BigInt(powInternal(exp), sign);
+      return result;
     } else {
-      remainder = exp % 2;
+      return BigInt(powInternal(exp), this.sign && exp % 2);
     }
-
-    auto left = powFast(halfExp);
-    auto right = powFast(halfExp + remainder);
-    return left * right;
   }
   unittest {
+    writeln("powFast unittest");
     BigInt a = 2;
     assert(a.toString() == "2");
     BigInt b = 5;
@@ -612,6 +778,10 @@ private:
     BigInt e = 13;
     assert(e.powFast(11).toString() == "1792160394037");
     assert(e.powFast(14).toString() == "3937376385699289");
+    BigInt d = 13;
+    z = a.powFast(d);
+    assert(z.toString() == "8192");
+    writeln("powFast unittest passed");
   }
 
   BigInt add()(auto ref const(BigInt) rhs) const {
@@ -635,6 +805,7 @@ private:
 		return sum;
 	}
 	unittest {
+    writeln("add unittest");
 		BigInt a = BigInt(2948);
 		BigInt b = BigInt(38);
 		BigInt c = BigInt(-10392);
@@ -650,7 +821,6 @@ private:
 		e = b.add(a);
 		assert(e.toString() == "2986");
 		e = a.add(d);
-    //writeln(e);
 		assert(e.toString() == "2510");
 		e = d.add(a);
 		assert(e.toString() == "2510");
@@ -670,6 +840,7 @@ private:
 		assert(e.toString() == "1091");
 		e = i.add(h);
 		assert(e.toString() == "1091");		
+    writeln("add unittest passed");
 	}
 
 	BigInt sub()(auto ref BigInt rhs) {
@@ -693,6 +864,7 @@ private:
 		return diff;
 	}
 	unittest {
+    writeln("sub unittest");
 		BigInt a = BigInt(2948);
 		BigInt b = BigInt(38);
 		BigInt c = BigInt(-10392);
@@ -727,13 +899,14 @@ private:
 		assert(e.toString() == "655");
 		e = i.sub(h);
 		assert(e.toString() == "-655");	
+    writeln("sub unittest passed");
 	}
 
   ref BigInt inc() {
     if (this.sign) {
-      this.decAbs();
+      this.mant = decAbs(this.mant);
     } else {
-      this.incAbs();
+      this.mant = incAbs(this.mant);
     }
 
     if (this.mant[$ - 1] == 0)
@@ -742,6 +915,7 @@ private:
     return this;
   }
   unittest {
+    writeln("inc unittest");
     BigInt a = BigInt(555);
     a.inc();
     assert(a.toString() == "556");
@@ -764,16 +938,17 @@ private:
     BigInt f = BigInt(9);
     f.inc();
     assert(f.toString() == "10");
+    writeln("inc unittest passed");
   }
 
   ref BigInt dec() {
     if (this.sign) {
-      this.incAbs();
+      this.mant = incAbs(this.mant);
     } else if (this.mant[$ - 1] == 0) {
-      this.incAbs();
+      this.mant = incAbs(this.mant);
       this.sign = true;
     } else {
-      this.decAbs();
+      this.mant = decAbs(this.mant);
     }
 
     if (this.mant[$ - 1] == 0)
@@ -782,6 +957,7 @@ private:
     return this;
   }
   unittest {
+    writeln("dec unittest");
     BigInt a = BigInt(2);
     a.dec();
     assert(a.toString() == "1");
@@ -803,6 +979,7 @@ private:
     BigInt e = BigInt(-999);
     e.dec();
     assert(e.toString() == "-1000");
+    writeln("dec unittest passed");
   }
 
 	BigInt mul()(auto ref const(BigInt) rhs) const {
@@ -819,6 +996,7 @@ private:
 		return pro;
 	}
 	unittest {
+    writeln("mul unittest");
 		auto a = BigInt(999);
 		auto b = BigInt(9);
 
@@ -871,6 +1049,7 @@ private:
     b = BigInt(128);
     c = a.mul(b);
     assert(c.toString() == "8192");
+    writeln("mul unittest passed");
 	}
 
   BigInt neg() {
@@ -883,13 +1062,15 @@ private:
     BigInt quo;
 
     auto result = divMod(this.mant, rhs.mant);
+
     quo = BigInt(result[0], result[0][$-1] == 0 ? false : (this.sign != rhs.sign));
-    BigInt.lastQuotient = BigInt(quo.mant, quo.sign);
-    BigInt.lastRemainder = BigInt(result[1], result[1][$-1] == 0 ? false : this.sign);
+    BigInt.lastQuotient = BigInt(quo.mant.dup, quo.sign);
+    BigInt.lastRemainder = BigInt(result[1].dup, result[1][$-1] == 0 ? false : this.sign);
 
 		return quo;
 	}
 	unittest {
+    writeln("div unittest");
 		auto a = BigInt(476);
 		auto b = BigInt(12);
 		auto d = BigInt(23803671638400872);
@@ -901,10 +1082,7 @@ private:
     auto j = BigInt(16);
     auto k = BigInt(5);
 
-		auto z = a.div(b);  // if we initialize to 0, this unittest fails. Why?
-    // bug fixed. DivMod builds up its mantissa digit by digit, so it's mantissa length
-    // must initially be 0. DivMod now sets it to 0 before building the mantissa.
-		//writeln(z);
+		auto z = a.div(b);
 		assert(z.toString() == "39");
 		z = d.div(e);
 		assert(z.toString() == "4885981579");
@@ -922,11 +1100,7 @@ private:
     assert(z.toString() == "0");
     z = i.div(k);
     assert(BigInt.lastRemainder.toString() == "0");
-		/*try {
-			z = g.div(h);
-		} catch(Exception err) {
-			writeln(err.message);
-		}*/
+    writeln("div unittest passed");
 	}
 
 	BigInt mod()(auto ref const(BigInt) rhs) const {
@@ -934,12 +1108,13 @@ private:
 
     auto result = divMod(this.mant, rhs.mant);
     rem = BigInt(result[1], result[1][$-1] == 0 ? false : this.sign);
-    BigInt.lastQuotient = BigInt(result[0], result[0][$-1] == 0 ? false : (this.sign != rhs.sign));
-    BigInt.lastRemainder = BigInt(rem.mant, rem.sign);
+    BigInt.lastQuotient = BigInt(result[0].dup, result[0][$-1] == 0 ? false : (this.sign != rhs.sign));
+    BigInt.lastRemainder = BigInt(rem.mant.dup, rem.sign);
 
 		return rem;
 	}
 	unittest {
+    writeln("mod unittest");
 		auto a = BigInt(476);
 		auto b = BigInt(12);
 		auto c = BigInt(23803671638400872);
@@ -968,7 +1143,21 @@ private:
     z = j.mod(k);
     assert(z.toString() == "0");
     z = j.mod(l);
+    assert(z.toString() == "-15");
     assert(BigInt.lastQuotient.toString() == "0");
+    z = h.mod(j);
+    assert(z.toString() == "-6");
+    z = h.mod(g);
+    assert(z.toString() == "-111");
+    z = f.mod(j);
+    assert(z.toString() == "-10");
+    z = f.mod(g);
+    assert(z.toString() == "-70");
+    z = b.mod(k);
+    assert(z.toString() == "2");
+    z = l.mod(k);
+    assert(z.toString() == "1");
+    writeln("div unittest passed");
 	}
 
 public:
@@ -1002,7 +1191,7 @@ public:
 			this.mant.length = 1;
 	}
 	unittest {
-    //writeln("this(string source) unittest:");
+    writeln("this(string) unittest");
 		BigInt num = BigInt("100");
 		assert(num.mant == [0, 0, 1]);
 		assert(num.sign == false);
@@ -1010,6 +1199,7 @@ public:
 		BigInt num2 = BigInt("-321");
 		assert(num2.mant == [1, 2, 3]);
 		assert(num2.sign == true);
+    writeln("this(string) unittest passed");
 	}
 
 	this(long source) nothrow {
@@ -1034,7 +1224,7 @@ public:
 		}
 	}
 	unittest {
-    //writeln("this(long source) unittest:");
+    writeln("this(long) unittest");
     BigInt q = BigInt(0);
     assert(q.mant == [0]);
 
@@ -1074,6 +1264,7 @@ public:
 		assert(a.sign == false);
 		assert(b.mant == [0]);
 		assert(b.sign == false);
+    writeln("this(long) unittest passed");
 	}
 
   this(byte[] source, bool sign) nothrow {
@@ -1089,7 +1280,7 @@ public:
     this.sign = sign;
 	}
   unittest {
-    //writeln("this(byte[] source) unittest:");
+    writeln("this(byte[]) unittest");
 	  auto c = BigInt("68630377364883");
     auto d = BigInt(c.mant, c.sign);
     BigInt e = c;
@@ -1098,19 +1289,14 @@ public:
     assert(c.mant != e.mant);
     assert(c.mant is d.mant);
     assert(c.mant !is e.mant);
-    //writefln("c: %s, d: %s", c, d);
-    //writefln("c.mant is d.mant? %s", c.mant is d.mant);
-    //c[0] = 5;
-    //writefln("c: %s, e: %s", c, e);
-    //writefln("c.mant is e.mant? %s", c.mant is e.mant);
-    //writeln("end unittest");
+    writeln("this(byte[]) unittest passed");
   }
 
 	this(this) nothrow {
-    //writefln("postblit called!");
 		mant = mant.dup;
 	}
 	unittest {
+    writeln("this(this) unittest");
 		BigInt a = "777";
 		BigInt b = "888";
 
@@ -1118,6 +1304,7 @@ public:
 		assert(c.toString() == "777");
 		a = b;
 		assert(a.toString() == "888");
+    writeln("this(this) unittest passed");
 	}
 
   auto ref BigInt opUnary(string op)() {
@@ -1129,6 +1316,7 @@ public:
       return this.neg();
   }
   unittest {
+    writeln("opUnary unittest");
     BigInt a = BigInt(-2);
     ++a;
     assert(a.toString() == "-1");
@@ -1159,6 +1347,7 @@ public:
     assert((-a).toString() == "2");
     assert((-b).toString() == "-10");
     assert((-c).toString() == "9");
+    writeln("opUnary unittest passed");
   }
 
   //BigInt opBinary(string op, T)(T rhs)
@@ -1225,6 +1414,7 @@ public:
 		return true;
 	}
 	unittest {
+    writeln("opEquals unittest");
 		auto a = BigInt(18298);
 		auto b = BigInt(327);
 		auto c = BigInt(-2389893);
@@ -1239,6 +1429,7 @@ public:
 		assert(c != f);
 		assert(e == g);
 		assert(d == h);
+    writeln("opEquals unittest passed");
 	}
 
   int opCmp(T)(T rhs) const
@@ -1267,6 +1458,7 @@ public:
 		return res;
 	}
 	unittest {
+    writeln("opCmp unittest");
 		auto a = BigInt(18298);
 		auto b = BigInt(327);
 		auto c = BigInt(-2389893);
@@ -1287,6 +1479,7 @@ public:
 		assert(f < a);
 		assert(h < b);
 		assert(h >= f);
+    writeln("opCmp unittest passed");
 	}
 
   void opAssign(T)(T rhs)
@@ -1325,10 +1518,12 @@ public:
     return cast(immutable)mantissa;
 	}
 	unittest {
+    writeln("mantissa unittest");
     auto a = BigInt(12345);
     assert(a.mantissa == "12345");
     a = BigInt(54321);
     assert(a.mantissa == "54321");
+    writeln("mantissa unittest passed");
 	}
 
   string toString() const {
@@ -1345,16 +1540,35 @@ public:
 		return cast(string)(str);
 	}	
 	unittest {
+    writeln("toString unittest");
 		BigInt num = BigInt(321);
 		assert(num.toString() == "321");
 
 		BigInt num2 = BigInt(-536);
 		assert(num2.toString() == "-536");
+    writeln("toString unittest passed");
 	}
 
   mixin RvalueRef;
 }
 
+byte[] toReverseBytes(string value) {
+  return value.retro.map!(a => (a - 48).to!byte()).array();
+}
+unittest {
+  writeln("toReverseBytes unittest");
+  assert("2374".toReverseBytes() == [4, 7, 3, 2]);
+  writeln("toReverseBytes unittest passed");
+}
+
+string toReverseString(const(byte)[] value) {
+  return value.retro.map!(a => (a + 48).to!char()).array.idup();
+}
+unittest {
+  writeln("toReverseString unittest");
+  assert([4, 7, 3, 2].toReverseString() == "2374");
+  writeln("toReverseString unittest passed");
+}
 
 int[] factorial(int[] digits) {
 	int[] result = digits.dup;
