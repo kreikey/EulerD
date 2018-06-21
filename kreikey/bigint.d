@@ -25,12 +25,6 @@ struct BigInt {
 private:
 	byte[] mant = [0];
 	bool sign = false;
-	//alias mant this;
-  static bool divModCached = false;
-  static byte[] lastDividend;
-  static byte[] lastDivisor;
-  static byte[] lastQuotient;
-  static byte[] lastRemainder;
 
 	BigInt addAbsOld(BigInt rhs) {
 		BigInt sum = BigInt();
@@ -410,15 +404,14 @@ private:
 				//.addAbs(z0);
 
 		return addAbs(
-        addAbs(
-          mulPow10(z2, 2 * m), 
-          mulPow10(
-            subAbs(
-              subAbs(z1, z2),
-              z0),
-            m)
-          ),
-        z0);
+      addAbs(
+        mulPow10(z2, 2 * m), 
+        mulPow10(
+          subAbs(
+            subAbs(z1, z2),
+            z0),
+          m)),
+      z0);
 	}
 
 	// Multiplies by a power of 10
@@ -446,14 +439,14 @@ private:
 		auto b = BigInt(4000);
 		BigInt c;
 
-		c = BigInt(mulPow10(a.mant, 5));
+		c = BigInt(mulPow10(a.mant, 5), a.sign);
 		assert(c.toString() == "123400000");
-		c = BigInt(mulPow10(b.mant, 2));
+		c = BigInt(mulPow10(b.mant, 2), b.sign);
 		assert(c.toString() == "400000");
-		c = BigInt(mulPow10(a.mant, 1));
+		c = BigInt(mulPow10(a.mant, 1), a.sign);
 		assert(c.toString() == "12340");
 		a = BigInt(20);
-		c = BigInt(mulPow10(a.mant, 2));
+		c = BigInt(mulPow10(a.mant, 2), a.sign);
 		assert(c.toString() == "2000");
 	}
 
@@ -490,49 +483,41 @@ private:
 		byte y = 9;
 		byte z = 3;
 
-		assert(BigInt(mulSingleDigit(a.mant, x)).toString() == "93728");
+		assert(BigInt(mulSingleDigit(a.mant, x), a.sign).toString() == "93728");
 		//writeln(a.mulSingleDigit(y).toString());
     //writeln(BigInt(mulSingleDigit(a.mant, y)));
     // current result is 843552 rather than 210888. Why?
-		assert(BigInt(mulSingleDigit(a.mant, y)).toString() == "210888");
-		assert(BigInt(mulSingleDigit(a.mant, z)).toString() == "70296");
-		assert(BigInt(mulSingleDigit(b.mant, x)).toString() == "349052");
-		assert(BigInt(mulSingleDigit(b.mant, y)).toString() == "785367");
-		assert(BigInt(mulSingleDigit(b.mant, z)).toString() == "261789");
-		assert(BigInt(mulSingleDigit(c.mant, x)).toString() == "131144"); // the sign is ignored for practical reasons. 
-		assert(BigInt(mulSingleDigit(c.mant, y)).toString() == "295074");
-		assert(BigInt(mulSingleDigit(c.mant, z)).toString() == "98358");
-		assert(BigInt(mulSingleDigit(d.mant, w)).toString() == "0");
-		assert(BigInt(mulSingleDigit(d.mant, x)).toString() == "0");
-		assert(BigInt(mulSingleDigit(d.mant, y)).toString() == "0");
-		assert(BigInt(mulSingleDigit(d.mant, z)).toString() == "0");
-		assert(BigInt(mulSingleDigit(a.mant, w)).toString() == "0");
-		assert(BigInt(mulSingleDigit(b.mant, w)).toString() == "0");
-		assert(BigInt(mulSingleDigit(c.mant, w)).toString() == "0");
+		assert(BigInt(mulSingleDigit(a.mant, y), a.sign).toString() == "210888");
+		assert(BigInt(mulSingleDigit(a.mant, z), a.sign).toString() == "70296");
+		assert(BigInt(mulSingleDigit(b.mant, x), a.sign).toString() == "349052");
+		assert(BigInt(mulSingleDigit(b.mant, y), a.sign).toString() == "785367");
+		assert(BigInt(mulSingleDigit(b.mant, z), a.sign).toString() == "261789");
+		assert(BigInt(mulSingleDigit(c.mant, x), a.sign).toString() == "131144"); // the sign is ignored for practical reasons. 
+		assert(BigInt(mulSingleDigit(c.mant, y), a.sign).toString() == "295074");
+		assert(BigInt(mulSingleDigit(c.mant, z), a.sign).toString() == "98358");
+		assert(BigInt(mulSingleDigit(d.mant, w), a.sign).toString() == "0");
+		assert(BigInt(mulSingleDigit(d.mant, x), a.sign).toString() == "0");
+		assert(BigInt(mulSingleDigit(d.mant, y), a.sign).toString() == "0");
+		assert(BigInt(mulSingleDigit(d.mant, z), a.sign).toString() == "0");
+		assert(BigInt(mulSingleDigit(a.mant, w), a.sign).toString() == "0");
+		assert(BigInt(mulSingleDigit(b.mant, w), a.sign).toString() == "0");
+		assert(BigInt(mulSingleDigit(c.mant, w), a.sign).toString() == "0");
 	}
 
-  Tuple!(const(byte)[], const(byte)[]) divMod(const(byte)[] lhs, const(byte)[] rhs) const {
+  Tuple!(byte[], byte[]) divMod(const(byte)[] lhs, const(byte)[] rhs) const {
     // This function could use some serious reworking and updating, for optimization purposes.
     byte[] quo;
     byte[] rem;
 		byte[] acc;
-		//byte[] divid;
-		//byte[] quoMant;
 		byte dig;
 		int littleEnd, bigEnd;
-
-    if (this.divModCached) {
-      if (lhs == this.lastDividend && rhs == this.lastDivisor) {
-        return Tuple!(const(byte)[], const(byte)[])(this.lastQuotient.dup, this.lastRemainder.dup);
-      }
-    }
 
 		if (rhs == [0])
 			throw new Exception("Divide by zero error.");
 		if (cmpAbs(lhs, rhs) < 0) {
       //quo = [0];
 			//rem = rhs;
-			return Tuple!(const(byte)[], const(byte)[])([0], rhs.idup);
+			return Tuple!(byte[], byte[])([0], rhs.dup);
 		}
 
 		// Needs to examine the lengths of each number and act accordingly.
@@ -580,46 +565,35 @@ private:
     // I could look only at the byte[]s of each cached operand, then consider the signs of the actual operand.
     // Or I would just look at the BigInt operands.
 
-    this.divModCached = true;
-    this.lastQuotient = quo.dup;
-    this.lastRemainder = rem.dup;
-    this.lastDividend = lhs.dup;
-    this.lastDivisor = rhs.dup;
-
-    return Tuple!(const(byte)[], const(byte)[])(quo, rem);
+    return Tuple!(byte[], byte[])(quo, rem);
   }
 
   BigInt powFast(T)(auto ref const(T) exp) const
   if (isIntegral!T || is(T == BigInt)) {
     T remainder = 0;
-    //BigInt left, right;
     T halfExp;
-   //int currentIter = iter;
 
     if (exp < 0) {
       throw new Exception("It's an integer library, not a fraction or floating point library. No negative exponents allowed!");
     } else if (exp == 0) {
       return BigInt(1);
     } else if (exp == 1) {
-      BigInt result;
-      result.mant = this.mant.dup;
-      result.sign = this.sign;
-      //BigInt result = this;
+      BigInt result = BigInt(this.mant.dup, this.sign);
       return result;
   // If I make it fully generic like this, I need to provide an efficient divMod function that won't calculate divMod twice.
     // I.e. I need to make divMod cache the result of the last operation and query whether we're using the same operands as last time.
     }
 
-    //writefln("iteration: %s", iter++);
-    remainder = exp % 2;
-    //writefln("remainder: %s", remainder);
     halfExp = exp / 2;
-    //writefln("exp: %s", exp);
-    //writefln("this: %s", this);
+
+    static if (is(T == BigInt)) {
+      remainder = BigInt.lastRemainder;
+    } else {
+      remainder = exp % 2;
+    }
+
     auto left = powFast(halfExp);
     auto right = powFast(halfExp + remainder);
-    //writefln("this: %s, powfast: %s * %s; iter: %s", this, left, right, currentIter);
-    //return powFast(exp, iter) * powFast(exp + remainder, iter);
     return left * right;
   }
   unittest {
@@ -639,152 +613,6 @@ private:
     assert(e.powFast(11).toString() == "1792160394037");
     assert(e.powFast(14).toString() == "3937376385699289");
   }
-
-public:
-	this(string source) nothrow {
-		bool allZeros = true;
-    bool valid = true;
-
-		if (source[0] == '-') {
-			this.sign = true;
-			source = source[1 .. $];
-		}
-
-		foreach (c; source) {
-			if (c < '0' || c > '9')
-				valid = false;
-			if (c != '0')
-				allZeros = false;
-		}
-
-    assert(valid == true);
-
-		this.mant.length = source.length;
-		this.mant[] = cast(byte[])(source);
-		this.mant[] -= '0';
-		std.algorithm.reverse(this.mant);
-
-		if (this.mant.length >= 1 && allZeros)
-			this.mant.length = 1;
-	}
-	unittest {
-    //writeln("this(string source) unittest:");
-		BigInt num = BigInt("100");
-		assert(num.mant == [0, 0, 1]);
-		assert(num.sign == false);
-
-		BigInt num2 = BigInt("-321");
-		assert(num2.mant == [1, 2, 3]);
-		assert(num2.sign == true);
-	}
-
-	this(long source) nothrow {
-		byte digit;
-
-		this.mant.length = 1;
-		this.mant[0] = 0;
-		this.sign = false;
-
-		if (source != 0)
-			this.mant.length = 0;
-
-		if (source < 0)
-			this.sign = true;
-
-		source = abs(source);
-
-		while (source > 0) {
-			digit = source % 10;
-			source = source / 10;
-			this.mant ~= digit;
-		}
-	}
-	unittest {
-    //writeln("this(long source) unittest:");
-    BigInt q = BigInt(0);
-    assert(q.mant == [0]);
-
-		BigInt num = BigInt(100);
-		assert(num.mant == [0, 0, 1]);
-		assert(num.sign == false);
-
-		BigInt num2 = BigInt(-321);
-		assert(num2.mant == [1, 2, 3]);
-		assert(num2.sign == true);
-
-		BigInt num3 = BigInt(0);
-		assert(num3.mant == [0]);
-		assert(num3.sign == false);
-
-		BigInt num4 = BigInt(-0);
-		assert(num4.mant == [0]);
-		assert(num4.sign == false);
-
-		num2 = BigInt(0);
-		assert(num2.mant == [0]);
-		assert(num2.sign == false);
-
-		num = BigInt(0);
-		assert(num.mant == [0]);
-		assert(num.sign == false);
-
-		BigInt a = BigInt(947436711);
-		BigInt b = BigInt(3245879);
-		assert(a.mant == [1, 1, 7, 6, 3, 4, 7, 4, 9]);
-		assert(a.sign == false);
-		assert(b.mant == [9, 7, 8, 5, 4, 2, 3]);
-		assert(b.sign == false);
-		a = BigInt(0);
-		b = BigInt(0);
-		assert(a.mant == [0]);
-		assert(a.sign == false);
-		assert(b.mant == [0]);
-		assert(b.sign == false);
-	}
-
-  this(byte[] source) nothrow {
-		// Allows us to take a slice of an existing BigInt and encapsulate it in a new BigInt.
-		// Use caution. The new BigInt refers to the same data as the source.
-
-    this.mant = source;
-    this.mant.length = source.length;
-  }
-
-	this(const(byte)[] source) nothrow {
-		this.mant = source.dup;
-    this.mant.length = source.length;
-	}
-  unittest {
-    //writeln("this(byte[] source) unittest:");
-	  auto c = BigInt("68630377364883");
-    auto d = BigInt(c.mant);
-    BigInt e = c;
-    c.mant[5] = 4;
-    assert(c.mant == d.mant);
-    assert(c.mant != e.mant);
-    assert(c.mant is d.mant);
-    assert(c.mant !is e.mant);
-    //writefln("c: %s, d: %s", c, d);
-    //writefln("c.mant is d.mant? %s", c.mant is d.mant);
-    //c[0] = 5;
-    //writefln("c: %s, e: %s", c, e);
-    //writefln("c.mant is e.mant? %s", c.mant is e.mant);
-    //writeln("end unittest");
-  }
-
-	this(this) nothrow {
-    //writefln("postblit called!");
-		mant = mant.dup;
-	}
-	unittest {
-		BigInt a = "777";
-		BigInt b = "888";
-
-		auto c = a;
-		assert(c.toString() == "777");
-		a = b;
-		assert(a.toString() == "888");
-	}
 
   BigInt add()(auto ref const(BigInt) rhs) const {
 		BigInt sum;
@@ -1045,14 +873,19 @@ public:
     assert(c.toString() == "8192");
 	}
 
-	BigInt div()(auto ref const(BigInt) rhs) const {
-		auto result = divMod(this.mant, rhs.mant);
-    BigInt quo = BigInt(result[0]);
+  BigInt neg() {
+    BigInt copy = this;
+    copy.sign = !copy.sign;
+    return copy;
+  }
 
-		if (quo.mant[$ - 1] == 0)
-			quo.sign = false;
-		else
-			quo.sign = this.sign != rhs.sign;
+	BigInt div()(auto ref const(BigInt) rhs) const {
+    BigInt quo;
+
+    auto result = divMod(this.mant, rhs.mant);
+    quo = BigInt(result[0], result[0][$-1] == 0 ? false : (this.sign != rhs.sign));
+    BigInt.lastQuotient = BigInt(quo.mant, quo.sign);
+    BigInt.lastRemainder = BigInt(result[1], result[1][$-1] == 0 ? false : this.sign);
 
 		return quo;
 	}
@@ -1064,6 +897,9 @@ public:
 		auto f = BigInt(100);
 		auto g = BigInt(-8271);
 		auto h = BigInt(0);
+    auto i = BigInt(-15);
+    auto j = BigInt(16);
+    auto k = BigInt(5);
 
 		auto z = a.div(b);  // if we initialize to 0, this unittest fails. Why?
     // bug fixed. DivMod builds up its mantissa digit by digit, so it's mantissa length
@@ -1082,6 +918,10 @@ public:
 		assert(z.toString() == "-2877967795720");
 		z = f.div(a);
 		assert(z.toString() == "0");
+    z = i.div(j);
+    assert(z.toString() == "0");
+    z = i.div(k);
+    assert(BigInt.lastRemainder.toString() == "0");
 		/*try {
 			z = g.div(h);
 		} catch(Exception err) {
@@ -1090,13 +930,12 @@ public:
 	}
 
 	BigInt mod()(auto ref const(BigInt) rhs) const {
-		auto result = divMod(this.mant, rhs.mant);
-    BigInt rem = BigInt(result[1]);
+    BigInt rem;
 
-		if (rem.mant[$ - 1] == 0)
-			rem.sign = false;
-		else
-			rem.sign = this.sign;
+    auto result = divMod(this.mant, rhs.mant);
+    rem = BigInt(result[1], result[1][$-1] == 0 ? false : this.sign);
+    BigInt.lastQuotient = BigInt(result[0], result[0][$-1] == 0 ? false : (this.sign != rhs.sign));
+    BigInt.lastRemainder = BigInt(rem.mant, rem.sign);
 
 		return rem;
 	}
@@ -1110,6 +949,9 @@ public:
 		auto g = BigInt(120);
 		auto h = BigInt(-8271);
 		auto i = BigInt(0);
+    auto j = BigInt(-15);
+    auto k = BigInt(-5);
+    auto l = BigInt(16);
 
 		auto z = a.mod(b);
 		assert(z.toString() == "8");
@@ -1123,13 +965,168 @@ public:
 		assert(z.toString() == "-2381302");		
 		z = g.mod(b);
 		assert(z.toString() == "0");
+    z = j.mod(k);
+    assert(z.toString() == "0");
+    z = j.mod(l);
+    assert(BigInt.lastQuotient.toString() == "0");
 	}
 
-  ref BigInt opUnary(string op)() {
+public:
+  static BigInt lastQuotient;
+  static BigInt lastRemainder;
+
+	this(string source) nothrow {
+		bool allZeros = true;
+    bool valid = true;
+
+		if (source[0] == '-') {
+			this.sign = true;
+			source = source[1 .. $];
+		}
+
+		foreach (c; source) {
+			if (c < '0' || c > '9')
+				valid = false;
+			if (c != '0')
+				allZeros = false;
+		}
+
+    assert(valid == true);
+
+		this.mant.length = source.length;
+		this.mant[] = cast(byte[])(source);
+		this.mant[] -= '0';
+		std.algorithm.reverse(this.mant);
+
+		if (this.mant.length >= 1 && allZeros)
+			this.mant.length = 1;
+	}
+	unittest {
+    //writeln("this(string source) unittest:");
+		BigInt num = BigInt("100");
+		assert(num.mant == [0, 0, 1]);
+		assert(num.sign == false);
+
+		BigInt num2 = BigInt("-321");
+		assert(num2.mant == [1, 2, 3]);
+		assert(num2.sign == true);
+	}
+
+	this(long source) nothrow {
+		byte digit;
+
+		this.mant.length = 1;
+		this.mant[0] = 0;
+		this.sign = false;
+
+		if (source != 0)
+			this.mant.length = 0;
+
+		if (source < 0)
+			this.sign = true;
+
+		source = abs(source);
+
+		while (source > 0) {
+			digit = source % 10;
+			source = source / 10;
+			this.mant ~= digit;
+		}
+	}
+	unittest {
+    //writeln("this(long source) unittest:");
+    BigInt q = BigInt(0);
+    assert(q.mant == [0]);
+
+		BigInt num = BigInt(100);
+		assert(num.mant == [0, 0, 1]);
+		assert(num.sign == false);
+
+		BigInt num2 = BigInt(-321);
+		assert(num2.mant == [1, 2, 3]);
+		assert(num2.sign == true);
+
+		BigInt num3 = BigInt(0);
+		assert(num3.mant == [0]);
+		assert(num3.sign == false);
+
+		BigInt num4 = BigInt(-0);
+		assert(num4.mant == [0]);
+		assert(num4.sign == false);
+
+		num2 = BigInt(0);
+		assert(num2.mant == [0]);
+		assert(num2.sign == false);
+
+		num = BigInt(0);
+		assert(num.mant == [0]);
+		assert(num.sign == false);
+
+		BigInt a = BigInt(947436711);
+		BigInt b = BigInt(3245879);
+		assert(a.mant == [1, 1, 7, 6, 3, 4, 7, 4, 9]);
+		assert(a.sign == false);
+		assert(b.mant == [9, 7, 8, 5, 4, 2, 3]);
+		assert(b.sign == false);
+		a = BigInt(0);
+		b = BigInt(0);
+		assert(a.mant == [0]);
+		assert(a.sign == false);
+		assert(b.mant == [0]);
+		assert(b.sign == false);
+	}
+
+  this(byte[] source, bool sign) nothrow {
+		// Allows us to take a slice of an existing BigInt and encapsulate it in a new BigInt.
+		// Use caution. The new BigInt refers to the same data as the source.
+
+    this.mant = source;
+    this.sign = sign;
+  }
+
+	this(const(byte)[] source, bool sign) nothrow {
+		this.mant = source.dup;
+    this.sign = sign;
+	}
+  unittest {
+    //writeln("this(byte[] source) unittest:");
+	  auto c = BigInt("68630377364883");
+    auto d = BigInt(c.mant, c.sign);
+    BigInt e = c;
+    c.mant[5] = 4;
+    assert(c.mant == d.mant);
+    assert(c.mant != e.mant);
+    assert(c.mant is d.mant);
+    assert(c.mant !is e.mant);
+    //writefln("c: %s, d: %s", c, d);
+    //writefln("c.mant is d.mant? %s", c.mant is d.mant);
+    //c[0] = 5;
+    //writefln("c: %s, e: %s", c, e);
+    //writefln("c.mant is e.mant? %s", c.mant is e.mant);
+    //writeln("end unittest");
+  }
+
+	this(this) nothrow {
+    //writefln("postblit called!");
+		mant = mant.dup;
+	}
+	unittest {
+		BigInt a = "777";
+		BigInt b = "888";
+
+		auto c = a;
+		assert(c.toString() == "777");
+		a = b;
+		assert(a.toString() == "888");
+	}
+
+  auto ref BigInt opUnary(string op)() {
     static if (op == "++")
       return this.inc();
     else static if (op == "--")
       return this.dec();
+    else static if (op == "-")
+      return this.neg();
   }
   unittest {
     BigInt a = BigInt(-2);
@@ -1159,6 +1156,9 @@ public:
     assert((--c).toString() == "-10");
     c++;
     assert(c.toString() == "-9");
+    assert((-a).toString() == "2");
+    assert((-b).toString() == "-10");
+    assert((-c).toString() == "9");
   }
 
   //BigInt opBinary(string op, T)(T rhs)

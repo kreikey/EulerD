@@ -25,6 +25,10 @@ void main() {
   writeln(somedigs);
   //const(BigInt) num = 357834;
   //writeln(num);
+  somedigs.hashOf.writeln();
+  //typeid(byte[]).getHash(&somedigs).writeln();
+  byte[] moredigs = [7, 3, 9, 6, 1, 3, 5, 8, 2];
+  moredigs.hashOf.writeln();
 
   //writeln("const test!!!");
   //const bool yesno = false;
@@ -45,5 +49,24 @@ void main() {
   //nums4 = nums2;
   //nums1[3] = 1;
   //writeln(nums4);
+
+  writeln("divMod test!!!");
+  int c, d;
+  c = 17;
+  d = 3;
+  writeln(c / d);
+  writeln(c % d);
+  c = -c;
+  writeln(c / d);
+  writeln(c % d);
+  d = -d;
+  writeln(c / d);
+  writeln(c % d);
+  c = -c;
+  writeln(c / d);
+  writeln(c % d);
+  writeln((-0) / 5);
+  writeln((-0) % 5);
+  // Conclusion: The remainder takes the sign of the dividend.
 }
 
