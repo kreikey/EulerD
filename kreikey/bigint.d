@@ -26,7 +26,7 @@ private:
 	byte[] mant = [0];
 	bool sign = false;
 
-  static void addAbsInPlace(ref byte[] lhs, const(byte[]) rhs) {
+  static void addAbsInPlace(ref byte[] lhs, const byte[] rhs) {
     uint carry = 0;
 
     lhs.length = lhs.length > rhs.length ? lhs.length : rhs.length;
@@ -58,7 +58,7 @@ private:
     writeln("addAbsInPlace unittest passed");
   }
 
-  static byte[] addAbs(const(byte[]) lhs, const(byte[]) rhs) {
+  static byte[] addAbs(const byte[] lhs, const byte[] rhs) {
     byte[] temp = lhs.dup;
     addAbsInPlace(temp, rhs);
     return temp;
@@ -100,7 +100,7 @@ private:
     writeln("addAbs unittest passed");
   }
 
-  static void subAbsInPlace(ref byte[] lhs, const(byte[]) rhs) {
+  static void subAbsInPlace(ref byte[] lhs, const byte[] rhs) {
     ulong i = 0;
     uint borrow = 0;
 
@@ -147,7 +147,7 @@ private:
     writeln("subAbsInPlace unittest passed");
   }
 
-  static byte[] subAbs(const(byte[]) lhs, const(byte[]) rhs) {
+  static byte[] subAbs(const byte[] lhs, const byte[] rhs) {
     byte[] difference = lhs.dup;
     subAbsInPlace(difference, rhs);
     return difference;
@@ -171,7 +171,7 @@ private:
     writeln("subAbs unittest passed");
   }
 
-  static byte[] incAbs(byte[] lhs) {
+  static void incAbs(ref byte[] lhs) {
     int carry = 1;
 
     foreach (ref d; lhs) {
@@ -187,23 +187,22 @@ private:
     if (carry) {
       lhs ~= 1;
     }
-    return lhs;
   }
   unittest {
     writeln("incAbs unittest");
     byte[] a = [0];
-    a = incAbs(a);
+    incAbs(a);
     assert(a == [1]);
     a = [9];
-    a = incAbs(a);
+    incAbs(a);
     assert(a == [0, 1]);
     a = [9, 9, 9];
-    a = incAbs(a);
+    incAbs(a);
     assert(a == [0, 0, 0, 1]);
     writeln("incAbs unittest passed");
   }
 
-  static byte[] decAbs(byte[] lhs) {
+  static void decAbs(ref byte[] lhs) {
     bool borrow = false;
 
     ulong i = 0;
@@ -222,32 +221,31 @@ private:
     if (lhs[$ - 1] == 0 && lhs.length > 1)
       lhs.length--;
 
-    return lhs;
   }
   unittest {
     writeln("decAbs unittest");
     byte[] a = [2];
-    a = decAbs(a);
+    decAbs(a);
     assert(a == [1]);
-    a = decAbs(a);
+    decAbs(a);
     assert(a == [0]);
     byte[] b = [0, 0, 0, 1];
-    b = decAbs(b);
+    decAbs(b);
     assert(b == [9, 9, 9]);
-    b = decAbs(b);
+    decAbs(b);
     assert(b == [8, 9, 9]);
     byte[] c = [1, 1];
-    c = decAbs(c);
+    decAbs(c);
     assert(c == [0, 1]);
-    c = decAbs(c);
+    decAbs(c);
     assert(c == [9]);
     byte[] d = [7];
-    d = decAbs(d);
+    decAbs(d);
     assert(d == [6]);
     writeln("decAbs unittest passed");
   }
 
-  static int cmpAbs(const(byte[]) left, const(byte[]) right) {
+  static int cmpAbs(const byte[] left, const byte[] right) {
     if (left.length < right.length)
       return -1;
     else if (left.length > right.length)
@@ -281,12 +279,15 @@ private:
     writeln("cmpAbs unittest passed");
 	}
 
-	static byte[] karatsuba(const(byte)[] lhs, const(byte)[] rhs) {
+	static byte[] karatsuba(ref const byte[] lhs, ref const byte[] rhs) {
 		byte[] z0;
 		byte[] z1;
 		byte[] z2;
 		byte n;
 		ulong m;
+    
+    //writeln(typeof(lhs).stringof);
+    //writeln(typeof(rhs).stringof);
 
     // Take care of base case where one or both operands are of length 1
     if (lhs.length == 1) {
@@ -298,10 +299,19 @@ private:
 		m = lhs.length > rhs.length ? lhs.length / 2 : rhs.length / 2;
 
 		// Split and handle out-of-bounds indices
-		const(byte)[] highLeft = m >= lhs.length ? cast(byte[])[0] : lhs[m .. $];
-		const(byte)[] lowLeft = m >= lhs.length ? lhs : lhs[0 .. m];
-		const(byte)[] highRight = m >= rhs.length ? cast(byte[])[0] : rhs[m .. $];
-		const(byte)[] lowRight = m >= rhs.length ? rhs : rhs[0 .. m];
+		auto highLeft = m >= lhs.length ? cast(byte[])[0] : lhs[m .. $];
+		auto lowLeft = m >= lhs.length ? lhs : lhs[0 .. m];
+		auto highRight = m >= rhs.length ? cast(byte[])[0] : rhs[m .. $];
+		auto lowRight = m >= rhs.length ? rhs : rhs[0 .. m];
+
+    //writeln(highLeft);
+    //writeln(typeof(highLeft).stringof);
+    //writeln(lowLeft);
+    //writeln(typeof(lowLeft).stringof);
+    //writeln(highLeft);
+    //writeln(typeof(highRight).stringof);
+    //writeln(lowRight);
+    //writeln(typeof(lowRight).stringof);
 
 		// Handle leading zeros
 		while (lowLeft[$ - 1] == 0 && lowLeft.length > 1)
@@ -311,7 +321,9 @@ private:
 
 		z2 = karatsuba(highLeft, highRight);
 		z0 = karatsuba(lowLeft, lowRight);
-		z1 = karatsuba(addAbs(lowLeft, highLeft), addAbs(lowRight, highRight));
+    auto left = addAbs(lowLeft, highLeft);
+    auto right = addAbs(lowRight, highRight);
+		z1 = karatsuba(left, right);
 
     // Imperative style. Really efficient.
     subAbsInPlace(z1, z2);
@@ -427,7 +439,7 @@ private:
     writeln("shiftLittleInPlace unittest passed");
   }
 
-	static byte[] mulSingleDigit(const(byte[]) lhs, const(byte) n) {
+	static byte[] mulSingleDigit(const byte[] lhs, const byte n) {
 		byte[] pro = lhs.dup;
 		byte carry;
 
@@ -480,7 +492,7 @@ private:
     writeln("mulSingleDigit unittest passed");
 	}
 
-  Tuple!(byte[], byte[]) divMod(const(byte)[] lhs, const(byte)[] rhs) const {
+  Tuple!(byte[], byte[]) divMod(ref const byte[] lhs, ref const byte[] rhs) const {
     // This function could use some serious reworking and updating, for optimization purposes.
     byte[] quo = [0];
 		byte[] acc;
@@ -537,9 +549,9 @@ private:
     return Tuple!(byte[], byte[])(quo, rem);
   }
 
-  BigInt powFast(T)(auto ref const(T) exp) const
+  BigInt powFast(T)(auto ref const T exp) const
   if (isIntegral!T || is(T == BigInt)) {
-    const(byte)[] powInternal(T)(auto ref const(T) exp) 
+    const(byte[]) powInternal(T)(auto ref const T exp) 
     if (isIntegral!T || is(T == BigInt)) {
       T oddExp = 0;
       T halfExp;
@@ -556,13 +568,13 @@ private:
 
       static if (is(T == BigInt)) {
         oddExp = BigInt.lastRemainder;
-        const(byte)[] left = powInternal(halfExp.byRef());
+        const byte[] left = powInternal(halfExp.byRef());
       } else {
         oddExp = exp % 2;
-        const(byte)[] left = powInternal(halfExp);
+        const byte[] left = powInternal(halfExp);
       }
 
-      const(byte)[] right = oddExp ? karatsuba(left, this.mant) : left;
+      const byte[] right = oddExp ? karatsuba(left, this.mant) : left;
 
       return karatsuba(left, right);
     }
@@ -591,12 +603,12 @@ private:
     writeln("powFast unittest passed");
   }
 
-  BigInt add()(auto ref const(BigInt) rhs) const {
+  BigInt add()(auto ref const BigInt rhs) const {
 		BigInt sum;
 
     int cmpRes = cmpAbs(this.mant, rhs.mant);
-    const(byte[]) big = cmpRes < 0 ? rhs.mant : this.mant;
-    const(byte[]) little = cmpRes >= 0 ? rhs.mant : this.mant;
+    const byte[] big = cmpRes < 0 ? rhs.mant : this.mant;
+    const byte[] little = cmpRes >= 0 ? rhs.mant : this.mant;
 
 		if (this.sign == rhs.sign) {
 			sum.mant = addAbs(big, little);
@@ -650,12 +662,12 @@ private:
     writeln("add unittest passed");
 	}
 
-	BigInt sub()(auto ref BigInt rhs) {
+	BigInt sub()(auto ref const BigInt rhs) const {
 		BigInt diff = BigInt();
 
     int cmpRes = cmpAbs(this.mant, rhs.mant);
-    byte[] big = cmpRes < 0 ? rhs.mant : this.mant;
-    byte[] little = cmpRes >= 0 ? rhs.mant : this.mant;
+    auto big = cmpRes < 0 ? rhs.mant : this.mant;
+    auto little = cmpRes >= 0 ? rhs.mant : this.mant;
 
 		if (this.sign == rhs.sign) {
       diff.mant = subAbs(big, little);
@@ -711,9 +723,9 @@ private:
 
   ref BigInt inc() {
     if (this.sign) {
-      this.mant = decAbs(this.mant);
+      decAbs(this.mant);
     } else {
-      this.mant = incAbs(this.mant);
+      incAbs(this.mant);
     }
 
     if (this.mant[$ - 1] == 0)
@@ -731,6 +743,7 @@ private:
     assert(b.toString() == "1000");
     BigInt c = BigInt(-10);
     c.inc();
+    writeln(c);
     assert(c.toString() == "-9");
     BigInt d = BigInt(-1);
     d.inc();
@@ -750,12 +763,12 @@ private:
 
   ref BigInt dec() {
     if (this.sign) {
-      this.mant = incAbs(this.mant);
+      incAbs(this.mant);
     } else if (this.mant[$ - 1] == 0) {
-      this.mant = incAbs(this.mant);
+      incAbs(this.mant);
       this.sign = true;
     } else {
-      this.mant = decAbs(this.mant);
+      decAbs(this.mant);
     }
 
     if (this.mant[$ - 1] == 0)
@@ -789,7 +802,7 @@ private:
     writeln("dec unittest passed");
   }
 
-	BigInt mul()(auto ref const(BigInt) rhs) const {
+	BigInt mul()(auto ref const BigInt rhs) const {
 		BigInt pro;
     pro.mant = karatsuba(this.mant, rhs.mant);
 
@@ -856,7 +869,7 @@ private:
     writeln("mul unittest passed");
 	}
 
-	BigInt div()(auto ref const(BigInt) rhs) const {
+	BigInt div()(auto ref const BigInt rhs) const {
     BigInt quo;
 
     auto result = divMod(this.mant, rhs.mant);
@@ -901,7 +914,7 @@ private:
     writeln("div unittest passed");
 	}
 
-	BigInt mod()(auto ref const(BigInt) rhs) const {
+	BigInt mod()(auto ref const BigInt rhs) const {
     BigInt rem;
 
     auto result = divMod(this.mant, rhs.mant);
@@ -1073,7 +1086,7 @@ public:
     this.sign = sign;
   }
 
-	this(const(byte)[] source, bool sign) nothrow {
+	this(const byte[] source, bool sign) nothrow {
 		this.mant = source.dup;
     this.sign = sign;
 	}
@@ -1160,7 +1173,7 @@ public:
     writeln("opUnary unittest passed");
   }
 
-  BigInt opBinary(string op, T)(auto ref const(T) rhs) const
+  BigInt opBinary(string op, T)(auto ref const T rhs) const
   if (isIntegral!T || is(T == BigInt)) {
     static if (isIntegral!T) {
       static if (op == "^^") {
@@ -1185,12 +1198,12 @@ public:
     }
   }
 
-  bool opEquals(T)(const(T) rhs) const
+  bool opEquals(T)(const T rhs) const
   if (isIntegral!T) {
     return opEquals((BigInt(rhs)).byRef());
   }
 
-  bool opEquals()(auto ref const(BigInt) rhs) const {
+  bool opEquals()(auto ref const BigInt rhs) const {
 		if (this.mant == [0] && rhs.mant == [0]) {
 			return true;
 		}
@@ -1232,7 +1245,7 @@ public:
     return this.opCmp((BigInt(rhs)).byRef());
   }
 
-	int opCmp(ref const(BigInt) rhs) const {
+	int opCmp(ref const BigInt rhs) const {
 		int res;
 
 		if (this.mant == [0] && rhs.mant == [0]) {
@@ -1311,22 +1324,6 @@ public:
     }
   }
 
-	string mantissa() @property const {
-    return this.mant
-      .retro
-      .map!(a => (a + 48).to!char())
-      .array
-      .idup;
-	}
-	unittest {
-    writeln("mantissa unittest");
-    auto a = BigInt(12345);
-    assert(a.mantissa == "12345");
-    a = BigInt(54321);
-    assert(a.mantissa == "54321");
-    writeln("mantissa unittest passed");
-	}
-
   string toString() const {
 		char[] str = this.mant
       .map!(a => (a + 48).to!char())
@@ -1364,7 +1361,7 @@ unittest {
   writeln("rbytes unittest passed");
 }
 
-string rstr(const(byte)[] value) {
+string rstr(const byte[] value) {
   return value.retro.map!(a => (a + 48).to!char()).array.idup();
 }
 unittest {

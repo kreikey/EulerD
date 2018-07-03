@@ -18,9 +18,9 @@ void main() {
   //BigInt m = 29;
   //q = n ^^ m;
   //assert(q.toString() == "68630377364883");
-  //BigInt a = 81;
-  //BigInt b = 81;
-  //writeln(a * b);
+  BigInt a = 8192;
+  BigInt b = 811;
+  writeln(a * b);
   //writeln(++(a * b));
   //byte[] somedigs = [1, 2, 3, 4, 5];
   ////writeln(somedigs.toString());
@@ -95,16 +95,69 @@ void main() {
   //writefln("h: %s type: %s", h, typeof(h).stringof);
   //writefln("cast(int)h: %s, type: %s", cast(int)h, typeof(cast(int)h).stringof);
 
+  // Test abs and neg
+  //BigInt z = 598;
+  //writeln(z);
+  //z = z.neg();
+  //writeln(z);
+  //z = z.abs();
+  //writeln(z);
 
-  BigInt z = 598;
-  //= BigInt(54);
-  //BigInt y;
+  // reserve test
+  //int[] x = [1, 2, 3, 4, 5];
+  //x.reserve(20);
+  //writeln(x.capacity);
+  //changeNumbers(x);
+  //writeln(x.capacity);
+  //int[] y;
+  //writeln(y.capacity);
+  //y = x;
+  //writeln(y.capacity);
+  // conclusion: You can reserve and pass to a function, and it will stick.
 
-  //y = z;
-  writeln(z);
-  z = z.neg();
-  writeln(z);
-  z = z.abs();
-  writeln(z);
+  // const array test
+  //const byte[] x = [1, 2, 3, 4, 5];
+  //byte[] y = [6, 7, 8, 9, 10];
+  //writeln(x);
+  //writeln(typeof(x).stringof);
+  //writeln(y);
+  //writeln(typeof(y).stringof);
+  //useNumbers(y);
+  //const(byte)[] z = [11, 12, 13, 14, 15];
+  //writeln(z);
+  //writeln(typeof(z).stringof);
+  ////changeNumbers(z);
+  //useNumbers(z);
+  //playWithNumbers(z);
+}
+
+void changeNumbers(byte[] x) {
+  writeln(x.capacity);
+}
+
+void useNumbers(const byte[] x) {
+  writeln(x);
+  writeln(typeof(x).stringof);
+  writeln(x.capacity);
+  //x.reserve(20);
+  //writeln(x.capacity);
+  //x ~= 5;
+}
+
+void playWithNumbers(const(byte)[] x) {
+  writeln(x);
+  writeln(typeof(x).stringof);
+  writeln(x.capacity);
+  x.reserve(20);
+  writeln(x.capacity);
+  x ~= 5;
+  writeln(x);
+  writeln(x.capacity);
+  //x[2] = 0;
+  //writeln(x);
+  //x[5] = 0;
+  //writeln(x);
+  x.length = 20;
+  writeln(x);
 }
 
