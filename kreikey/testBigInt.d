@@ -22,6 +22,7 @@ void main() {
   BigInt b = 811;
   writeln(a * b);
   //writeln(++(a * b));
+
   //byte[] somedigs = [1, 2, 3, 4, 5];
   ////writeln(somedigs.toString());
   //writeln(somedigs);
@@ -129,6 +130,20 @@ void main() {
   ////changeNumbers(z);
   //useNumbers(z);
   //playWithNumbers(z);
+
+  // const array test
+  const byte[] array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+  writeln(typeof(array).stringof);
+  auto slice1 = array[0..3];
+  writeln(slice1, typeof(slice1).stringof);
+  auto slice2 = slice1.length < 3 ? slice1 : cast(byte[])[0];
+  writeln(slice2, typeof(slice2).stringof);
+  auto slice3 = cast(byte[])[0];
+  writeln(slice3, typeof(slice3).stringof);
+  //conclusion: casting a literal in a ternary operation will automatically apply const if the other type is const.
+
+
+
 }
 
 void changeNumbers(byte[] x) {

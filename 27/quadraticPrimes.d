@@ -85,7 +85,7 @@ bool delegate(int) isPrimeInit() {
       return false;
 
     if (number > p.front) {
-      foreach(z; p.until!(x => x >= number)(No.openRight)) {
+      foreach(z; p.until!(x => x >= number)(OpenRight.no)) {
         savedPrimes[z] = pndx++;
         //savedPrimes ~= z;
       }
