@@ -172,9 +172,26 @@ Factor[] primeFactorsOld(int num) {
 	return factorsMultiplicity;
 }
 
-long[] primeFactors(long num) {
-	long[] factors;
-	long n = 2;
+/*
+ *long[] primeFactors(long num) {
+ *  long[] factors;
+ *  long n = 2;
+ *
+ *  while (num > 1) {
+ *    while (num % n == 0) {
+ *      factors ~= n;
+ *      num /= n;
+ *    }
+ *    n++;
+ *  }
+ *
+ *  return factors;
+ *}
+ */
+
+ulong[] primeFactors(ulong num) {
+	ulong[] factors;
+	ulong n = 2;
 
 	while (num > 1) {
 		while (num % n == 0) {
@@ -196,9 +213,16 @@ Factor maxMultiplicity(Factor a, Factor b) {
 	return a.multiplicity > b.multiplicity ? a : b;
 }
 
-bool isPrime(long number) {
-  long[] factors = primeFactors(number); 
+/*
+ *bool isPrime(long number) {
+ *  long[] factors = primeFactors(number); 
+ *  //writeln(factors);
+ *  return factors.length == 1;
+ *}
+ */
+
+bool isPrime(ulong number) {
+  ulong[] factors = primeFactors(number); 
   //writeln(factors);
 	return factors.length == 1;
 }
-

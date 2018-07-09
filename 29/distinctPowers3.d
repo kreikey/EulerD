@@ -30,8 +30,11 @@ void main(string[] args) {
         .array())
     .array
     .multiwayMerge
-    .filter!(unique)
-    .fold!((a, b) => (a != b) ? a + 1 : a)(0)
+    //.filter!(unique)
+    //.fold!((int a, BigInt b) => a + 1)(0)
+    .array
+    .slide(2, 1)
+    .fold!((a, b) => b[0] == b[1] ? a : a + 1)(1)
     .writeln();
 
   sw.stop();
