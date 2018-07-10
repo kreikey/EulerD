@@ -145,9 +145,10 @@ void main() {
   // array sort test
   auto c = [4, 2, 9, 5, 3, 7, 0, 8];
   writefln("%s type: %s", c, typeof(c).stringof);
-  sort(c);
+  writefln("%s type: %s", c, typeof(std.algorithm.sort(c)).stringof);
   writefln("%s type: %s", c, typeof(c).stringof);
   // conclusion: sorting an array returns an array; defining custom sort alias is superfluous.
+  // Wait! Except when it's not. The in-place type remains the same. Obviously. But it returns a sortedRange.
 }
 
 void changeNumbers(byte[] x) {
