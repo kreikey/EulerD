@@ -10,12 +10,11 @@ import kreikey.intmath;
 import kreikey.bigint;
 
 alias primeFactorsFast = memoize!primeFactors;
-//alias lessThan = (a, b) => cmp(a, b) < 0;
 alias sort = a => std.algorithm.sort(a).array();
 
 void main(string[] args) {
   StopWatch clock;
-  ulong n = 5;
+  ulong n = 100;
 
   if (args.length > 1)
     n = args[1].parse!ulong();
@@ -58,6 +57,23 @@ void main(string[] args) {
   writefln("finished in %s milliseconds", clock.peek.total!"msecs"());
 }
 
-auto cycleN(ulong[] array, ulong copies) {
+ulong[] cycleN(ulong[] array, ulong copies) {
   return array.cycle.take(array.length * copies).array();
 }
+
+//ulong[][] duplicateN(ulong[] array, ulong copies) {
+  //auto length = array.length;
+  //return array.cycleN(copies).chunks(length).array();
+//}
+
+//ulong[][] duplicateN(ulong[] array, ulong copies) {
+  //ulong[][] matrix;
+
+  //foreach (i; 0..copies) {
+    //matrix ~= array.dup;
+  //}
+
+  //return matrix;
+//}
+
+
