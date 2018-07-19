@@ -10,7 +10,7 @@ import kreikey.intmath;
 import kreikey.bigint;
 
 alias primeFactorsFast = memoize!primeFactors;
-alias sort = a => std.algorithm.sort(a).array();
+alias asort = a => std.algorithm.sort(a).array();
 
 void main(string[] args) {
   StopWatch clock;
@@ -25,9 +25,9 @@ void main(string[] args) {
 
   iota(2, n+ 1)
     .map!(base => iota(2, n+1)
-      .map!(exponent => base.primeFactorsFast.cycleN(exponent).sort())
+      .map!(exponent => base.primeFactorsFast.cycleN(exponent).asort())
       .array
-      .sort())
+      .asort())
     .array
     .multiwayUnion
     .count
