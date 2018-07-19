@@ -149,6 +149,16 @@ void main() {
   writefln("%s type: %s", c, typeof(c).stringof);
   // conclusion: sorting an array returns an array; defining custom sort alias is superfluous.
   // Wait! Except when it's not. The in-place type remains the same. Obviously. But it returns a sortedRange.
+
+  // array indexing test
+  writeln(c[$ - 1]);
+  writeln(typeof(c[$-1]).stringof);
+  writeln(is(typeof(c[$])));
+  writeln(typeof(c[$]).stringof);
+  writeln(is(typeof(c[$]) == typeof(c[$ - 1])));
+  //writeln(c[$]);
+  //conclusion: indexing out of bounds returns the type of the array element,
+  //but actually indexing out of bounds throws a runtime range violation exception.
 }
 
 void changeNumbers(byte[] x) {
