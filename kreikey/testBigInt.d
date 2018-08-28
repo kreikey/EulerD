@@ -159,6 +159,16 @@ void main() {
   //writeln(c[$]);
   //conclusion: indexing out of bounds returns the type of the array element,
   //but actually indexing out of bounds throws a runtime range violation exception.
+
+  // divMod 0 and 1 test
+  int x = 0, y = 1;
+  writeln(x % y);
+  writeln(x / y);
+  x++;
+  writeln(x / y);
+  x--;
+  y--;
+  //writeln(x / y); // floating point error
 }
 
 void changeNumbers(byte[] x) {

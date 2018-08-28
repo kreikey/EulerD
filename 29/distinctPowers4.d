@@ -28,29 +28,28 @@ void main(string[] args) {
       .map!(exponent => base.primeFactorsFast.cycleN(exponent).asort())
       .array
       .asort())
-    .array
+    .array()
     .multiwayUnion
     .count
     .writeln();
 
   // Imperative style. For the record.
-/*
- *  ulong[][][] powersMatrix;
- *  ulong[][] row;
- *  ulong[] res;
- *
- *  foreach(base; 2 .. n + 1) {
- *    row = [];
- *    foreach(exponent; 2 .. n + 1) {
- *      res = base.primeFactors.cycleN(exponent).sort.array();
- *      row ~= res;
- *    }
- *    sort(row);
- *    powersMatrix ~= row;
- *  }
- *
- *  powersMatrix.multiwayMerge.uniq.count.writeln();
- */
+  //ulong[][][] powersMatrix;
+  //ulong[][] row;
+  //ulong[] res;
+
+  //foreach(base; 2 .. n + 1) {
+    //row = [];
+    //foreach(exponent; 2 .. n + 1) {
+      //res = base.primeFactors.cycleN(exponent).sort.array();
+      //row ~= res;
+    //}
+    //sort(row);
+    //powersMatrix ~= row;
+  //}
+
+  //powersMatrix.each!writeln;
+  //powersMatrix.multiwayMerge.uniq.count.writeln();
 
   clock.stop();
 
@@ -60,20 +59,4 @@ void main(string[] args) {
 ulong[] cycleN(ulong[] array, ulong copies) {
   return array.cycle.take(array.length * copies).array();
 }
-
-//ulong[][] duplicateN(ulong[] array, ulong copies) {
-  //auto length = array.length;
-  //return array.cycleN(copies).chunks(length).array();
-//}
-
-//ulong[][] duplicateN(ulong[] array, ulong copies) {
-  //ulong[][] matrix;
-
-  //foreach (i; 0..copies) {
-    //matrix ~= array.dup;
-  //}
-
-  //return matrix;
-//}
-
 
