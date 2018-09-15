@@ -1,13 +1,12 @@
-#!/usr/bin/env rdmd -I..
+#!/usr/bin/env rdmd -i -I..
 
 import std.stdio;
-import std.datetime;
+import std.datetime.stopwatch;
 import std.algorithm;
 import std.range;
 import std.conv;
 import std.math;
 import kreikey.primes;
-//import kreikey.intmath;
 
 bool delegate(int) isPrime;
 
@@ -35,13 +34,13 @@ void main(string[] args) {
       if (primes.length > mostPrimes.length) {
         mostPrimes = primes;
         polyMostPrimes = [a, b];
-        writefln("n^2 + %dn + %d", a, b);
-        writeln(primes);
+        //writefln("n^2 + %dn + %d", a, b);
+        //writeln(primes);
       }
     }
   }
 
-  writeln(mostPrimes.length);
+  //writeln(mostPrimes.length);
   sw.stop();
 
   writeln("The polynomial that generates the most primes is: ");
@@ -49,7 +48,7 @@ void main(string[] args) {
   writeln("The primes: ", mostPrimes);
   writeln("The number of primes: ", mostPrimes.length);
   writeln("The product of the coefficients: ", polyMostPrimes[0] * polyMostPrimes[1]);
-  writeln("finished in ", sw.peek.msecs(), " milliseconds.");
+  writeln("finished in ", sw.peek.total!"msecs"(), " milliseconds.");
 }
 
 int[] generatePrimes(int a, int b) {
@@ -76,23 +75,18 @@ bool delegate(int) isPrimeInit() {
   auto p = new Primes!int();
   int[int] savedPrimes;
   int pndx;
-  //int[] savedPrimes;
   savedPrimes[p.front] = pndx++;
-  //savedPrimes ~= p.front;
 
   bool isPrime(int number) {
     if (number < 2)
       return false;
 
     if (number > p.front) {
-      foreach(z; p.until!(x => x >= number)(OpenRight.no)) {
-        savedPrimes[z] = pndx++;
-        //savedPrimes ~= z;
-      }
+      p.until!(x => x >= number)(OpenRight.no)
+        .each!(a => savedPrimes[a] = pndx++);
     }
 
     if ((number in savedPrimes) !is null)
-    //if (savedPrimes.canFind(number))
       return true;
     else
       return false;

@@ -1,4 +1,4 @@
-#!/usr/bin/env rdmd -I.. -i
+#!/usr/bin/env rdmd -i -I..
  
 import std.range;
 import std.algorithm;
@@ -107,26 +107,13 @@ T[] rickMultiMerge(T)(T[][] matrix) {
 
 auto cycleN(T, U)(T numbers, U copies)
 if ((isInputRange!T && hasLength!T) || (isForwardRange!T && !isInfinite!T)) {
-  size_t length = 0;
-  static if (hasLength!T) {
-    length = numbers.length;
-  } else {
-    length = count(numbers);
-  }
-
-  return numbers.cycle.take(length * copies);
+  return numbers.cycle.take(count(numbers) * copies);
 }
 
 auto rickarray(T)(T itemRange)
 if ((isInputRange!T && hasLength!T) || (isForwardRange!T && !isInfinite!T)) {
   alias E = ElementType!T;
-  size_t length = 0;
-  static if (hasLength!T) {
-    length = itemRange.length;
-  } else {
-    length = count(itemRange);
-  }
-  E[] array = alloc.makeArray!(E)(length);
+  E[] array = alloc.makeArray!(E)(count(itemRange));
   copy(itemRange, array);
 
   return array;
