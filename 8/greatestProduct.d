@@ -7,25 +7,25 @@ import std.datetime;
 import productIter;
 
 void main() {
-	StopWatch sw;
-	string digits;
-	int product;
-	ProductIter prodFive;
+  StopWatch sw;
+  string digits;
+  int product;
+  ProductIter prodFive;
 
-	sw.start();
-	getData(digits);
-	prodFive = new ProductIter(digits, 5);
-	product = prodFive.getProduct();
+  sw.start();
+  getData(digits);
+  prodFive = new ProductIter(digits, 5);
+  product = prodFive.getProduct();
 
-	while (!prodFive.isFinished()) {
-		if (prodFive.nextProduct() > product)
-			product = prodFive.getProduct;
-	}
-	sw.stop();
-	writeln(product);
-	writeln("finished in ", sw.peek.msecs(), " milliseconds");	
+  while (!prodFive.isFinished()) {
+    if (prodFive.nextProduct() > product)
+      product = prodFive.getProduct;
+  }
+  sw.stop();
+  writeln(product);
+  writeln("finished in ", sw.peek.msecs(), " milliseconds");
 }
 
 void getData(ref string text) {
-	text = cast(string)read("digits.txt");
+  text = cast(string)read("digits.txt");
 }

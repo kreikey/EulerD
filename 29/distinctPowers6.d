@@ -1,5 +1,5 @@
 #!/usr/bin/env rdmd -i -I..
- 
+
 import std.range;
 import std.algorithm;
 import std.datetime.stopwatch;
@@ -10,13 +10,13 @@ import core.stdc.stdlib;
 
 template unpack(alias func)
 {
-	import std.typecons: isTuple;
+  import std.typecons: isTuple;
 
-	auto unpack(TupleType)(TupleType tup)
-		if (isTuple!TupleType)
-	{
-		return func(tup.expand);
-	}
+  auto unpack(TupleType)(TupleType tup)
+    if (isTuple!TupleType)
+  {
+    return func(tup.expand);
+  }
 }
 
 alias alloc = Mallocator.instance;
@@ -232,7 +232,7 @@ struct PrimeFactors {
 //auto scaleAll(int[] xs, int m) @nogc {
     //import std.range: repeat, zip;
     //import std.algorithm: map;
-    
+
     //return repeat(m).zip(xs).map!(unpack!((m, x) => m * x));
 //}
 

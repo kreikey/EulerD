@@ -8,17 +8,17 @@ import kreikey.primes;
 import kreikey.intmath;
 
 void main () {
-	StopWatch sw;
-	Primes p = new Primes();
-	long num = 600851475143;
+  StopWatch sw;
+  Primes p = new Primes();
+  long num = 600851475143;
 
 
-	sw.start();
+  sw.start();
 
-	// The ever-so-simple solution:
-	writeln(num.primeFactors.reduce!(max));
+  // The ever-so-simple solution:
+  writeln(num.primeFactors.reduce!(max));
 
-	sw.stop();
+  sw.stop();
 
-	writeln("finished in ", sw.peek.msecs(), " milliseconds");
+  writeln("finished in ", sw.peek.msecs(), " milliseconds");
 }

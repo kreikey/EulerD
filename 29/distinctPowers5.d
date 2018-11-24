@@ -1,5 +1,5 @@
 #!/usr/bin/env rdmd -i -I..
- 
+
 import std.range;
 import std.algorithm;
 import std.datetime.stopwatch;

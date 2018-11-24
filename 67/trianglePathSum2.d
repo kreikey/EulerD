@@ -15,7 +15,7 @@ void main(string args[]) {
 	if (args.length > 1) {
 		fileName = args[1];
 	}
-	
+
 	sw.start();
 	inFile = File(fileName);
 	triangle = inFile.byLine.map!(line => line.split(" ").map!(numstr => numstr.parse!(int)).array).array();

@@ -11,23 +11,23 @@ import kreikey.fibonacci;
 alias curry!(std.algorithm.reduce!((a, b) => a + b), 0UL) addn;
 
 void main(string args[]) {
-	static assert(isInputRange!(Fibonacci));
-	static assert(isInfinite!(Fibonacci));
-	static assert(isForwardRange!(Fibonacci));
-	
-	StopWatch sw;
-	auto fib = new Fibonacci();
-	ulong limit = 4000000;
-	ulong result;
+  static assert(isInputRange!(Fibonacci));
+  static assert(isInfinite!(Fibonacci));
+  static assert(isForwardRange!(Fibonacci));
 
-	if (args.length > 1)
-		limit = args[1].parse!(ulong);
+  StopWatch sw;
+  auto fib = new Fibonacci();
+  ulong limit = 4000000;
+  ulong result;
 
-	sw.start();
+  if (args.length > 1)
+    limit = args[1].parse!(ulong);
 
-	result = fib.until!((a, b) => a >= b)(limit).filter!(a => a % 2 == 0).addn();
+  sw.start();
 
-	sw.stop();
-	writeln("The sum of even fibonacci numbers not greater than ", limit, " is:\n", result);
-	writeln("finished in ", sw.peek.msecs(), " milliseconds.");
+  result = fib.until!((a, b) => a >= b)(limit).filter!(a => a % 2 == 0).addn();
+
+  sw.stop();
+  writeln("The sum of even fibonacci numbers not greater than ", limit, " is:\n", result);
+  writeln("finished in ", sw.peek.msecs(), " milliseconds.");
 }

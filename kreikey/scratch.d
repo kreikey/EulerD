@@ -1,37 +1,37 @@
 // From bigint.d; Uses the old method of having a BigInt for everything
-	int cmpAbsOld(const(BigInt) rhs) const {
-		if (this.mant.length < rhs.mant.length)
-			return -1;
-		else if (this.mant.length > rhs.mant.length)
-			return 1;
+  int cmpAbsOld(const(BigInt) rhs) const {
+    if (this.mant.length < rhs.mant.length)
+      return -1;
+    else if (this.mant.length > rhs.mant.length)
+      return 1;
 
-		foreach (i; retro(iota(0, this.mant.length)))
-			if (this.mant[i] < rhs.mant[i])
-				return -1;
-			else if (this.mant[i] > rhs.mant[i])
-				return 1;
+    foreach (i; retro(iota(0, this.mant.length)))
+      if (this.mant[i] < rhs.mant[i])
+        return -1;
+      else if (this.mant[i] > rhs.mant[i])
+        return 1;
 
-		return 0;
-	}
-	unittest {
+    return 0;
+  }
+  unittest {
     writeln("cmpAbsOld unittest");
-		BigInt a = BigInt(234);
-		BigInt b = BigInt(969);
-		BigInt c = BigInt(-1293);
-		BigInt d = BigInt(45);
-		BigInt e = BigInt(-969);
-		BigInt f = BigInt(1199);
+    BigInt a = BigInt(234);
+    BigInt b = BigInt(969);
+    BigInt c = BigInt(-1293);
+    BigInt d = BigInt(45);
+    BigInt e = BigInt(-969);
+    BigInt f = BigInt(1199);
 
-		assert(a.cmpAbsOld(b) < 0);
-		assert(b.cmpAbsOld(a) > 0);
-		assert(c.cmpAbsOld(d) > 0);
-		assert(d.cmpAbsOld(c) < 0);
-		assert(c.cmpAbsOld(d) > 0);
-		assert(b.cmpAbsOld(e) == 0);
-		assert(c.cmpAbsOld(f) > 0);
-		assert(f.cmpAbsOld(c) < 0);
+    assert(a.cmpAbsOld(b) < 0);
+    assert(b.cmpAbsOld(a) > 0);
+    assert(c.cmpAbsOld(d) > 0);
+    assert(d.cmpAbsOld(c) < 0);
+    assert(c.cmpAbsOld(d) > 0);
+    assert(b.cmpAbsOld(e) == 0);
+    assert(c.cmpAbsOld(f) > 0);
+    assert(f.cmpAbsOld(c) < 0);
     writeln("cmpAbsOld unittest passed");
-	}
+  }
 
 // From bigint.d; This code isn't used.
   static byte[] addDigitInPlace(ref byte[] lhs, uint dig) {
@@ -77,7 +77,7 @@
     //uint carry = 0;
 
     //lhs.length = (lhs.length > rhs.length ? lhs.length : rhs.length) + 1;
-    
+
     //while (i < rhs.length) {
       //lhs[i] += rhs[i] + carry;
       //if (lhs[i] > 9) {
@@ -148,21 +148,21 @@
     //b = [9, 9];
     //a = subAbsInPlace(a, b);
     //assert(a == [1]);
-  //}  
+  //}
 
 // From Karatsuba
     // Functional style with UFCS, everything BigInt, or helper functions defined outside of struct.
-		//return z2.shiftBig(2 * m)
-				//.addAbs(z1
-					//.subAbs(z2)
-					//.subAbs(z0)
-					//.shiftBig(m))
-				//.addAbs(z0);
+    //return z2.shiftBig(2 * m)
+        //.addAbs(z1
+          //.subAbs(z2)
+          //.subAbs(z0)
+          //.shiftBig(m))
+        //.addAbs(z0);
 
     // Functional style with no UFCS
     //return addAbs(
       //addAbs(
-        //shiftBig(z2, 2 * m), 
+        //shiftBig(z2, 2 * m),
         //shiftBig(
           //subAbs(
             //subAbsInPlace(z1, z2),
@@ -186,117 +186,117 @@
 // From the end of bigint.d; It should probably go in intMath.d
 
 int[] factorial(int[] digits) {
-	int[] result = digits.dup;
-	int[] multiplier = digits.dup;
-	int[] subtrahend = "1".dup.toReverseIntArr;
-	subtract(multiplier, subtrahend);
+  int[] result = digits.dup;
+  int[] multiplier = digits.dup;
+  int[] subtrahend = "1".dup.toReverseIntArr;
+  subtract(multiplier, subtrahend);
 
-	while (multiplier.length != 1 || multiplier[0] != 0) {
-		result = multiply(result, multiplier);
-		subtract(multiplier, subtrahend);
-	}
+  while (multiplier.length != 1 || multiplier[0] != 0) {
+    result = multiply(result, multiplier);
+    subtract(multiplier, subtrahend);
+  }
 
-	return result;
+  return result;
 }
 
 int[] multiply(int[] digits, int[] multiplier) {
-	int offset;
-	int[] addend;
-	int[] result;
-	int carry;
-	int dig;
+  int offset;
+  int[] addend;
+  int[] result;
+  int carry;
+  int dig;
 
-	foreach (n; digits) {
-		foreach (m; multiplier) {
-			dig = m * n + carry;
-			addend ~= dig % 10;
-			carry = dig / 10;
-		}
-		if (carry) {
-			addend ~= carry;
-			carry = 0;
-		}
-		accumulate(result, addend, offset);
-		addend.length = 0;
-		offset++;
-	}
+  foreach (n; digits) {
+    foreach (m; multiplier) {
+      dig = m * n + carry;
+      addend ~= dig % 10;
+      carry = dig / 10;
+    }
+    if (carry) {
+      addend ~= carry;
+      carry = 0;
+    }
+    accumulate(result, addend, offset);
+    addend.length = 0;
+    offset++;
+  }
 
-	return result;
+  return result;
 }
 
 void accumulate(ref int[] result, int[] addend, int offset) {
-	int carry;
-	int digSum;
-	int i = offset;
+  int carry;
+  int digSum;
+  int i = offset;
 
-	if (result.length < addend.length + offset)
-		result.length = addend.length + offset;
+  if (result.length < addend.length + offset)
+    result.length = addend.length + offset;
 
-	auto resSlice = result[offset..$];
+  auto resSlice = result[offset..$];
 
-	foreach (int j, addDig; addend) {
-		digSum = resSlice[j] + addDig + carry;
-		resSlice[j] = digSum % 10;
-		carry = digSum / 10;
-		i++;
-	}
+  foreach (int j, addDig; addend) {
+    digSum = resSlice[j] + addDig + carry;
+    resSlice[j] = digSum % 10;
+    carry = digSum / 10;
+    i++;
+  }
 
-	while (carry) {
-		if (i < result.length) {
-			digSum = result[i] + carry;
-			result[i] = (digSum % 10);
-			carry = digSum / 10;			
-		} else {
-			result ~= carry;
-			carry = 0;
-		}
-		i++;
-	}
+  while (carry) {
+    if (i < result.length) {
+      digSum = result[i] + carry;
+      result[i] = (digSum % 10);
+      carry = digSum / 10;
+    } else {
+      result ~= carry;
+      carry = 0;
+    }
+    i++;
+  }
 }
 
 void subtract(ref int[] digits, int[] subtrahend) {
-	int borrow;
-	int dig;
-	int i;
+  int borrow;
+  int dig;
+  int i;
 
-	foreach (j, subDig; subtrahend) {
-		dig = digits[j] - subDig - borrow;
-		if (dig < 0) {
-			dig += 10;
-			borrow = 1;
-		} else {
-			borrow = 0;
-		}
-		digits[j] = dig;
-		i++;
-	}
+  foreach (j, subDig; subtrahend) {
+    dig = digits[j] - subDig - borrow;
+    if (dig < 0) {
+      dig += 10;
+      borrow = 1;
+    } else {
+      borrow = 0;
+    }
+    digits[j] = dig;
+    i++;
+  }
 
-	while (borrow) {
-		dig = digits[i] - borrow;
-		if (dig < 0) {
-			dig += 10;
-			borrow = 1;
-		} else {
-			borrow = 0;
-		}
-		digits[i++] = dig;	// Will give range violation if subtrahend is bigger than digits
-	}
+  while (borrow) {
+    dig = digits[i] - borrow;
+    if (dig < 0) {
+      dig += 10;
+      borrow = 1;
+    } else {
+      borrow = 0;
+    }
+    digits[i++] = dig;  // Will give range violation if subtrahend is bigger than digits
+  }
 
-	while (digits[$ - 1] == 0 && digits.length > 1) {
-		digits.length--;
-	}
+  while (digits[$ - 1] == 0 && digits.length > 1) {
+    digits.length--;
+  }
 }
 
 int[] toReverseIntArr(char[] cArr) {
   int[] iArr = cArr.map!(a => cast(int)(a - '0')).array();
-	std.algorithm.reverse(iArr);
+  std.algorithm.reverse(iArr);
   return iArr;
 }
 
 char[] toReverseCharArr(int[] iArr) {
-	char[] cArr = iArr.map!(n => cast(char)(n + '0')).array();
+  char[] cArr = iArr.map!(n => cast(char)(n + '0')).array();
   std.algorithm.reverse(cArr);
-	return cArr;
+  return cArr;
 }
 
 

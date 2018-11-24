@@ -10,33 +10,33 @@ import kreikey.primes;
 // num.factors.filter!(isPrime).reduce!(max);
 
 void main () {
-	StopWatch sw;
-	Primes p = new Primes();
-	long num = 600851475143;
+  StopWatch sw;
+  Primes p = new Primes();
+  long num = 600851475143;
 
-	sw.start();
+  sw.start();
 
-	auto equalsDividend = quotientCompareInit(num);
-	p.until!(equalsDividend)(OpenRight.no).array()[$ - 1].writeln();
+  auto equalsDividend = quotientCompareInit(num);
+  p.until!(equalsDividend)(OpenRight.no).array()[$ - 1].writeln();
 
-	sw.stop();
+  sw.stop();
 
-	writeln("finished in ", sw.peek.msecs(), " milliseconds");
+  writeln("finished in ", sw.peek.msecs(), " milliseconds");
 }
 
 bool delegate(long) quotientCompareInit(long num) {
-	long dividend = num;
+  long dividend = num;
 
-	bool equalsDividend(long divisor) {
-		if (dividend % divisor == 0) {
-			dividend /= divisor;
+  bool equalsDividend(long divisor) {
+    if (dividend % divisor == 0) {
+      dividend /= divisor;
 
-			if (dividend <= divisor)
-				return true;
-		}
+      if (dividend <= divisor)
+        return true;
+    }
 
-		return false;
-	}
+    return false;
+  }
 
-	return &equalsDividend;
+  return &equalsDividend;
 }
