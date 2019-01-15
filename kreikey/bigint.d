@@ -1053,16 +1053,7 @@ public:
     //writeln("this(long) unittest passed");
   }
 
-  //Slicing an existing BigInt is obsolete. I don't think it will hurt anything to remove this constructor.
-  //this(byte[] source, bool sign) nothrow {
-    //// Allows us to take a slice of an existing BigInt and encapsulate it in a new BigInt.
-    //// Use caution. The new BigInt refers to the same data as the source.
-
-    //this.mant = source;
-    //this.sign = sign;
-  //}
-
-  private this(inout byte[] source, bool sign) nothrow {
+  private this(const byte[] source, bool sign) nothrow {
     this.mant = source.dup;
     this.sign = sign;
   }
