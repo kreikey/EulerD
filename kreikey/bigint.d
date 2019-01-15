@@ -998,23 +998,16 @@ public:
   this(long source) nothrow {
     byte digit;
 
-    this.mant.length = 1;
-    this.mant[0] = 0;
-    this.sign = false;
-
-    if (source != 0)
-      this.mant.length = 0;
-
-    if (source < 0)
-      this.sign = true;
+    this.sign = source < 0;
+    this.mant.length = 0;
 
     source = std.math.abs(source);
 
-    while (source > 0) {
-      digit = source % 10;
+    do {
+      digit = source % 10UL;
       source = source / 10;
       this.mant ~= digit;
-    }
+    } while (source != 0);
   }
   unittest {
     //writeln("this(long) unittest");
@@ -1060,15 +1053,16 @@ public:
     //writeln("this(long) unittest passed");
   }
 
-  this(byte[] source, bool sign) nothrow {
-    // Allows us to take a slice of an existing BigInt and encapsulate it in a new BigInt.
-    // Use caution. The new BigInt refers to the same data as the source.
+  //Slicing an existing BigInt is obsolete. I don't think it will hurt anything to remove this constructor.
+  //this(byte[] source, bool sign) nothrow {
+    //// Allows us to take a slice of an existing BigInt and encapsulate it in a new BigInt.
+    //// Use caution. The new BigInt refers to the same data as the source.
 
-    this.mant = source;
-    this.sign = sign;
-  }
+    //this.mant = source;
+    //this.sign = sign;
+  //}
 
-  this(const byte[] source, bool sign) nothrow {
+  private this(inout byte[] source, bool sign) nothrow {
     this.mant = source.dup;
     this.sign = sign;
   }
@@ -1077,10 +1071,10 @@ public:
     auto c = BigInt("68630377364883");
     auto d = BigInt(c.mant, c.sign);
     BigInt e = c;
-    c.mant[5] = 4;
+    //c.mant[5] = 4;
     assert(c.mant == d.mant);
-    assert(c.mant != e.mant);
-    assert(c.mant is d.mant);
+    assert(c.mant == e.mant);
+    assert(c.mant !is d.mant);
     assert(c.mant !is e.mant);
     //writeln("this(byte[]) unittest passed");
   }

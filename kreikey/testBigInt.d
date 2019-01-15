@@ -53,24 +53,25 @@ void main() {
   //nums1[3] = 1;
   //writeln(nums4);
 
-  //writeln("divMod test!!!");
-  //int c, d;
-  //c = 17;
-  //d = 3;
-  //writeln(c / d);
-  //writeln(c % d);
-  //c = -c;
-  //writeln(c / d);
-  //writeln(c % d);
-  //d = -d;
-  //writeln(c / d);
-  //writeln(c % d);
-  //c = -c;
-  //writeln(c / d);
-  //writeln(c % d);
-  //writeln((-0) / 5);
-  //writeln((-0) % 5);
-  //writeln((-15) % 16);
+  writeln("divMod test!!!");
+  int c, d;
+  c = 17;
+  d = 3;
+  writeln(c / d);
+  writeln(c % d);
+  c = -c;
+  writeln(c / d);
+  writeln(c % d);
+  d = -d;
+  writeln(c / d);
+  writeln(c % d);
+  c = -c;
+  writeln(c / d);
+  writeln(c % d);
+  writeln((-0) / 5);
+  writeln((-0) % 5);
+  writeln((-15) % 16);
+  writeln(0 == -0);
   // Conclusion: The remainder takes the sign of the dividend.
 
   //auto arr = iota(1, 10).array();
@@ -143,19 +144,19 @@ void main() {
   //conclusion: casting a literal in a ternary operation will automatically apply const if the other type is const.
 
   // array sort test
-  auto c = [4, 2, 9, 5, 3, 7, 0, 8];
-  writefln("%s type: %s", c, typeof(c).stringof);
-  writefln("%s type: %s", c, typeof(std.algorithm.sort(c)).stringof);
-  writefln("%s type: %s", c, typeof(c).stringof);
+  //auto c = [4, 2, 9, 5, 3, 7, 0, 8];
+  //writefln("%s type: %s", c, typeof(c).stringof);
+  //writefln("%s type: %s", c, typeof(std.algorithm.sort(c)).stringof);
+  //writefln("%s type: %s", c, typeof(c).stringof);
   // conclusion: sorting an array returns an array; defining custom sort alias is superfluous.
   // Wait! Except when it's not. The in-place type remains the same. Obviously. But it returns a sortedRange.
 
   // array indexing test
-  writeln(c[$ - 1]);
-  writeln(typeof(c[$-1]).stringof);
-  writeln(is(typeof(c[$])));
-  writeln(typeof(c[$]).stringof);
-  writeln(is(typeof(c[$]) == typeof(c[$ - 1])));
+  //writeln(c[$ - 1]);
+  //writeln(typeof(c[$-1]).stringof);
+  //writeln(is(typeof(c[$])));
+  //writeln(typeof(c[$]).stringof);
+  //writeln(is(typeof(c[$]) == typeof(c[$ - 1])));
   //writeln(c[$]);
   //conclusion: indexing out of bounds returns the type of the array element,
   //but actually indexing out of bounds throws a runtime range violation exception.
@@ -169,6 +170,10 @@ void main() {
   x--;
   y--;
   //writeln(x / y); // floating point error
+
+  const ulong z = 12345;
+  BigInt f = z;
+  BigInt g = BigInt(z);
 }
 
 void changeNumbers(byte[] x) {
