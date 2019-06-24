@@ -2,7 +2,8 @@
 
 import std.stdio;
 import std.conv;
-import std.datetime;
+import std.datetime.stopwatch;
+import std.algorithm;
 
 void main() {
   StopWatch sw;
@@ -20,7 +21,7 @@ void main() {
   sw.stop();
 
   largestPal.writeln();
-  writeln("finished in ", sw.peek.msecs(), " milliseconds");
+  writeln("finished in ", sw.peek.total!"msecs"(), " milliseconds");
 }
 
 bool isPalindrome(long num) {

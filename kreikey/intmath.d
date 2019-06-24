@@ -83,18 +83,6 @@ bool areCoprime(ulong a, ulong b) {
   return b == 1;
 }
 
-ulong gcdOld(ulong a, ulong b) {
-  ulong t;
-
-  while (b != 0) {
-    t = b;
-    b = a % b;
-    a = t;
-  }
-
-  return a;
-}
-
 // gcd with subtraction is about twice as fast as gcd with modulo
 ulong gcd(ulong a, ulong b) {
   ulong t;
