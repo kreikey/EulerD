@@ -3,15 +3,15 @@
 import std.stdio;
 import std.datetime.stopwatch;
 import std.algorithm;
+import std.range;
 import std.functional;
 import std.conv;
-import unionmultiples;
 
-alias partial!(std.algorithm.reduce!((a, b) => a + b), 0UL) addn;
+// partial used to be called curry. This alias is no longer necessary, as sum works.
+//alias partial!(std.algorithm.reduce!((a, b) => a + b), 0UL) addn;
 
 void main(string[] args) {
   StopWatch sw;
-  auto um = new UnionMultiples(3, 5);
   ulong limit = 1000;
   ulong result;
 
@@ -20,10 +20,13 @@ void main(string[] args) {
 
   sw.start();
 
-  result = um.until!((a, b) => a >= b)(limit).addn();
-  //result = std.algorithm.sum(um.until!((a, b) => a >= b)(limit));
+  result = iota(3, limit, 3)
+  .merge(iota(5, limit, 5))
+  .uniq
+  .sum();
 
   sw.stop();
   writeln("The sum multiples of 3 and 5 below ", limit, " is: ", result);
   writeln("finished in ", sw.peek.total!"msecs"(), " milliseconds.");
 }
+
