@@ -1,16 +1,16 @@
 #!/usr/bin/env rdmd -I..
 
 import std.stdio;
-import std.datetime;
+import std.datetime.stopwatch;
 import std.algorithm;
 import std.functional;
 import std.conv;
 import std.range;
 import kreikey.fibonacci;
 
-alias curry!(std.algorithm.reduce!((a, b) => a + b), 0UL) addn;
+alias partial!(std.algorithm.reduce!((a, b) => a + b), 0UL) addn;
 
-void main(string args[]) {
+void main(string[] args) {
   static assert(isInputRange!(Fibonacci));
   static assert(isInfinite!(Fibonacci));
   static assert(isForwardRange!(Fibonacci));
@@ -29,5 +29,5 @@ void main(string args[]) {
 
   sw.stop();
   writeln("The sum of even fibonacci numbers not greater than ", limit, " is:\n", result);
-  writeln("finished in ", sw.peek.msecs(), " milliseconds.");
+  writeln("finished in ", sw.peek.total!"msecs"(), " milliseconds.");
 }

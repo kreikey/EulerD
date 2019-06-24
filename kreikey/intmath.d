@@ -144,50 +144,6 @@ string recipDigits(int divisor, int length) {
   return cast(string)digits;
 }
 
-Factor[] primeFactorsOld(int num) {
-  Factor[] factorsMultiplicity;
-  int n = 2;
-  int m = 0;
-
-  while (num > 1) {
-
-    if (num % n == 0) {
-      do {
-        m++;
-        num /= n;
-      } while (num % n == 0);
-
-      //writefln("factor: %s multiplicity %s ", n, m);
-      factorsMultiplicity ~= Factor(n, m);
-    }
-
-    //writefln("%s is divisible by %s with multiplicity %s", num, n, m);
-
-    m = 0;
-    n++;
-  }
-
-  //writeln("num: ", num);
-
-  return factorsMultiplicity;
-}
-
-/*
- *long[] primeFactors(long num) {
- *  long[] factors;
- *  long n = 2;
- *
- *  while (num > 1) {
- *    while (num % n == 0) {
- *      factors ~= n;
- *      num /= n;
- *    }
- *    n++;
- *  }
- *
- *  return factors;
- *}
- */
 
 ulong[] primeFactors(ulong num) {
   ulong[] factors;
@@ -212,14 +168,6 @@ struct Factor {
 Factor maxMultiplicity(Factor a, Factor b) {
   return a.multiplicity > b.multiplicity ? a : b;
 }
-
-/*
- *bool isPrime(long number) {
- *  long[] factors = primeFactors(number);
- *  //writeln(factors);
- *  return factors.length == 1;
- *}
- */
 
 bool isPrime(ulong number) {
   ulong[] factors = primeFactors(number);

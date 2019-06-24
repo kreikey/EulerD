@@ -1,6 +1,6 @@
 #!/usr/bin/env rdmd -I..
 import std.stdio;
-import std.datetime;
+import std.datetime.stopwatch;
 import std.algorithm;
 import std.range;
 import std.array;
@@ -9,7 +9,7 @@ import kreikey.intmath;
 
 void main () {
   StopWatch sw;
-  Primes p = new Primes();
+  auto p = new Primes!long();
   long num = 600851475143;
 
 
@@ -20,5 +20,5 @@ void main () {
 
   sw.stop();
 
-  writeln("finished in ", sw.peek.msecs(), " milliseconds");
+  writeln("finished in ", sw.peek.total!"msecs"(), " milliseconds");
 }
