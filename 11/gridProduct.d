@@ -3,9 +3,9 @@ import std.stdio;
 import std.array;
 import std.conv;
 import std.algorithm;
-import std.datetime;
+import std.datetime.stopwatch;
 
-void main(string args[]) {
+void main() {
   StopWatch sw;
   int[] products;
   int maxProduct;
@@ -31,5 +31,5 @@ void main(string args[]) {
   maxProduct = products.reduce!(max);
   writeln(maxProduct);
   sw.stop();
-  writefln("finished in %s milliseconds.", sw.peek().msecs);
+  writefln("finished in %s milliseconds.", sw.peek().total!"msecs");
 }

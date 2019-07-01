@@ -1,9 +1,9 @@
-#!/usr/bin/env rdmd -I../
+#!/usr/bin/env rdmd -I..
 
 import std.stdio;
 import std.conv;
 import std.file;
-import std.datetime;
+import std.datetime.stopwatch;
 import productIter;
 
 void main() {
@@ -23,7 +23,7 @@ void main() {
   }
   sw.stop();
   writeln(product);
-  writeln("finished in ", sw.peek.msecs(), " milliseconds");
+  writeln("finished in ", sw.peek.total!"msecs"(), " milliseconds");
 }
 
 void getData(ref string text) {

@@ -1314,6 +1314,13 @@ public:
     //writeln("toString unittest passed");
   }
 
+  string digits() const {
+    char[] digits = cast(char[])this.mant.dup;
+    digits[] += '0';
+    std.algorithm.reverse(digits);
+    return cast(string)digits;
+  }
+
   mixin RvalueRef;
 }
 

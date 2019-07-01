@@ -2,15 +2,15 @@
 
 import std.stdio;
 import std.conv;
-import std.datetime;
+import std.datetime.stopwatch;
 //import std.range;
 import std.algorithm;
 import kreikey.primes;
 
-void main(string args[]) {
+void main(string[] args) {
   StopWatch sw;
   int limit = 10001;
-  Primes p = new Primes();
+  auto p = new Primes!int();
 
   sw.start();
   if (args.length > 1)
@@ -21,5 +21,5 @@ void main(string args[]) {
 
   sw.stop();
 
-  writeln("finished in ", sw.peek.msecs(), " milliseconds");
+  writeln("finished in ", sw.peek.total!"msecs"(), " milliseconds");
 }

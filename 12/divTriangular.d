@@ -1,9 +1,9 @@
 #!/usr/bin/env rdmd -I..
 import std.stdio;
-import std.datetime;
+import std.datetime.stopwatch;
 import std.conv;
 
-void main(string args[]) {
+void main(string[] args) {
   StopWatch sw;
   int trian;
   int topNum = 500;
@@ -20,7 +20,7 @@ void main(string args[]) {
 
   writefln("n: %s t: %s factor count: %s", n, triangularize(n), countTrianFactors(n));
   sw.stop();
-  writefln("finished in %s milliseconds.", sw.peek().msecs);
+  writefln("finished in %s milliseconds.", sw.peek().total!"msecs");
 
 }
 

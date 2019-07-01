@@ -4,7 +4,7 @@ import std.stdio;
 import std.conv;
 import std.math;
 import pythagoreanTriplet;
-import std.datetime;
+import std.datetime.stopwatch;
 
 void main() {
   int abcSum;
@@ -40,5 +40,5 @@ void main() {
     }
   }
   sw.stop();*/
-  writefln("finished in %s milliseconds.", sw.peek().msecs);
+  writefln("finished in %s milliseconds.", sw.peek().total!"msecs");
 }

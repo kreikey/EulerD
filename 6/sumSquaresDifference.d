@@ -2,12 +2,12 @@
 
 import std.stdio;
 import std.conv;
-import std.datetime;
+import std.datetime.stopwatch;
 import std.algorithm;
 import std.array;
 import std.range;
 
-void main(string args[]) {
+void main(string[] args) {
   StopWatch sw;
   int topNum = 100;
   int[] arr;
@@ -23,5 +23,5 @@ void main(string args[]) {
   sw.stop();
 
   writeln(difference);
-  writeln("finished in ", sw.peek.msecs(), " milliseconds");
+  writeln("finished in ", sw.peek.total!"msecs"(), " milliseconds");
 }

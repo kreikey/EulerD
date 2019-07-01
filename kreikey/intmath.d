@@ -3,6 +3,7 @@ module kreikey.intmath;
 import kreikey.bigint;
 import std.algorithm;
 import std.stdio;
+import std.traits;
 
 long[] getFactors(long number) {
   static long[][long] factorsCache;
@@ -133,9 +134,10 @@ string recipDigits(int divisor, int length) {
 }
 
 
-ulong[] primeFactors(ulong num) {
-  ulong[] factors;
-  ulong n = 2;
+T[] primeFactors(T)(T num) 
+if (isIntegral!T) {
+  T[] factors;
+  T n = 2;
 
   while (num > 1) {
     while (num % n == 0) {

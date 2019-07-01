@@ -1,16 +1,16 @@
 #!/usr/bin/env rdmd -I..
 import std.stdio;
 import std.conv;
-import std.datetime;
+import std.datetime.stopwatch;
 import kreikey.primes;
 
-void main(string args[]) {
-  ulong belowNum = 2_000_000;
-  ulong sum = 0;
-  Primes p = new Primes(1000);
+void main(string[] args) {
+  int belowNum = 2_000_000;
+  int sum = 0;
+  auto p = new Primes!int(1000);
 
   if (args.length > 1)
-    belowNum = args[1].parse!(long);
+    belowNum = args[1].parse!(int);
 
   StopWatch sw;
   sw.start();
@@ -19,5 +19,5 @@ void main(string args[]) {
     p.popFront();
   } while (p.front < belowNum);
   sw.stop();
-  writefln("got sum of %s from primes below %s in %s milliseconds", sum, belowNum, sw.peek().msecs());
+  writefln("got sum of %s from primes below %s in %s milliseconds", sum, belowNum, sw.peek().total!"msecs"());
 }
