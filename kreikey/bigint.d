@@ -1302,7 +1302,7 @@ public:
 
     std.algorithm.reverse(str);
 
-    return str.idup;
+    return cast(string)str;
   }
   unittest {
     //writeln("toString unittest");
@@ -1315,10 +1315,12 @@ public:
   }
 
   string digits() const {
-    char[] digits = cast(char[])this.mant.dup;
-    digits[] += '0';
-    std.algorithm.reverse(digits);
-    return cast(string)digits;
+    //char[] digits = cast(char[])this.mant.dup;
+    //digits[] += '0';
+    //std.algorithm.reverse(digits);
+    //return cast(string)digits;
+
+    return this.mant.retro.map!(d => cast(immutable(char))(d + '0')).array();
   }
 
   mixin RvalueRef;
