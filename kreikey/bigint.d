@@ -1292,9 +1292,8 @@ public:
   }
 
   string toString() const {
-    char[] str = this.mant
-      .map!(a => (a + 48).to!char())
-      .array();
+    byte[] str = this.mant.dup;
+    str[] += '0';
 
     if (sign) {
       str ~= '-';
@@ -1315,12 +1314,11 @@ public:
   }
 
   string digits() const {
-    //char[] digits = cast(char[])this.mant.dup;
-    //digits[] += '0';
-    //std.algorithm.reverse(digits);
-    //return cast(string)digits;
-
-    return this.mant.retro.map!(d => cast(immutable(char))(d + '0')).array();
+    //return this.mant.retro.map!(d => cast(immutable(char))(d + '0')).array();
+    byte[] digits = this.mant.dup;
+    digits[] += '0';
+    std.algorithm.reverse(digits);
+    return cast(string)digits;
   }
 
   mixin RvalueRef;
@@ -1329,7 +1327,11 @@ public:
 private:
 
 byte[] rbytes(string value) {
-  return value.retro.map!(a => (a - 48).to!byte()).array();
+  //return value.retro.map!(a => (a - 48).to!byte()).array();
+  char[] result = value.dup;
+  result[] -= '0';
+  std.algorithm.reverse(result);
+  return cast(byte[])result;
 }
 unittest {
   //writeln("rbytes unittest");
@@ -1338,7 +1340,11 @@ unittest {
 }
 
 string rstr(const byte[] value) {
-  return value.retro.map!(a => (a + 48).to!char()).array.idup();
+  //return value.retro.map!(a => (a + 48).to!char()).array.idup();
+  byte[] result = value.dup;
+  result[] += '0';
+  std.algorithm.reverse(result);
+  return cast(string)result;
 }
 unittest {
   //writeln("rstr unittest");
