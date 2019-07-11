@@ -1,9 +1,9 @@
 #!/usr/bin/env rdmd -I..
 import std.stdio;
-import std.datetime;
+import std.datetime.stopwatch;
 import std.conv;
 
-void main(string args[]) {
+void main(string[] args) {
   ulong top = 1000000;
   ulong maxStart;
   StopWatch sw;
@@ -16,7 +16,7 @@ void main(string args[]) {
   maxStart = maxStartingNumberUnder(top);
   sw.stop();
   writefln("The number under %s producing the longest chain is %s", top, maxStart);
-  writefln("Finished in %d milliseconds", sw.peek.msecs());
+  writefln("Finished in %d milliseconds", sw.peek.total!"msecs"());
 }
 
 ulong nextCollatz(ulong n) {

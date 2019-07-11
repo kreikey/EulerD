@@ -1,14 +1,14 @@
 #!/usr/bin/env rdmd -I..
 import std.stdio;
-import std.datetime;
+import std.datetime.stopwatch;
 import std.array;
 import std.conv;
 import std.algorithm;
 
-void main(string args[]) {
+void main(string[] args) {
   int[] digits;
   char[] result;
-  int dig, carryVal, n, sum, pow = 1000;
+  int temp, carryVal, n, sum, pow = 1000;
 
   if (args.length > 1) {
     pow = args[1].to!int;
@@ -19,15 +19,15 @@ void main(string args[]) {
   sw.start();
   digits ~= 1;
 
-  foreach (i; 0..pow) {
-    foreach (j, x; digits) {
-      dig = x * 2 + carryVal;
+  foreach (i; 0 .. pow) {
+    foreach (ref digit; digits) {
+      temp = digit * 2 + carryVal;
 
-      if (dig > 9) {
-        digits[j] = dig % 10;
-        carryVal = dig / 10;
+      if (temp > 9) {
+        digit = temp % 10;
+        carryVal = temp / 10;
       } else {
-        digits[j] = dig;
+        digit = temp;
         carryVal = 0;
       }
     }
@@ -45,5 +45,5 @@ void main(string args[]) {
   sw.stop();
   writefln("2^%s = %s", n, result);
   writefln("the sum of the digits is %s", sum);
-  writefln("finished in %s milliseconds", sw.peek.msecs());
+  writefln("finished in %s milliseconds", sw.peek.total!"msecs"());
 }

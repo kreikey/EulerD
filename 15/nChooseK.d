@@ -1,9 +1,9 @@
 #!/usr/bin/env rdmd -I..
 import std.stdio;
-import std.datetime;
+import std.datetime.stopwatch;
 import std.conv;
 
-void main(string args[]) {
+void main(string[] args) {
   int width = 20, height = 20;
   ulong result;
   StopWatch sw;
@@ -18,7 +18,7 @@ void main(string args[]) {
   sw.stop();
   writefln("The number of lattice paths in a %sx%s grid from top left to bottom right are:\n%s",
       width, height, result);
-  writefln("finished in %s milliseconds", sw.peek.msecs());
+  writefln("finished in %s milliseconds", sw.peek.total!"msecs"());
 }
 
 ulong countLatticePaths(int width, int height) {

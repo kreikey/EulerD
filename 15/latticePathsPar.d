@@ -1,12 +1,12 @@
 #!/usr/bin/env rdmd -I..
 import std.stdio;
-import std.datetime;
+import std.datetime.stopwatch;
 import std.conv;
 import std.parallelism;
 
-enum {RIGHT, DOWN};
+enum {RIGHT, DOWN}
 
-void main(string args[]) {
+void main(string[] args) {
   int width = 20, height = 20;
   ulong pathCount;
   StopWatch sw;
@@ -21,7 +21,7 @@ void main(string args[]) {
   pathCount = countLatticePaths(width, height);
   sw.stop();
   writeln(pathCount);
-  writefln("finished in %s milliseconds", sw.peek.msecs());
+  writefln("finished in %s milliseconds", sw.peek.total!"msecs"());
 }
 
 ulong countLatticePaths(int width, int height) {
