@@ -1313,13 +1313,22 @@ public:
     //writeln("toString unittest passed");
   }
 
-  string digits() const {
+  const(char)[] digitString() const {
     //return this.mant.retro.map!(d => cast(immutable(char))(d + '0')).array();
     byte[] digits = this.mant.dup;
     digits[] += '0';
     std.algorithm.reverse(digits);
-    return cast(string)digits;
+    return cast(char[])digits;
   }
+
+  const(byte)[] digitBytes() const {
+    //return this.mant.retro.map!(d => cast(immutable(char))(d + '0')).array();
+    byte[] digitBytes = this.mant.dup;
+    //digits[] += '0';
+    std.algorithm.reverse(digitBytes);
+    return digitBytes;
+  }
+
 
   mixin RvalueRef;
 }

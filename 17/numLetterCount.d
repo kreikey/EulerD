@@ -1,9 +1,9 @@
 #!/usr/bin/env rdmd -I..
 import std.stdio;
-import std.datetime;
+import std.datetime.stopwatch;
 import std.conv;
 
-void main(string args[]) {
+void main(string[] args) {
   StopWatch sw;
   string result;
   int firstNum = 1;
@@ -25,12 +25,17 @@ void main(string args[]) {
   numWrite = numToWordsInit();
 
   foreach (i; firstNum..lastNum + 1) {
-    result ~= numWrite(i);
+    try {
+      result ~= numWrite(i);
+    } catch(Exception e) {
+      writeln(e.msg);
+      return;
+    }
   }
 
   sw.stop();
   writefln("the numbers from %s to %s written out contain %s letters.", firstNum, lastNum, result.length);
-  writefln("finished in %s milliseconds", sw.peek.msecs());
+  writefln("finished in %s milliseconds", sw.peek.total!"msecs"());
 }
 
 string delegate(int) numToWordsInit() {
@@ -42,17 +47,16 @@ string delegate(int) numToWordsInit() {
   string numToWords(int num) {
     string numWord;
 
-    if (num < 1) {
-      numWord = "";
-    } else if (num < 20) {
-      numWord = numWordMap[num];
-    } else if (num < 100) {
-      numWord = numWordMap[num - (num % 10)] ~ numToWords(num % 10);
-    } else if (num < 1000) {
-      numWord = numToWords(num / 100) ~ "hundred" ~ (num % 100 > 0 ? "and" ~ numToWords(num % 100): "");
-    } else if (num < 100000) {
-      numWord = numToWords(num / 1000) ~ "thousand" ~ numToWords(num % 1000);
+    if (num >= 100000) {
+      throw new Exception("num >= 100,000, which is not supported");
     }
+
+    numWord = (num < 1) ? "" :
+      (num < 20) ? numWordMap[num] :
+      (num < 100) ? numWordMap[num - (num % 10)] ~ numToWords(num % 10) :
+      (num < 1000) ? numToWords(num / 100) ~ "hundred" ~ (num % 100 > 0 ? "and" ~ numToWords(num % 100): "") :
+      numToWords(num / 100) ~ "thousand" ~ numToWords(num % 1000);
+
     return numWord;
   }
 

@@ -20,7 +20,7 @@ void main(string[] args) {
   BigInt num = 2;
   BigInt result = num ^^ pow;
 
-  sum = result.digits.map!(d => d - '0').sum();
+  sum = result.digitBytes.sum();
 
   sw.stop();
   writefln("2^%s = %s", pow, result);
