@@ -1,35 +1,35 @@
 #!/usr/bin/env rdmd -I..
 import std.stdio;
-import std.datetime;
+import std.datetime.stopwatch;
 import std.array;
 import std.conv;
 import std.algorithm;
-import Shared.bigInt;
+import std.range;
+import kreikey.bigint;
 
-void main(string args[]) {
+void main(string[] args) {
   StopWatch sw;
-  int[] digits = "100".dup.toReverseIntArr();
-  int[] result;
-  char[] resultString;
-  char[] digitsString;
-  int offset = 0;
+  int digits = 100;
   int sum;
 
   if (args.length > 1) {
-    digits = args[1].dup.toReverseIntArr();
+    digits = args[1].to!int();
   }
 
   sw.start();
 
-  result = factorial(digits);
-  resultString = result.toReverseCharArr();
-  digitsString = digits.toReverseCharArr();
-  sum = result.reduce!((a, b) => a + b);
+  BigInt result = digits;
+
+  foreach (n; iota(2, digits).retro()) {
+    result *= n;
+  }
+
+  sum = result.digitBytes.sum();
 
   sw.stop();
 
-  writefln("The factorial of %s is:\n%s", digitsString, resultString);
+  writefln("The factorial of %s is:\n%s", digits, result);
   writefln("the sum of the digits is %s", sum);
-  writefln("finished in %s milliseconds", sw.peek.msecs());
+  writefln("finished in %s milliseconds", sw.peek.total!"msecs"());
 }
 

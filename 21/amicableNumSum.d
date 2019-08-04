@@ -1,12 +1,12 @@
 #!/usr/bin/env rdmd -I..
 import std.stdio;
-import std.datetime;
+import std.datetime.stopwatch;
 import std.conv;
 import std.algorithm;
 import std.range;
 import kreikey.intmath;
 
-void main(string args[]) {
+void main(string[] args) {
   StopWatch sw;
   long topNum = 10000;
   long amicableSum;
@@ -21,7 +21,7 @@ void main(string args[]) {
 
   sw.stop();
   writefln("The sum of amicable numbers below %s is %s", topNum, amicableSum);
-  writefln("finished in %s milliseconds", sw.peek.msecs());
+  writefln("finished in %s milliseconds", sw.peek.total!"msecs"());
 }
 
 long isAmicable(long number) {

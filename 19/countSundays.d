@@ -1,7 +1,7 @@
 #!/usr/bin/env rdmd -I..
 
 import std.stdio;
-import std.datetime;
+import std.datetime.stopwatch;
 import std.conv;
 import std.array;
 import std.algorithm;
@@ -34,5 +34,5 @@ void main() {
   writefln("there are %s Sundays on the first of the month \nbetween %s %s %s and %s %s %s",
     sundayTheFirstCount, startDay, startMonthWord, startYear,
     cal.getDay(), cal.getMonthWord(), cal.getYear());
-  writefln("finished in %s milliseconds", sw.peek.msecs());
+  writefln("finished in %s milliseconds", sw.peek.total!"msecs"());
 }

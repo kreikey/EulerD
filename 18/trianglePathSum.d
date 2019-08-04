@@ -1,11 +1,11 @@
 #!/usr/bin/env rdmd -I..
 import std.stdio;
-import std.datetime;
+import std.datetime.stopwatch;
 import std.conv;
 import std.array;
 import std.algorithm;
 
-void main(string args[]) {
+void main(string[] args) {
   StopWatch sw;
   int[][] triangle;
   File inFile;
@@ -22,7 +22,7 @@ void main(string args[]) {
   sum = biggestPathSum(triangle, 0, 0);
   writeln(sum);
   sw.stop();
-  writefln("finished in %s milliseconds", sw.peek.msecs());
+  writefln("finished in %s milliseconds", sw.peek.total!"msecs"());
 }
 
 int biggestPathSum(ref int[][] triangle, int i, int j) {
