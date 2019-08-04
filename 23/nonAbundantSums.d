@@ -1,11 +1,11 @@
 #!/usr/bin/env rdmd -I..
 import std.stdio;
-import std.datetime;
+import std.datetime.stopwatch;
 import std.algorithm;
 import std.range;
 import kreikey.intmath;
 
-void main(string args[]) {
+void main(string[] args) {
   StopWatch sw;
   ulong sum;
 
@@ -15,7 +15,7 @@ void main(string args[]) {
 
   sw.stop();
   writefln("The sum of non-abundant numbers below 28124 is: %s", sum);
-  writefln("finished in %s milliseconds", sw.peek.msecs());
+  writefln("finished in %s milliseconds", sw.peek.total!"msecs"());
 }
 
 bool isAbundant(long num) {

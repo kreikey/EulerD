@@ -1,10 +1,10 @@
 #!/usr/bin/env rdmd -I..
 import std.stdio;
-import std.datetime;
+import std.datetime.stopwatch;
 import std.algorithm;
 import std.array;
 
-void main(string args[]) {
+void main(string[] args) {
   StopWatch sw;
   string filename = "names.txt";
   char[] contents;
@@ -36,7 +36,7 @@ void main(string args[]) {
 
   sw.stop();
   writefln("The total of the scores is: %s", total);
-  writefln("finished in %s milliseconds", sw.peek.msecs());
+  writefln("finished in %s milliseconds", sw.peek.total!"msecs"());
 }
 
 int value(ref char[] word) {
