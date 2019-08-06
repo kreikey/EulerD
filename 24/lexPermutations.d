@@ -4,6 +4,7 @@ import std.datetime.stopwatch;
 import std.algorithm;
 import std.conv;
 import std.array;
+import std.range;
 
 void main(string[] args) {
   StopWatch sw;
@@ -13,7 +14,7 @@ void main(string[] args) {
   ulong sNdx;
 
   sw.start();
-  digits = "0123456789".map!(a => cast(int)a).array();
+  digits = iota(10).array();
   n = digits.length - 1;
 
   while (permCount < 1000000) {
@@ -32,7 +33,7 @@ void main(string[] args) {
   }
 
   sw.stop();
-  writefln("The %sth permutation of digits 0 - 9 is: %s", permCount, digits);
+  writefln("The %sth permutation of digits 0 - 9 is: %s", permCount, digits.map!(a => cast(char)(a + '0'))());
   writefln("finished in %s milliseconds", sw.peek.total!"msecs"());
 }
 
