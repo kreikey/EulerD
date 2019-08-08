@@ -17,7 +17,7 @@ void main(string[] args) {
 
   sw.start();
 
-  result = recurrence!("a[1] + a[0]")(1, 1).until!(a => a >= limit).filter!(a => a % 2 == 0).sum();
+  result = recurrence!((a, n) => a[1] + a[0])(1, 1).until!(a => a >= limit).filter!(a => a % 2 == 0).sum();
 
   sw.stop();
   writeln("The sum of even fibonacci numbers not greater than ", limit, " is:\n", result);

@@ -1,12 +1,13 @@
 #!/usr/bin/env rdmd -I..
 import std.stdio;
-import std.datetime;
+import std.datetime.stopwatch;
 import std.array;
 import std.conv;
 import std.algorithm;
+import std.range;
 import kreikey.bigint;
 
-void main(string args[]) {
+void main(string[] args) {
   StopWatch sw;
   int[] result;
   int[] addend1;
@@ -39,5 +40,19 @@ void main(string args[]) {
 
   writefln("the first %s-digit fibonacci term is number %s.", length, term);
   writefln("the term is:\n%s", result.toReverseCharArr);
-  writefln("finished in %s milliseconds", sw.peek.msecs());
+  writefln("finished in %s milliseconds", sw.peek.total!"msecs"());
+}
+
+int[] toReverseIntArr(char[] arr) {
+  return arr.retro.map!(to!int).array();
+}
+
+char[] toReverseCharArr(int[] arr) {
+  return arr.retro.map!(to!char).array();
+}
+
+void accumulate(ref int[] result, const int[] addend, int offset) {
+  int carry = 0;
+
+  
 }
