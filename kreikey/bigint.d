@@ -1336,7 +1336,7 @@ public:
 private:
 
 byte[] rbytes(string value) {
-  //return value.retro.map!(a => (a - 48).to!byte()).array();
+  //return value.retro.map!(a => cast(byte)(a - '0')).array();
   char[] result = value.dup;
   result[] -= '0';
   std.algorithm.reverse(result);
@@ -1349,7 +1349,7 @@ unittest {
 }
 
 string rstr(const byte[] value) {
-  //return value.retro.map!(a => (a + 48).to!char()).array.idup();
+  //return value.retro.map!(a => cast(immutable(char))(a + '0')).array();
   byte[] result = value.dup;
   result[] += '0';
   std.algorithm.reverse(result);

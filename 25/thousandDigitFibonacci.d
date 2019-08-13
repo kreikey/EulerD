@@ -9,50 +9,69 @@ import kreikey.bigint;
 
 void main(string[] args) {
   StopWatch sw;
-  int[] result;
-  int[] addend1;
-  int[] addend2;
-  int length = 1000;
-  int term;
+  byte[] result;
+  byte[] addend1;
+  byte[] addend2;
+  int limit = 1000;
+  int term = 2;
 
   if (args.length > 1) {
-    length = args[1].parse!int;
+    limit = args[1].parse!int;
   }
 
   sw.start();
-
-  addend1 = "1".dup.toReverseIntArr;
-  addend2 = "1".dup.toReverseIntArr;
-
-  accumulate(result, addend1, 0);
-  accumulate(result, addend2, 0);
-  addend1 = result.dup;
-  term = 3;
-
-  while (result.length < length) {
-    accumulate(result, addend2, 0);
-    addend2 = addend1.dup;
-    addend1 = result.dup;
+  addend1 = "1".rbytes;
+  addend2 = "1".rbytes;
+  
+  while (result.length < limit) {
+    result = add(addend1, addend2);
+    addend1 = addend2;
+    addend2 = result;
     term++;
   }
-
   sw.stop();
 
-  writefln("the first %s-digit fibonacci term is number %s.", length, term);
-  writefln("the term is:\n%s", result.toReverseCharArr);
+  writefln("the first %s-digit fibonacci term is number %s.", limit, term);
+  writefln("the term is:\n%s", result.rstr);
   writefln("finished in %s milliseconds", sw.peek.total!"msecs"());
 }
 
-int[] toReverseIntArr(char[] arr) {
-  return arr.retro.map!(to!int).array();
+byte[] rbytes(string value) {
+  return value.retro.map!(a => cast(byte)(a - '0')).array();
 }
 
-char[] toReverseCharArr(int[] arr) {
-  return arr.retro.map!(to!char).array();
+string rstr(const byte[] value) {
+  return value.retro.map!(a => cast(immutable(char))(a + '0')).array();
 }
 
-void accumulate(ref int[] result, const int[] addend, int offset) {
-  int carry = 0;
+char[] toReverseCharArr(byte[] arr) {
+  return arr.retro.map!(a => cast(char)(a + '0')).array();
+}
 
-  
+byte[] add(const(byte)[] left, const(byte)[] right) {
+  const(byte)[] temp;
+
+  if (right.length > left.length) {
+    temp = left;
+    left = right;
+    right = temp;
+  }
+
+  byte[] result = left.dup;
+  byte carry = 0;
+
+  foreach (ref a, b; lockstep(result, right)) {
+    a += b + carry;
+    carry = a / 10;
+    a %= 10;
+  }
+  foreach (ref a; result[right.length .. $]) {
+    a += carry;
+    carry = a / 10;
+    a %= 10;
+  }
+  if (carry)
+    result ~= carry;
+
+  return result;
 }
