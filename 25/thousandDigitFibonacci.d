@@ -5,7 +5,7 @@ import std.array;
 import std.conv;
 import std.algorithm;
 import std.range;
-import kreikey.bigint;
+import kreikey.bytemath;
 
 void main(string[] args) {
   StopWatch sw;
@@ -29,6 +29,8 @@ void main(string[] args) {
     addend2 = result;
     term++;
   }
+  auto digs = "45797".rbytes();
+  digs.accumulate("324598723450987".rbytes()).rstr.writeln();
   sw.stop();
 
   writefln("the first %s-digit fibonacci term is number %s.", limit, term);
@@ -46,32 +48,4 @@ string rstr(const byte[] value) {
 
 char[] toReverseCharArr(byte[] arr) {
   return arr.retro.map!(a => cast(char)(a + '0')).array();
-}
-
-byte[] add(const(byte)[] left, const(byte)[] right) {
-  const(byte)[] temp;
-
-  if (right.length > left.length) {
-    temp = left;
-    left = right;
-    right = temp;
-  }
-
-  byte[] result = left.dup;
-  byte carry = 0;
-
-  foreach (ref a, b; lockstep(result, right)) {
-    a += b + carry;
-    carry = a / 10;
-    a %= 10;
-  }
-  foreach (ref a; result[right.length .. $]) {
-    a += carry;
-    carry = a / 10;
-    a %= 10;
-  }
-  if (carry)
-    result ~= carry;
-
-  return result;
 }
