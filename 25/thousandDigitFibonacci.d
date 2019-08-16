@@ -29,8 +29,6 @@ void main(string[] args) {
     addend2 = result;
     term++;
   }
-  auto digs = "45797".rbytes();
-  digs.accumulate("324598723450987".rbytes()).rstr.writeln();
   sw.stop();
 
   writefln("the first %s-digit fibonacci term is number %s.", limit, term);

@@ -21,7 +21,7 @@ void main(string[] args) {
     accumulator += BigInt(line);
 
   //accumulator.reverse();
-  writeln("The first 10 digits of the sum is: ", accumulator.digitChars[0 .. 10]);
+  writeln("The first 10 digits of the sum is: ", accumulator.digitString[0 .. 10]);
   writeln("total sum: ", accumulator);
   sw.stop();
   writeln("finished in ", sw.peek.total!"msecs"(), " milliseconds");
