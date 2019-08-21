@@ -20,9 +20,9 @@ void main(string[] args) {
   }
 
   sw.start();
-  addend1 = "1".rbytes;
-  addend2 = "1".rbytes;
-  
+  addend1 = "1".rbytes();
+  addend2 = "1".rbytes();
+
   while (result.length < limit) {
     result = add(addend1, addend2);
     addend1 = addend2;
@@ -36,14 +36,3 @@ void main(string[] args) {
   writefln("finished in %s milliseconds", sw.peek.total!"msecs"());
 }
 
-byte[] rbytes(string value) {
-  return value.retro.map!(a => cast(byte)(a - '0')).array();
-}
-
-string rstr(const byte[] value) {
-  return value.retro.map!(a => cast(immutable(char))(a + '0')).array();
-}
-
-char[] toReverseCharArr(byte[] arr) {
-  return arr.retro.map!(a => cast(char)(a + '0')).array();
-}

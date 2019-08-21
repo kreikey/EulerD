@@ -12,14 +12,18 @@ void main(string[] args) {
 
   sw.start();
   File inFile = File("longNumbers.txt", "r");
-  longNumbers = inFile.byLine.map!(line => line.reverse.map!(dig => cast(byte)(dig - '0')).array()).array();
+  longNumbers = inFile.byLine.map!(rbytes).array();
   accumulator = longNumbers[0].dup;
+  //writeln(accumulator.rstr);
 
-  foreach (line; longNumbers[1..$])
-    accumulate(line, accumulator);
+  foreach (i, line; longNumbers[1 .. $]) {
+    accumulate(accumulator, line);
+    //writeln(accumulator.rstr());
+  }
 
-  accumulator.reverse();
-  writeln("The first 10 digits of the sum is: ", accumulator[0..10].map!(dig => cast(char)(dig + '0')).array());
+  //accumulator.reverse();
+  writeln("The first 10 digits of the sum is: ", accumulator.rstr()[0..10]);
+  writeln("total sum: ", accumulator.rstr());
   sw.stop();
   writeln("finished in ", sw.peek.total!"msecs"(), " milliseconds");
 }
