@@ -4,28 +4,26 @@ import std.datetime.stopwatch;
 import std.array;
 import std.conv;
 import std.algorithm;
-import kreikey.bytemath;
+import kreikey.bigint;
 
 void main(string[] args) {
-  StopWatch sw;
-  byte[] digits = [2];
-  int sum = 0;
-  int pow = 1000;
+  int[] digits;
+  int sum, pow = 1000;
 
   if (args.length > 1) {
     pow = args[1].to!int;
   }
-
+  
+  StopWatch sw;
   sw.start();
 
-  foreach (i; 1 .. pow) {
-    digits = digits.mul([2]);
-  }
+  BigInt num = 2;
+  BigInt result = num ^^ pow;
 
-  sum = digits.sum();
+  sum = result.digitBytes.sum();
 
   sw.stop();
-  writefln("2^%s = %s", pow, digits.rstr);
+  writefln("2^%s = %s", pow, result);
   writefln("the sum of the digits is %s", sum);
   writefln("finished in %s milliseconds", sw.peek.total!"msecs"());
 }
