@@ -4,30 +4,31 @@ import std.datetime.stopwatch;
 import std.array;
 import std.conv;
 import std.algorithm;
-import kreikey.bytemath;
+import std.range;
+import kreikey.bigint;
 
 void main(string[] args) {
   StopWatch sw;
-  byte[] digits = "100".dup.rbytes();
-  int offset = 0;
+  int digits = 100;
   int sum;
 
   if (args.length > 1) {
-    digits = args[1].dup.rbytes();
+    digits = args[1].to!int();
   }
 
   sw.start();
 
-  byte[] result = digits.dup;
+  BigInt result = digits;
 
-  for (byte[] x = result.sub([1]); x.isGreaterThan([1]); x.decumulate([1])) {
-    result = result.mul(x);
+  foreach (n; iota(2, digits).retro()) {
+    result *= n;
   }
 
-  sum = result.sum();
+  sum = result.digitBytes.sum();
+
   sw.stop();
 
-  writefln("The factorial of %s is:\n%s", digits.rstr(), result.rstr());
+  writefln("The factorial of %s is:\n%s", digits, result);
   writefln("the sum of the digits is %s", sum);
   writefln("finished in %s milliseconds", sw.peek.total!"msecs"());
 }
