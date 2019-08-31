@@ -14,11 +14,9 @@ void main(string[] args) {
   File inFile = File("longNumbers.txt", "r");
   longNumbers = inFile.byLineCopy.array();
   accumulator = BigInt(longNumbers[0]);
-  //writeln(accumulator);
 
   foreach (line; longNumbers[1 .. $]) {
     accumulator += BigInt(line);
-    //writeln(accumulator);
   }
 
   writeln("The first 10 digits of the sum is: ", accumulator.digitString[0 .. 10]);

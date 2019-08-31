@@ -9,7 +9,7 @@ import std.functional;
 import kreikey.intmath;
 import kreikey.bigint;
 
-alias primeFactorsFast = memoize!primeFactors;
+alias primeFactorsFast = memoize!(primeFactors!ulong);
 alias asort = a => std.algorithm.sort(a).array();
 
 void main(string[] args) {

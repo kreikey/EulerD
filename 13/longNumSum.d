@@ -14,14 +14,11 @@ void main(string[] args) {
   File inFile = File("longNumbers.txt", "r");
   longNumbers = inFile.byLine.map!(rbytes).array();
   accumulator = longNumbers[0].dup;
-  //writeln(accumulator.rstr);
 
   foreach (i, line; longNumbers[1 .. $]) {
     accumulate(accumulator, line);
-    //writeln(accumulator.rstr());
   }
 
-  //accumulator.reverse();
   writeln("The first 10 digits of the sum is: ", accumulator.rstr()[0..10]);
   writeln("total sum: ", accumulator.rstr());
   sw.stop();

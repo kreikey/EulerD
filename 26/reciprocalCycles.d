@@ -1,7 +1,7 @@
 #!/usr/bin/env rdmd -I..
 
 import std.stdio;
-import std.datetime;
+import std.datetime.stopwatch;
 import std.algorithm;
 import std.conv;
 //import reciprocals;
@@ -44,5 +44,5 @@ void main(string[] args) {
   //writefln("transient: %s\ntransient length: %s", rec2.transient, rec2.transient.length);
   //writefln("reptend: %s\nreptend length: %s", rec2.reptend, rec2.reptend.length);
 
-  writeln("finished in ", sw.peek.msecs(), " milliseconds");
+  writeln("finished in ", sw.peek.total!"msecs"(), " milliseconds");
 }

@@ -1,14 +1,14 @@
 #!/usr/bin/env rdmd -I..
 
 import std.stdio;
-import std.datetime;
+import std.datetime.stopwatch;
 import std.algorithm;
 import std.conv;
 import reciprocals;
 
 import std.range;
 
-void main(string args[]) {
+void main(string[] args) {
   StopWatch sw;
   ulong end = 999;
   ulong start = 2;
@@ -28,7 +28,7 @@ void main(string args[]) {
 
   //iota(2, 1000).reduce!((a, b) => a.reptendLength() > b.reptendLength() ? a : b).writeln();
 
-  writeln("finished in ", sw.peek.msecs(), " milliseconds");
+  writeln("finished in ", sw.peek.total!"msecs"(), " milliseconds");
 }
 
 long reptendLength(ulong denom) {
