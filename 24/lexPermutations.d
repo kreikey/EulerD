@@ -7,13 +7,13 @@ import std.array;
 import std.range;
 
 void main(string[] args) {
-  StopWatch sw;
+  StopWatch timer;
   int[] digits;
   ulong permCount = 1;
   ulong n;
   ulong sNdx;
 
-  sw.start();
+  timer.start();
   digits = iota(10).array();
   n = digits.length - 1;
 
@@ -32,8 +32,8 @@ void main(string[] args) {
     n = cast(int)digits.length - 1;
   }
 
-  sw.stop();
+  timer.stop();
   writefln("The %sth permutation of digits 0 - 9 is: %s", permCount, digits.map!(a => cast(char)(a + '0'))());
-  writefln("finished in %s milliseconds", sw.peek.total!"msecs"());
+  writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
 }
 

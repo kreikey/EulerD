@@ -7,7 +7,7 @@ import std.algorithm;
 import kreikey.bytemath;
 
 void main(string[] args) {
-  StopWatch sw;
+  StopWatch timer;
   byte[] digits = "100".dup.rbytes();
   int offset = 0;
   int sum;
@@ -16,7 +16,7 @@ void main(string[] args) {
     digits = args[1].dup.rbytes();
   }
 
-  sw.start();
+  timer.start();
 
   byte[] result = digits.dup;
 
@@ -25,10 +25,10 @@ void main(string[] args) {
   }
 
   sum = result.sum();
-  sw.stop();
+  timer.stop();
 
   writefln("The factorial of %s is:\n%s", digits.rstr(), result.rstr());
   writefln("the sum of the digits is %s", sum);
-  writefln("finished in %s milliseconds", sw.peek.total!"msecs"());
+  writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
 }
 

@@ -4,19 +4,19 @@ import std.datetime.stopwatch;
 import kreikey.primes;
 
 void main () {
-  StopWatch sw;
+  StopWatch timer;
   auto p = new Primes!long();
   long num = 600851475143;
 
-  sw.start();
+  timer.start();
   do {
     if (num % p.front == 0) {
       num = num / p.front;
     }
     p.popFront();
   } while (num != p.front);
-  sw.stop();
+  timer.stop();
 
   writeln(num);
-  writeln("finished in ", sw.peek.total!"msecs"(), " milliseconds");
+  writeln("finished in ", timer.peek.total!"msecs"(), " milliseconds");
 }

@@ -6,11 +6,11 @@ import std.datetime.stopwatch;
 import std.algorithm;
 
 void main() {
-  StopWatch sw;
+  StopWatch timer;
   long num = 0;
   long largestPal = 0;
 
-  sw.start();
+  timer.start();
   foreach (int i; 100..1000) {
     foreach (int j; 100..1000) {
       num = i * j;
@@ -18,10 +18,10 @@ void main() {
         largestPal = num;
     }
   }
-  sw.stop();
+  timer.stop();
 
   largestPal.writeln();
-  writeln("finished in ", sw.peek.total!"msecs"(), " milliseconds");
+  writeln("finished in ", timer.peek.total!"msecs"(), " milliseconds");
 }
 
 bool isPalindrome(long num) {

@@ -13,7 +13,7 @@ void main(string[] args) {
   static assert(isInfinite!(Fibonacci));
   static assert(isForwardRange!(Fibonacci));
 
-  StopWatch sw;
+  StopWatch timer;
   auto fib = new Fibonacci();
   ulong limit = 4000000;
   ulong result;
@@ -21,11 +21,11 @@ void main(string[] args) {
   if (args.length > 1)
     limit = args[1].parse!(ulong);
 
-  sw.start();
+  timer.start();
 
   result = fib.until!(a => a >= limit).filter!(a => a % 2 == 0).sum();
 
-  sw.stop();
+  timer.stop();
   writeln("The sum of even fibonacci numbers not greater than ", limit, " is:\n", result);
-  writeln("finished in ", sw.peek.total!"msecs"(), " milliseconds.");
+  writeln("finished in ", timer.peek.total!"msecs"(), " milliseconds.");
 }

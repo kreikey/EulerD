@@ -11,20 +11,20 @@ import std.conv;
 //alias partial!(std.algorithm.reduce!((a, b) => a + b), 0UL) addn;
 
 void main(string[] args) {
-  StopWatch sw;
+  StopWatch timer;
   ulong limit = 1000;
   ulong result;
 
   if (args.length > 1)
     limit = args[1].parse!(ulong);
 
-  sw.start();
+  timer.start();
 
   result = iota(1, limit).filter!(a => a % 3 == 0 || a % 5 == 0)
     .sum();
 
-  sw.stop();
+  timer.stop();
   writeln("The sum multiples of 3 and 5 below ", limit, " is: ", result);
-  writeln("finished in ", sw.peek.total!"msecs"(), " milliseconds.");
+  writeln("finished in ", timer.peek.total!"msecs"(), " milliseconds.");
 }
 

@@ -6,11 +6,11 @@ import std.algorithm;
 import std.datetime.stopwatch;
 
 void main() {
-  StopWatch sw;
+  StopWatch timer;
   int[] products;
   int maxProduct;
 
-  sw.start();
+  timer.start();
   File inFile = File("gridNumbers.txt", "r");
 
   int[][] matrix = inFile.byLine.map!(line => line.idup.split(" ").map!(numstr => numstr.parse!(int)).array).array;
@@ -30,6 +30,6 @@ void main() {
   }
   maxProduct = products.reduce!(max);
   writeln(maxProduct);
-  sw.stop();
-  writefln("finished in %s milliseconds.", sw.peek().total!"msecs");
+  timer.stop();
+  writefln("finished in %s milliseconds.", timer.peek().total!"msecs");
 }

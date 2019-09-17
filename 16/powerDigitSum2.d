@@ -7,16 +7,16 @@ import std.algorithm;
 import kreikey.bytemath;
 
 void main(string[] args) {
-  StopWatch sw;
+  StopWatch timer;
   byte[] digits = [2];
   int sum = 0;
   int pow = 1000;
 
   if (args.length > 1) {
-    pow = args[1].to!int;
+    pow = args[1].parse!int();
   }
 
-  sw.start();
+  timer.start();
 
   foreach (i; 1 .. pow) {
     digits = digits.mul([2]);
@@ -24,8 +24,8 @@ void main(string[] args) {
 
   sum = digits.sum();
 
-  sw.stop();
+  timer.stop();
   writefln("2^%s = %s", pow, digits.rstr);
   writefln("the sum of the digits is %s", sum);
-  writefln("finished in %s milliseconds", sw.peek.total!"msecs"());
+  writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
 }

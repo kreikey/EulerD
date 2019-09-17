@@ -11,7 +11,7 @@ import core.stdc.stdlib;
 alias alloc = Mallocator.instance;
 
 void main(string[] args) @nogc {
-  StopWatch clock;
+  StopWatch timer;
   ulong n = 100;
 
   if (args.length > 1) {
@@ -22,7 +22,7 @@ void main(string[] args) @nogc {
 
   printf("distinct powers\n");
 
-  clock.start();
+  timer.start();
 
   // Imperative style. For the record.
   auto powersMatrix = alloc.makeMultidimensionalArray!(ulong[])(n - 1, n - 1);
@@ -42,8 +42,8 @@ void main(string[] args) @nogc {
   ulong number = flattened.uniq.count();
   printf("%d\n", number);
 
-  clock.stop();
-  printf("finished in %d milliseconds\n", clock.peek.total!"msecs"());
+  timer.stop();
+  printf("finished in %d milliseconds\n", timer.peek.total!"msecs"());
 }
 
 char[] nullTerminatedCopy(string str) @nogc {

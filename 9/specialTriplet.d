@@ -10,10 +10,10 @@ void main() {
   int abcSum;
   int b;
   int c;
-  StopWatch sw;
+  StopWatch timer;
 
   PythagoreanTriplet pyTrip = new PythagoreanTriplet(1000);
-  sw.start();
+  timer.start();
   while (pyTrip.getA() + pyTrip.getB() + pyTrip.getC() != 1000 && !pyTrip.isFinished()) {
     pyTrip.nextTriplet();
   }
@@ -23,11 +23,11 @@ void main() {
     writefln("%s + %s + %s = %s", pyTrip.getA(), pyTrip.getB(), pyTrip.getC(), (pyTrip.getA() + pyTrip.getB() + pyTrip.getC()));
     writefln("%s * %s * %s = %s", pyTrip.getA(), pyTrip.getB(), pyTrip.getC(), (pyTrip.getA() * pyTrip.getB() * pyTrip.getC()));
   }
-  sw.stop();
+  timer.stop();
 
 
   // implemented a more efficient, more specialized algorithm here.
-/*  sw.start();
+/*  timer.start();
   for (int a = 1; a < 500; a++) {
     if (1000 * (500 - a) % (1000 - a) == 0) {
       b = 1000 * (500 - a) / (1000 - a);
@@ -39,6 +39,6 @@ void main() {
       break;
     }
   }
-  sw.stop();*/
-  writefln("finished in %s milliseconds.", sw.peek().total!"msecs");
+  timer.stop();*/
+  writefln("finished in %s milliseconds.", timer.peek().total!"msecs");
 }

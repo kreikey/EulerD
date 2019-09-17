@@ -12,12 +12,12 @@ void main(string[] args) {
   if (args.length > 1)
     belowNum = args[1].parse!(int);
 
-  StopWatch sw;
-  sw.start();
+  StopWatch timer;
+  timer.start();
   do {
     sum += p.front;
     p.popFront();
   } while (p.front < belowNum);
-  sw.stop();
-  writefln("got sum of %s from primes below %s in %s milliseconds", sum, belowNum, sw.peek().total!"msecs"());
+  timer.stop();
+  writefln("got sum of %s from primes below %s in %s milliseconds", sum, belowNum, timer.peek().total!"msecs"());
 }

@@ -6,18 +6,18 @@ import std.datetime.stopwatch;
 import std.traits;
 
 void main() {
-  StopWatch sw;
+  StopWatch timer;
   int sum;
 
-  sw.start();
+  timer.start();
   foreach (i; 1 .. 1000) {
     if (i % 3 == 0 || i % 5 == 0) {
       sum += i;
       //writeln(i);
     }
   }
-  sw.stop();
+  timer.stop();
 
   writeln(sum);
-  writeln("finished in ", sw.peek.total!"msecs", " milliseconds");
+  writeln("finished in ", timer.peek.total!"msecs", " milliseconds");
 }

@@ -11,19 +11,19 @@ void main(string[] args) {
   int sum, pow = 1000;
 
   if (args.length > 1) {
-    pow = args[1].to!int;
+    pow = args[1].parse!int();
   }
   
-  StopWatch sw;
-  sw.start();
+  StopWatch timer;
+  timer.start();
 
   BigInt num = 2;
   BigInt result = num ^^ pow;
 
   sum = result.digitBytes.sum();
 
-  sw.stop();
+  timer.stop();
   writefln("2^%s = %s", pow, result);
   writefln("the sum of the digits is %s", sum);
-  writefln("finished in %s milliseconds", sw.peek.total!"msecs"());
+  writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
 }

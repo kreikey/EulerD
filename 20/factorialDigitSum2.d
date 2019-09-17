@@ -8,15 +8,15 @@ import std.range;
 import kreikey.bigint;
 
 void main(string[] args) {
-  StopWatch sw;
+  StopWatch timer;
   int digits = 100;
   int sum;
 
   if (args.length > 1) {
-    digits = args[1].to!int();
+    digits = args[1].parse!int();
   }
 
-  sw.start();
+  timer.start();
 
   BigInt result = digits;
 
@@ -26,10 +26,10 @@ void main(string[] args) {
 
   sum = result.digitBytes.sum();
 
-  sw.stop();
+  timer.stop();
 
   writefln("The factorial of %s is:\n%s", digits, result);
   writefln("the sum of the digits is %s", sum);
-  writefln("finished in %s milliseconds", sw.peek.total!"msecs"());
+  writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
 }
 

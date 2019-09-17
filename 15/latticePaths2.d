@@ -9,19 +9,19 @@ enum {RIGHT, DOWN}
 void main(string[] args) {
   int width = 20, height = 20;
   ulong pathCount;
-  StopWatch sw;
+  StopWatch timer;
 
   if (args.length > 2) {
-    width = args[1].to!(int);
-    height = args[2].to!(int);
+    width = args[1].parse!int();
+    height = args[2].parse!int();
   }
 
-  sw.start();
+  timer.start();
   writeln("working");
   pathCount = countLatticePaths(width, height);
-  sw.stop();
+  timer.stop();
   writeln(pathCount);
-  writefln("finished in %s milliseconds", sw.peek.total!"msecs"());
+  writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
 }
 
 ulong countLatticePaths(int width, int height) {

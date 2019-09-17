@@ -5,7 +5,7 @@ import std.algorithm;
 import std.array;
 
 void main(string[] args) {
-  StopWatch sw;
+  StopWatch timer;
   string filename = "names.txt";
   char[] contents;
   char[][] names;
@@ -19,7 +19,7 @@ void main(string[] args) {
 
   File inFile = File(filename);
 
-  sw.start();
+  timer.start();
 
   contents.length = inFile.size;
   inFile.rawRead(contents);
@@ -34,9 +34,9 @@ void main(string[] args) {
 
   total = scores.reduce!((a, b) => a + b);
 
-  sw.stop();
+  timer.stop();
   writefln("The total of the scores is: %s", total);
-  writefln("finished in %s milliseconds", sw.peek.total!"msecs"());
+  writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
 }
 
 int value(ref char[] word) {

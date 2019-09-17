@@ -7,12 +7,12 @@ import std.datetime.stopwatch;
 import productIter;
 
 void main() {
-  StopWatch sw;
+  StopWatch timer;
   string digits;
   int product;
   ProductIter prodFive;
 
-  sw.start();
+  timer.start();
   getData(digits);
   prodFive = new ProductIter(digits, 5);
   product = prodFive.getProduct();
@@ -21,9 +21,9 @@ void main() {
     if (prodFive.nextProduct() > product)
       product = prodFive.getProduct;
   }
-  sw.stop();
+  timer.stop();
   writeln(product);
-  writeln("finished in ", sw.peek.total!"msecs"(), " milliseconds");
+  writeln("finished in ", timer.peek.total!"msecs"(), " milliseconds");
 }
 
 void getData(ref string text) {

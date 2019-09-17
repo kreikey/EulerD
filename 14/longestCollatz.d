@@ -6,17 +6,17 @@ import std.conv;
 void main(string[] args) {
   ulong top = 1000000;
   ulong maxStart;
-  StopWatch sw;
+  StopWatch timer;
 
-  sw.start();
+  timer.start();
 
   if (args.length > 1)
-    top = args[1].to!(ulong);
+    top = args[1].parse!ulong();
 
   maxStart = maxStartingNumberUnder(top);
-  sw.stop();
+  timer.stop();
   writefln("The number under %s producing the longest chain is %s", top, maxStart);
-  writefln("Finished in %d milliseconds", sw.peek.total!"msecs"());
+  writefln("Finished in %d milliseconds", timer.peek.total!"msecs"());
 }
 
 ulong nextCollatz(ulong n) {

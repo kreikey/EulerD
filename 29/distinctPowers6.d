@@ -13,8 +13,7 @@ template unpack(alias func)
   import std.typecons: isTuple;
 
   auto unpack(TupleType)(TupleType tup)
-    if (isTuple!TupleType)
-  {
+  if (isTuple!TupleType) {
     return func(tup.expand);
   }
 }
@@ -22,7 +21,7 @@ template unpack(alias func)
 alias alloc = Mallocator.instance;
 
 void main(string[] args) @nogc {
-  StopWatch clock;
+  StopWatch timer;
   ulong n = 100;
 
   if (args.length > 1) {
@@ -33,7 +32,7 @@ void main(string[] args) @nogc {
 
   printf("distinct powers\n");
 
-  clock.start();
+  timer.start();
 
   auto flattened = iota(2, n + 1)
     .zip(repeat(n))
@@ -49,8 +48,8 @@ void main(string[] args) @nogc {
   ulong number = flattened.uniq.count();
   printf("%d\n", number);
 
-  clock.stop();
-  printf("finished in %d milliseconds\n", clock.peek.total!"msecs"());
+  timer.stop();
+  printf("finished in %d milliseconds\n", timer.peek.total!"msecs"());
 }
 
 char[] nullTerminatedCopy(string str) @nogc {

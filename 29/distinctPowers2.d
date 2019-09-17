@@ -8,7 +8,7 @@ import std.datetime.stopwatch;
 import kreikey.bigint;
 
 void main(string[] args) {
-  StopWatch sw;
+  StopWatch timer;
   ulong n = 100;
 
   if (args.length > 1)
@@ -16,7 +16,7 @@ void main(string[] args) {
 
   writeln("distinct powers");
 
-  sw.start();
+  timer.start();
 
   iota(2, n + 1)
     .map!(a => iota(2, n + 1)
@@ -29,8 +29,8 @@ void main(string[] args) {
 
   //writeln(count(multiwayUnion(array(map!(a => array(map!(b => BigInt(a) ^^ b)(iota(2, n + 1))))(iota(2, n + 1))))));
 
-  sw.stop();
+  timer.stop();
 
-  writefln("finished in %s milliseconds", sw.peek.total!"msecs"());
+  writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
 }
 

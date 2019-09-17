@@ -8,7 +8,7 @@ import std.datetime.stopwatch;
 import kreikey.bigint;
 
 void main(string[] args) {
-  StopWatch sw;
+  StopWatch timer;
   ulong n = 100;
 
   if (args.length > 1)
@@ -20,7 +20,7 @@ void main(string[] args) {
   BigInt[] row;
   BigInt res;
 
-  sw.start();
+  timer.start();
 
   foreach(base; 2 .. n + 1) {
     row = [];
@@ -33,6 +33,6 @@ void main(string[] args) {
 
   powersMatrix.multiwayUnion.count.writeln();
 
-  sw.stop();
-  writefln("finished in %s milliseconds", sw.peek.total!"msecs"());
+  timer.stop();
+  writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
 }

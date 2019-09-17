@@ -11,12 +11,12 @@ void main(string[] args) {
   int temp, carryVal, n, sum, pow = 1000;
 
   if (args.length > 1) {
-    pow = args[1].to!int;
+    pow = args[1].parse!int();
   }
-  StopWatch sw;
+  StopWatch timer;
 
 
-  sw.start();
+  timer.start();
   digits ~= 1;
 
   foreach (i; 0 .. pow) {
@@ -42,8 +42,8 @@ void main(string[] args) {
   result = digits.map!(num => cast(char)(num + '0')).array.reverse;
   sum = digits.reduce!((a, b) => a + b);
 
-  sw.stop();
+  timer.stop();
   writefln("2^%s = %s", n, result);
   writefln("the sum of the digits is %s", sum);
-  writefln("finished in %s milliseconds", sw.peek.total!"msecs"());
+  writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
 }

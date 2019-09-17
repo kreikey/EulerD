@@ -4,15 +4,15 @@ import std.datetime.stopwatch;
 import std.conv;
 
 void main(string[] args) {
-  StopWatch sw;
+  StopWatch timer;
   string result;
   int firstNum = 1;
   int lastNum = 1000;
   string delegate(int) numWrite;
 
   if (args.length > 2) {
-    firstNum = args[1].to!int;
-    lastNum = args[2].to!int;
+    firstNum = args[1].parse!int();
+    lastNum = args[2].parse!int();
   }
 
   if (!(lastNum >= firstNum && firstNum > 0)) {
@@ -21,7 +21,7 @@ void main(string[] args) {
     lastNum = 1000;
   }
 
-  sw.start();
+  timer.start();
   numWrite = numToWordsInit();
 
   foreach (i; firstNum..lastNum + 1) {
@@ -33,9 +33,9 @@ void main(string[] args) {
     }
   }
 
-  sw.stop();
-  writefln("the numbers from %s to %s written out contain %s letters.", firstNum, lastNum, result.length);
-  writefln("finished in %s milliseconds", sw.peek.total!"msecs"());
+  timer.stop();
+  writefln("the numbers from %s parse %s written out contain %s letters.", firstNum, lastNum, result.length);
+  writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
 }
 
 string delegate(int) numToWordsInit() {

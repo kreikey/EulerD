@@ -6,11 +6,11 @@ import std.algorithm;
 import kreikey.bigint;
 
 void main(string[] args) {
-  StopWatch sw;
+  StopWatch timer;
   string[] longNumbers;
   BigInt accumulator;
 
-  sw.start();
+  timer.start();
   File inFile = File("longNumbers.txt", "r");
   longNumbers = inFile.byLineCopy.array();
   accumulator = BigInt(longNumbers[0]);
@@ -21,6 +21,6 @@ void main(string[] args) {
 
   writeln("The first 10 digits of the sum is: ", accumulator.digitString[0 .. 10]);
   writeln("total sum: ", accumulator);
-  sw.stop();
-  writeln("finished in ", sw.peek.total!"msecs"(), " milliseconds");
+  timer.stop();
+  writeln("finished in ", timer.peek.total!"msecs"(), " milliseconds");
 }

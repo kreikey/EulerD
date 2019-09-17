@@ -6,11 +6,11 @@ import std.datetime.stopwatch;
 import kreikey.primes;
 
 void main(string[] args) {
-  StopWatch sw;
+  StopWatch timer;
   int topNum = 10001;
   auto p = new Primes!int();
 
-  sw.start();
+  timer.start();
   if (args.length > 1)
     topNum = args[1].to!(int);
 
@@ -18,7 +18,7 @@ void main(string[] args) {
     p.popFront();
   }
 
-  sw.stop();
+  timer.stop();
   writeln(p.front);
-  writeln("finished in ", sw.peek.total!"msecs"(), " milliseconds");
+  writeln("finished in ", timer.peek.total!"msecs"(), " milliseconds");
 }

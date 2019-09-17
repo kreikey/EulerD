@@ -6,7 +6,7 @@ import std.array;
 import std.algorithm;
 
 void main(string[] args) {
-  StopWatch sw;
+  StopWatch timer;
   int[][] triangle;
   File inFile;
   string fileName = "triangle.txt";
@@ -16,13 +16,13 @@ void main(string[] args) {
     fileName = args[1];
   }
 
-  sw.start();
+  timer.start();
   inFile = File(fileName);
   triangle = inFile.byLine.map!(line => line.split(" ").map!(numstr => numstr.parse!(int)).array).array();
   sum = biggestPathSum(triangle, 0, 0);
   writeln(sum);
-  sw.stop();
-  writefln("finished in %s milliseconds", sw.peek.total!"msecs"());
+  timer.stop();
+  writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
 }
 
 int biggestPathSum(ref int[][] triangle, int i, int j) {

@@ -10,18 +10,18 @@ import kreikey.primes;
 // num.factors.filter!(isPrime).reduce!(max);
 
 void main () {
-  StopWatch sw;
+  StopWatch timer;
   auto p = new Primes!long();
   long num = 600851475143;
 
-  sw.start();
+  timer.start();
 
   auto equalsDividend = quotientCompareInit(num);
   p.until!(equalsDividend)(OpenRight.no).array()[$ - 1].writeln();
 
-  sw.stop();
+  timer.stop();
 
-  writeln("finished in ", sw.peek.total!"msecs"(), " milliseconds");
+  writeln("finished in ", timer.peek.total!"msecs"(), " milliseconds");
 }
 
 bool delegate(long) quotientCompareInit(long num) {

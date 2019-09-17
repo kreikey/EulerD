@@ -7,7 +7,7 @@ import std.functional;
 import kreikey.primes;
 
 void main(string[] args) {
-  StopWatch sw;
+  StopWatch timer;
   auto p = new Primes!int(1000);
   int limit = 2_000_000;
   int sum;
@@ -15,12 +15,12 @@ void main(string[] args) {
   if (args.length > 1)
     limit = args[1].parse!(int);
 
-  sw.start();
+  timer.start();
 
   sum = p.until!((a, b) => a >= b)(limit).sum();
 
-  sw.stop();
+  timer.stop();
 
   writefln("The sum of all primes below %s is %s.", limit, sum);
-  writefln("Finished in %s milliseconds.", sw.peek.total!"msecs"());
+  writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }

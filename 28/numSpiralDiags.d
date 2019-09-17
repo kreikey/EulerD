@@ -1,17 +1,24 @@
 #!/usr/bin/env rdmd -I..
 
 import std.stdio;
+import std.datetime.stopwatch;
 import std.range;
 import std.algorithm;
 import std.conv;
 
 void main(string[] args) {
   ulong width = 1001;
+  StopWatch timer;
+
+  timer.start();
 
   if (args.length > 1)
-    width = args[1].to!ulong;
+    width = args[1].to!ulong();
 
   spiralDiagonalsInit.generate.take(width.countDiagonals()).sum.writeln();
+
+  timer.stop();
+  writeln("finished in ", timer.peek.total!"msecs"(), " milliseconds.");
 }
 
 auto spiralDiagonalsInit() {

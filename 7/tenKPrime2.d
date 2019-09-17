@@ -8,18 +8,18 @@ import std.algorithm;
 import kreikey.primes;
 
 void main(string[] args) {
-  StopWatch sw;
+  StopWatch timer;
   int limit = 10001;
   auto p = new Primes!int();
 
-  sw.start();
+  timer.start();
   if (args.length > 1)
     limit = args[1].to!(int);
 
   p[limit - 1].writeln();
   //p.drop(limit - 1).front.writeln();
 
-  sw.stop();
+  timer.stop();
 
-  writeln("finished in ", sw.peek.total!"msecs"(), " milliseconds");
+  writeln("finished in ", timer.peek.total!"msecs"(), " milliseconds");
 }

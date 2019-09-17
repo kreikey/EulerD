@@ -6,16 +6,16 @@ import std.range;
 import kreikey.intmath;
 
 void main(string[] args) {
-  StopWatch sw;
+  StopWatch timer;
   ulong sum;
 
-  sw.start();
+  timer.start();
 
   sum = iota(1, 28124).filter!(isNonAbundantSum).sum();
 
-  sw.stop();
+  timer.stop();
   writefln("The sum of non-abundant numbers below 28124 is: %s", sum);
-  writefln("finished in %s milliseconds", sw.peek.total!"msecs"());
+  writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
 }
 
 bool isAbundant(long num) {

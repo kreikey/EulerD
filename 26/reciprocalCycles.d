@@ -10,14 +10,14 @@ import reciprocals2;
 import std.range;
 
 void main(string[] args) {
-  StopWatch sw;
+  StopWatch timer;
   ulong end = 999;
   ulong start = 1;
 
   if (args.length > 1)
-    end = args[1].parse!(ulong);
+    end = args[1].parse!ulong();
 
-  sw.start();
+  timer.start();
 
   //foreach (i; 0 .. 100) {
   auto recs = Reciprocals();
@@ -44,5 +44,5 @@ void main(string[] args) {
   //writefln("transient: %s\ntransient length: %s", rec2.transient, rec2.transient.length);
   //writefln("reptend: %s\nreptend length: %s", rec2.reptend, rec2.reptend.length);
 
-  writeln("finished in ", sw.peek.total!"msecs"(), " milliseconds");
+  writeln("finished in ", timer.peek.total!"msecs"(), " milliseconds");
 }

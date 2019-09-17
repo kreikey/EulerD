@@ -13,7 +13,7 @@ alias primeFactorsFast = memoize!(primeFactors!ulong);
 alias asort = a => std.algorithm.sort(a).array();
 
 void main(string[] args) {
-  StopWatch clock;
+  StopWatch timer;
   ulong n = 100;
 
   if (args.length > 1)
@@ -21,7 +21,7 @@ void main(string[] args) {
 
   writeln("distinct powers");
 
-  clock.start();
+  timer.start();
 
   iota(2, n+ 1)
     .map!(base => iota(2, n+1)
@@ -51,9 +51,9 @@ void main(string[] args) {
   //powersMatrix.each!writeln;
   //powersMatrix.multiwayMerge.uniq.count.writeln();
 
-  clock.stop();
+  timer.stop();
 
-  writefln("finished in %s milliseconds", clock.peek.total!"msecs"());
+  writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
 }
 
 ulong[] cycleN(ulong[] array, ulong copies) {

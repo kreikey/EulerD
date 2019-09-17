@@ -8,7 +8,7 @@ import std.range;
 import kreikey.bytemath;
 
 void main(string[] args) {
-  StopWatch sw;
+  StopWatch timer;
   byte[] result;
   byte[] addend1;
   byte[] addend2;
@@ -16,10 +16,10 @@ void main(string[] args) {
   int term = 2;
 
   if (args.length > 1) {
-    limit = args[1].parse!int;
+    limit = args[1].parse!int();
   }
 
-  sw.start();
+  timer.start();
   addend1 = "1".rbytes();
   addend2 = "1".rbytes();
 
@@ -29,10 +29,10 @@ void main(string[] args) {
     addend2 = result;
     term++;
   }
-  sw.stop();
+  timer.stop();
 
   writefln("the first %s-digit fibonacci term is number %s.", limit, term);
   writefln("the term is:\n%s", result.rstr);
-  writefln("finished in %s milliseconds", sw.peek.total!"msecs"());
+  writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
 }
 

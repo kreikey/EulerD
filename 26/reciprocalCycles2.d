@@ -9,14 +9,14 @@ import reciprocals;
 import std.range;
 
 void main(string[] args) {
-  StopWatch sw;
+  StopWatch timer;
   ulong end = 999;
   ulong start = 2;
 
   if (args.length > 1)
-    end = args[1].parse!(ulong);
+    end = args[1].parse!ulong();
 
-  sw.start();
+  timer.start();
 
   auto nums = iota(start, end + 1);
   auto resTup = zip(nums, nums.map!(reptendLength)).reduce!((a, b) => a[1] > b[1] ? a : b);
@@ -28,7 +28,7 @@ void main(string[] args) {
 
   //iota(2, 1000).reduce!((a, b) => a.reptendLength() > b.reptendLength() ? a : b).writeln();
 
-  writeln("finished in ", sw.peek.total!"msecs"(), " milliseconds");
+  writeln("finished in ", timer.peek.total!"msecs"(), " milliseconds");
 }
 
 long reptendLength(ulong denom) {

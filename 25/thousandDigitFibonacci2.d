@@ -9,13 +9,13 @@ import std.range;
 import kreikey.bigint;
 
 void main(string[] args) {
-  StopWatch sw;
+  StopWatch timer;
   int limit = 1000;
 
   if (args.length > 1)
-    limit = args[1].parse!(int);
+    limit = args[1].parse!int();
 
-  sw.start();
+  timer.start();
 
   BigInt a = 1;
   BigInt b = 1;
@@ -29,9 +29,9 @@ void main(string[] args) {
     index++;
   }
 
-  sw.stop();
+  timer.stop();
 
   writefln("the index of the first %s-digit fibonacci term is %s.", limit, index);
   writefln("the term is:\n%s", b);
-  writefln("finished in %s milliseconds", sw.peek.total!"msecs"());
+  writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
 }

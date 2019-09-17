@@ -4,13 +4,13 @@ import std.stdio;
 import std.datetime.stopwatch;
 
 void main() {
-  StopWatch sw;
+  StopWatch timer;
   int fibNum;
   int fibA = 0;
   int fibB = 1;
   int fibEvenSum;
 
-  sw.start();
+  timer.start();
   while (fibNum <= 4000000) {
     if (fibNum % 2 == 0) {
       fibEvenSum += fibNum;
@@ -19,7 +19,7 @@ void main() {
     fibA = fibB;
     fibB = fibNum;
   }
-  sw.stop();
+  timer.stop();
   writeln(fibEvenSum);
-  writeln("finished in ", sw.peek.total!"msecs"(), " milliseconds");
+  writeln("finished in ", timer.peek.total!"msecs"(), " milliseconds");
 }

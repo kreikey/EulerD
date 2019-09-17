@@ -8,7 +8,7 @@ import std.datetime.stopwatch;
 import kreikey.bigint;
 
 void main(string[] args) {
-  StopWatch sw;
+  StopWatch timer;
   ulong n = 100;
 
   if (args.length > 1)
@@ -16,7 +16,7 @@ void main(string[] args) {
 
   writeln("distinct powers");
 
-  sw.start();
+  timer.start();
 
   //BigInt last = 0;
   bool delegate(BigInt) unique = notEqualToPreviousInit(BigInt(0));
@@ -37,9 +37,9 @@ void main(string[] args) {
     .fold!((a, b) => b[0] == b[1] ? a : a + 1)(1)
     .writeln();
 
-  sw.stop();
+  timer.stop();
 
-  writefln("finished in %s milliseconds", sw.peek.total!"msecs"());
+  writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
 }
 
 bool delegate(BigInt) notEqualToPreviousInit(BigInt previous) {

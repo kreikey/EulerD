@@ -4,7 +4,7 @@ import std.datetime.stopwatch;
 import std.conv;
 
 void main(string[] args) {
-  StopWatch sw;
+  StopWatch timer;
   int trian;
   int topNum = 500;
   int n = 1;
@@ -12,15 +12,15 @@ void main(string[] args) {
   if (args.length > 1)
     topNum = args[1].parse!(int);
 
-  sw.start();
+  timer.start();
 
   while (countTrianFactors(n) <= topNum) {
     n++;
   }
 
   writefln("n: %s t: %s factor count: %s", n, triangularize(n), countTrianFactors(n));
-  sw.stop();
-  writefln("finished in %s milliseconds.", sw.peek().total!"msecs");
+  timer.stop();
+  writefln("finished in %s milliseconds.", timer.peek().total!"msecs");
 
 }
 

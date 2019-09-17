@@ -11,9 +11,9 @@ import kreikey.primes;
 bool delegate(int) isPrime;
 
 void main(string[] args) {
-  StopWatch sw;
+  StopWatch timer;
 
-  sw.start();
+  timer.start();
 
   isPrime = isPrimeInit();
   int[] as = iota(-999, 1000, 2).array();
@@ -41,14 +41,14 @@ void main(string[] args) {
   }
 
   //writeln(mostPrimes.length);
-  sw.stop();
+  timer.stop();
 
   writeln("The polynomial that generates the most primes is: ");
   writefln("n^2 + %dn + %d", polyMostPrimes[0], polyMostPrimes[1]);
   writeln("The primes: ", mostPrimes);
   writeln("The number of primes: ", mostPrimes.length);
   writeln("The product of the coefficients: ", polyMostPrimes[0] * polyMostPrimes[1]);
-  writeln("finished in ", sw.peek.total!"msecs"(), " milliseconds.");
+  writeln("finished in ", timer.peek.total!"msecs"(), " milliseconds.");
 }
 
 int[] generatePrimes(int a, int b) {
