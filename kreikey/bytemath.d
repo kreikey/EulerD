@@ -15,14 +15,12 @@ alias isGreaterThanOrEqualTo = (const(byte)[] left, const(byte)[] right) => left
 alias isLessThanOrEqualTo = (const(byte)[] left, const(byte)[] right) => left.compare(right) <= 0;
 
 byte[] add(const(byte)[] left, const(byte)[] right) {
-  byte[] result;
-  result.reserve(left.length + right.length + 1);
 
   if (left.length < right.length) {
     swap(left, right);
   }
 
-  result ~= left;
+  byte[] result = left.dup;
   result.accumulate(right);
 
   return result;

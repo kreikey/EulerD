@@ -24,17 +24,21 @@ private:
   byte[] mant = [0];
   bool sign = false;
 
-  static void addAbsInPlace(ref byte[] lhs, const byte[] rhs) {
-    uint carry = 0;
+  static void addAbsInPlace(ref byte[] lhs, const(byte)[] rhs) {
+    byte carry = 0;
 
-    lhs.length = lhs.length > rhs.length ? lhs.length : rhs.length;
-    lhs[0 .. rhs.length] += rhs[];
-    lhs[1 .. $] += lhs[0 .. $-1] / 10;
-    carry = lhs[$-1] / 10;
-    lhs[] %= 10;
+    if (lhs.length < rhs.length)
+      lhs.length = rhs.length;
+
+    for (ulong i = 0; i < lhs.length; i++) {
+      lhs[i] += (rhs.length > i ? rhs[i] : 0) + carry;
+      carry = lhs[i] / 10;
+      if (lhs[i] > 9)
+        lhs[i] -= 10;
+    }
 
     if (carry)
-      lhs ~= 1;
+      lhs ~= carry;
   }
   unittest {
     //writeln("addAbsInPlace unittest");
@@ -56,9 +60,13 @@ private:
     //writeln("addAbsInPlace unittest passed");
   }
 
-  static byte[] addAbs(const byte[] lhs, const byte[] rhs) {
-    byte[] temp = lhs.dup;
-    addAbsInPlace(temp, rhs);
+  static byte[] addAbs(const(byte)[] lhs, const(byte)[] rhs) {
+    bool leftBigger = lhs.length > rhs.length;
+    const(byte)[] big = leftBigger ? lhs : rhs;
+    const(byte)[] little = leftBigger ? rhs : lhs;
+    byte[] temp = big.dup;
+
+    addAbsInPlace(temp, little);
     return temp;
   }
   unittest {
@@ -98,30 +106,19 @@ private:
     //writeln("addAbs unittest passed");
   }
 
-  static void subAbsInPlace(ref byte[] lhs, const byte[] rhs) {
-    ulong i = 0;
-    uint borrow = 0;
+  static void subAbsInPlace(ref byte[] lhs, const(byte)[] rhs) {
+    byte borrow = 0;
 
-    foreach (ref a, b; lockstep(lhs, rhs)) {
-      a -= b + borrow;
-      if (a < 0) {
-        a += 10;
-        borrow = 1;
-      } else {
-        borrow = 0;
-      }
-      i++;
-    }
-
-    while(borrow) {
-      lhs[i] -= borrow;
+    for (ulong i = 0; i < lhs.length; i++) {
+      lhs[i] -= (i < rhs.length ? rhs[i] : 0) + borrow;
       if (lhs[i] < 0) {
         lhs[i] += 10;
         borrow = 1;
       } else {
         borrow = 0;
+        if (i >= rhs.length)
+          break;
       }
-      i++;
     }
 
     while (lhs[$-1] == 0 && lhs.length > 1)
@@ -145,7 +142,7 @@ private:
     //writeln("subAbsInPlace unittest passed");
   }
 
-  static byte[] subAbs(const byte[] lhs, const byte[] rhs) {
+  static byte[] subAbs(const(byte)[] lhs, const(byte)[] rhs) {
     byte[] difference = lhs.dup;
     subAbsInPlace(difference, rhs);
     return difference;
@@ -170,12 +167,12 @@ private:
   }
 
   static void incAbs(ref byte[] lhs) {
-    int carry = 1;
+    byte carry = 1;
 
-    foreach (ref d; lhs) {
-      d += carry;
-      if (d == 10) {
-        d = 0;
+    for (ulong i; i < lhs.length; i++) {
+      lhs[i] += carry;
+      if (lhs[i] == 10) {
+        lhs[i] = 0;
       } else {
         carry = 0;
         break;
@@ -201,17 +198,17 @@ private:
   }
 
   static void decAbs(ref byte[] lhs) {
-    bool borrow = false;
+    byte borrow = 0;
 
     ulong i = 0;
 
     do {
       if (lhs[i] > 0) {
         lhs[i]--;
-        borrow = false;
+        borrow = 0;
       } else {
         lhs[i] = 9;
-        borrow = true;
+        borrow = 1;
       }
       i++;
     } while (borrow);
@@ -243,16 +240,16 @@ private:
     //writeln("decAbs unittest passed");
   }
 
-  static int cmpAbs(const byte[] left, const byte[] right) {
+  static int cmpAbs(const(byte)[] left, const(byte)[] right) {
     if (left.length < right.length)
       return -1;
     else if (left.length > right.length)
       return 1;
 
-    foreach (a, b; lockstep(left.retro(), right.retro()))
-      if (a < b)
+    for (ulong i = left.length - 1; i < ulong.max; i--)
+      if (left[i] < right[i])
         return -1;
-      else if (a > b)
+      else if (left[i] > right[i])
         return 1;
 
     return 0;
@@ -277,18 +274,17 @@ private:
     //writeln("cmpAbs unittest passed");
   }
 
-  static byte[] karatsuba(const byte[] lhs, const byte[] rhs) {
+  static byte[] karatsuba(const(byte)[] lhs, const(byte)[] rhs) {
     byte[] z0;
     byte[] z1;
     byte[] z2;
     ulong m;
 
     // Take care of base case where one or both operands are of length 1
-    if (lhs.length == 1) {
+    if (lhs.length == 1)
       return mulSingleDigit(rhs, lhs[0]);
-    } else if (rhs.length == 1) {
+    else if (rhs.length == 1)
       return mulSingleDigit(lhs, rhs[0]);
-    }
 
     m = lhs.length > rhs.length ? lhs.length / 2 : rhs.length / 2;
 
@@ -324,9 +320,8 @@ private:
 
     lhs.length += n;
 
-    for (ulong i = lhs.length; i > n; i--) {
+    for (ulong i = lhs.length; i > n; i--)
       lhs[i - 1] = lhs[i - n - 1];
-    }
 
     lhs[0 .. n] = 0;
   }
@@ -381,9 +376,8 @@ private:
       return;
     }
 
-    for (ulong i = 0; i < lhs.length - n; i++) {
+    for (ulong i = 0; i < lhs.length - n; i++)
       lhs[i] = lhs[i + n];
-    }
 
     lhs.length = lhs.length - n;
   }
@@ -422,21 +416,19 @@ private:
     //writeln("shiftLittleInPlace unittest passed");
   }
 
-  static byte[] mulSingleDigit(const byte[] lhs, const byte n) {
+  static byte[] mulSingleDigit(const(byte)[] lhs, const(byte) n) {
     byte[] pro = lhs.dup;
     byte carry;
 
-    pro[] *= n;
-
-    foreach (ref a; pro) {
-      a += carry;
-      carry = a / 10;
+    for (ulong i = 0; i < pro.length; i++) {
+      pro[i] *= n;
+      pro[i] += carry;
+      carry = pro[i] / 10;
+      pro[i] %= 10;
     }
 
     if (carry)
       pro ~= carry;
-
-    pro[] %= 10;
 
     // In case we've multiplied by a zero, set length to one.
     if (pro[$ - 1] == 0)
@@ -475,7 +467,12 @@ private:
     //writeln("mulSingleDigit unittest passed");
   }
 
-  Tuple!(byte[], byte[]) divMod(const byte[] lhs, const byte[] rhs) const {
+  Tuple!(byte[], byte[]) divMod(const(byte)[] lhs, const(byte)[] rhs) const {
+    if (lhs.toHash() == BigInt.lastDivModArgHashes[0] && rhs.toHash() == BigInt.lastDivModArgHashes[1])
+      return BigInt.lastDivModResult;
+    BigInt.lastDivModArgHashes[0] = lhs.toHash();
+    BigInt.lastDivModArgHashes[1] = rhs.toHash();
+
     // This function could use some serious reworking and updating, for optimization purposes.
     byte[] quo = [0];
     byte[] acc;
@@ -490,9 +487,8 @@ private:
 
     if (rhs == [0])
       throw new Exception("Divide by zero error.");
-    if (cmpAbs(lhs, rhs) < 0) {
+    if (cmpAbs(lhs, rhs) < 0)
       return Tuple!(byte[], byte[])(quo, rem);
-    }
 
     quo.length = 0;
     quo.reserve(lhs.length - rhs.length + 1);
@@ -501,9 +497,8 @@ private:
       cast(int)(lhs.length - rhs.length) :
       0;
 
-    if (cmpAbs(rhs, lhs[littleEnd .. $]) > 0 && littleEnd > 0) {
+    if (cmpAbs(rhs, lhs[littleEnd .. $]) > 0 && littleEnd > 0)
       littleEnd--;
-    }
 
     rem = lhs[littleEnd .. $].dup;
 
@@ -529,35 +524,36 @@ private:
 
     std.algorithm.reverse(quo);
 
+    BigInt.lastDivModResult[0] = quo;
+    BigInt.lastDivModResult[1] = rem;
+
     return Tuple!(byte[], byte[])(quo, rem);
   }
 
   BigInt powFast(T)(auto ref const T exp) const
   if (isIntegral!T || is(T == BigInt)) {
-    const(byte[]) powInternal(T)(ref const T exp)
+    const(byte)[] powInternal(T)(ref const T exp)
     if (isIntegral!T || is(T == BigInt)) {
       T oddExp = 0;
       T halfExp;
 
-      if (exp < 0) {
+      if (exp < 0)
         throw new Exception("It's an integer library, not a fraction or floating point library. No negative exponents allowed!");
-      } else if (exp == 0) {
+      else if (exp == 0)
         return [1];
-      } else if (exp == 1) {
+      else if (exp == 1)
         return this.mant;
-      }
 
       halfExp = exp / 2;
+      oddExp = exp % 2;
 
       static if (is(T == BigInt)) {
-        oddExp = BigInt.lastRemainder;
         auto left = powInternal(halfExp.byRef());
       } else {
-        oddExp = exp % 2;
         auto left = powInternal(halfExp);
       }
 
-      const byte[] right = oddExp ? karatsuba(left, this.mant) : left;
+      const(byte)[] right = oddExp ? karatsuba(left, this.mant) : left;
 
       return karatsuba(left, right);
     }
@@ -590,8 +586,8 @@ private:
     BigInt sum;
 
     int cmpRes = cmpAbs(this.mant, rhs.mant);
-    const byte[] big = cmpRes < 0 ? rhs.mant : this.mant;
-    const byte[] little = cmpRes >= 0 ? rhs.mant : this.mant;
+    const(byte)[] big = cmpRes < 0 ? rhs.mant : this.mant;
+    const(byte)[] little = cmpRes >= 0 ? rhs.mant : this.mant;
 
     if (this.sign == rhs.sign) {
       sum.mant = addAbs(big, little);
@@ -705,11 +701,10 @@ private:
   }
 
   ref BigInt inc() {
-    if (this.sign) {
+    if (this.sign)
       decAbs(this.mant);
-    } else {
+    else
       incAbs(this.mant);
-    }
 
     if (this.mant[$ - 1] == 0)
       this.sign = false;
@@ -744,14 +739,13 @@ private:
   }
 
   ref BigInt dec() {
-    if (this.sign) {
+    if (this.sign)
       incAbs(this.mant);
-    } else if (this.mant[$ - 1] == 0) {
+    else if (this.mant[$ - 1] == 0) {
       incAbs(this.mant);
       this.sign = true;
-    } else {
+    } else
       decAbs(this.mant);
-    }
 
     if (this.mant[$ - 1] == 0)
       this.sign = false;
@@ -857,8 +851,6 @@ private:
     auto result = divMod(this.mant, rhs.mant);
 
     quo = BigInt(result[0], result[0][$-1] == 0 ? false : (this.sign != rhs.sign));
-    BigInt.lastQuotient = BigInt(quo.mant.dup, quo.sign);
-    BigInt.lastRemainder = BigInt(result[1].dup, result[1][$-1] == 0 ? false : this.sign);
 
     return quo;
   }
@@ -891,18 +883,18 @@ private:
     assert(z.toString() == "0");
     z = i.div(j);
     assert(z.toString() == "0");
-    z = i.div(k);
-    assert(BigInt.lastRemainder.toString() == "0");
+    //z = i.div(k);
+    //assert(BigInt.lastRemainder.toString() == "0");
     //writeln("div unittest passed");
   }
 
   BigInt mod(ref const BigInt rhs) const {
     BigInt rem;
+    Tuple!(byte[], byte[]) result;
 
-    auto result = divMod(this.mant, rhs.mant);
+    result = divMod(this.mant, rhs.mant);
+
     rem = BigInt(result[1], result[1][$-1] == 0 ? false : this.sign);
-    BigInt.lastQuotient = BigInt(result[0].dup, result[0][$-1] == 0 ? false : (this.sign != rhs.sign));
-    BigInt.lastRemainder = BigInt(rem.mant.dup, rem.sign);
 
     return rem;
   }
@@ -935,9 +927,9 @@ private:
     assert(z.toString() == "0");
     z = j.mod(k);
     assert(z.toString() == "0");
-    z = j.mod(l);
-    assert(z.toString() == "-15");
-    assert(BigInt.lastQuotient.toString() == "0");
+    //z = j.mod(l);
+    //assert(z.toString() == "-15");
+    //assert(BigInt.lastQuotient.toString() == "0");
     z = h.mod(j);
     assert(z.toString() == "-6");
     z = h.mod(g);
@@ -954,8 +946,8 @@ private:
   }
 
 public:
-  static BigInt lastQuotient;
-  static BigInt lastRemainder;
+  static Tuple!(byte[], byte[]) lastDivModResult;
+  static Tuple!(ulong, ulong) lastDivModArgHashes;
 
   this(string source) nothrow {
     bool allZeros = true;
@@ -966,10 +958,10 @@ public:
       source = source[1 .. $];
     }
 
-    foreach (c; source) {
-      if (c < '0' || c > '9')
+    for (ulong i; i < source.length; i++) {
+      if (source[i] < '0' || source[i] > '9')
         valid = false;
-      if (c != '0')
+      if (source[i] != '0')
         allZeros = false;
     }
 
@@ -1053,7 +1045,7 @@ public:
     //writeln("this(long) unittest passed");
   }
 
-  private this(const byte[] source, bool sign) nothrow {
+  private this(const(byte)[] source, bool sign) nothrow {
     this.mant = source.dup;
     this.sign = sign;
   }
@@ -1171,22 +1163,13 @@ public:
   }
 
   bool opEquals()(auto ref const BigInt rhs) const {
-    if (this.mant == [0] && rhs.mant == [0]) {
+    if (this.mant.length == 1 && rhs.mant.length == 1 && this.mant[0] == 0 && rhs.mant[0] == 0)
       return true;
-    }
 
     if (this.sign != rhs.sign)
       return false;
 
-    if (this.mant.length != rhs.mant.length)
-      return false;
-
-    foreach(i; 0 .. this.mant.length) {
-      if (this.mant[i] != rhs.mant[i])
-        return false;
-    }
-
-    return true;
+    return this.mant == rhs.mant;
   }
   unittest {
     //writeln("opEquals unittest");
@@ -1215,17 +1198,17 @@ public:
   int opCmp(ref const BigInt rhs) const {
     int res;
 
-    if (this.mant == [0] && rhs.mant == [0]) {
+    if (this.mant.length == 1 && rhs.mant.length == 1 && this.mant[0] == 0 && rhs.mant[0] == 0) {
       res = 0;
     } else if (this.sign != rhs.sign) {
-      if (this.sign)
+      if (this.sign == true)
         res = -1;
       else
         res = 1;
     } else {
       res = cmpAbs(this.mant, rhs.mant);
 
-      if (this.sign) {
+      if (this.sign == true) {
         res = -res;
       }
     }
@@ -1329,6 +1312,9 @@ public:
     return digitBytes;
   }
 
+  ulong toHash() {
+    return typeid(typeof(this)).getHash(&this);
+  }
 
   mixin RvalueRef;
 }
@@ -1348,7 +1334,7 @@ unittest {
   //writeln("rbytes unittest passed");
 }
 
-string rstr(const byte[] value) {
+string rstr(const(byte)[] value) {
   //return value.retro.map!(a => cast(immutable(char))(a + '0')).array();
   byte[] result = value.dup;
   result[] += '0';
@@ -1359,5 +1345,9 @@ unittest {
   //writeln("rstr unittest");
   assert([4, 7, 3, 2].rstr() == "2374");
   //writeln("rstr unittest passed");
+}
+
+ulong toHash(T)(auto ref T value) {
+  return typeid(T).getHash(&value);
 }
 
