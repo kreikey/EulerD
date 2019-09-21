@@ -2,10 +2,11 @@
 import std.stdio;
 import std.datetime.stopwatch;
 import std.conv;
-import std.parallelism;
 
 void main(string[] args) {
-  int width = 20, height = 20, pathCount;
+  int width = 20, height = 20;
+  ulong pathCount;
+
   StopWatch timer;
 
   if (args.length > 2) {
@@ -21,9 +22,9 @@ void main(string[] args) {
   writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
 }
 
-int countLatticePaths(int width, int height) {
+ulong countLatticePaths(int width, int height) {
   enum {RIGHT, DOWN}
-  int rightCount, downCount, pathCount;
+  ulong rightCount, downCount, pathCount;
 
   void takePath(int direction) {
     if (direction == RIGHT)

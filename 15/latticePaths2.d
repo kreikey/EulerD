@@ -2,7 +2,7 @@
 import std.stdio;
 import std.datetime.stopwatch;
 import std.conv;
-import std.parallelism;
+import std.functional;
 
 enum {RIGHT, DOWN}
 
@@ -28,18 +28,8 @@ ulong countLatticePaths(int width, int height) {
   int rightCount, downCount;
   ulong pathCount;
 
-/*  auto rightPathTask = task!takePath(RIGHT, width, height, 0, 0);
-  rightPathTask.executeInNewThread();
+  pathCount += takePath(RIGHT, width, height, 0, 0);
   pathCount += takePath(DOWN, width, height, 0, 0);
-  pathCount += rightPathTask.yieldForce();
-*/
-
-  if (width == height) {
-    pathCount += 2 * takePath(RIGHT, width, height, 0, 0);
-  } else {
-    pathCount += takePath(RIGHT, width, height, 0, 0);
-    pathCount += takePath(DOWN, width, height, 0, 0);
-  }
 
   return pathCount;
 }
@@ -54,14 +44,14 @@ ulong takePath(int direction, int width, int height, int rightCount, int downCou
     downCount++;
 
   if (rightCount < width) {
-    rightPathCount = takePath(RIGHT, width, height, rightCount, downCount);
+    rightPathCount = memoize!takePath(RIGHT, width, height, rightCount, downCount);
     pathCount += rightPathCount;
   }
   if (downCount < height) {
     if (width - rightCount == height - downCount) {
       pathCount += rightPathCount;
     } else {
-      pathCount += takePath(DOWN, width, height, rightCount, downCount);
+      pathCount += memoize!takePath(DOWN, width, height, rightCount, downCount);
     }
   }
 
