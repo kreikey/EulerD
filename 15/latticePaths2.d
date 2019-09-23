@@ -28,8 +28,8 @@ ulong countLatticePaths(int width, int height) {
   int rightCount, downCount;
   ulong pathCount;
 
-  pathCount += takePath(RIGHT, width, height, 0, 0);
-  pathCount += takePath(DOWN, width, height, 0, 0);
+  pathCount += memoize!takePath(RIGHT, width, height, 0, 0);
+  pathCount += memoize!takePath(DOWN, width, height, 0, 0);
 
   return pathCount;
 }

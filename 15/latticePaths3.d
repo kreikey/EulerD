@@ -2,6 +2,7 @@
 import std.stdio;
 import std.datetime.stopwatch;
 import std.conv;
+import std.string;
 
 void main(string[] args) {
   int width = 20, height = 20;
@@ -22,23 +23,37 @@ void main(string[] args) {
 }
 
 ulong countLatticePaths(int width, int height) {
-  return nChooseK(width + height, width);
+  return nChooseK(width + height, height);
 }
 
 ulong nChooseK(int n, int k) {
-  int numerator, denominator;
+  ulong numerator;
   ulong result;
+  ulong lastRes;
+  ulong leftDenom;
+  ulong rightDenom;
 
-  numerator = n - k + 1;
-  denominator = 2;
+  leftDenom = 2;
+  rightDenom = 2;
   result = 1;
 
-  while (numerator <= n && denominator <= n - k) {
-    result *= numerator++;
+  for (numerator = 2; numerator <= n; numerator++) {
+    //writefln("%s %s %s %s", numerator, leftDenom, rightDenom, result);
+    lastRes = result;
+    result *= numerator;
+    if (result < lastRes) {
+      throw new Exception(format("result: %s < lastRes: %s", result, lastRes));
+    }
 
-    if (result % denominator == 0)
-      result /= denominator++;
+    if (leftDenom <= k && result % leftDenom == 0) {
+      result /= leftDenom++;
+    } if (rightDenom <= n - k && result % rightDenom == 0) {
+      result /= rightDenom++;
+    }
   }
+
+  if (leftDenom != k + 1 || rightDenom != n - k + 1)
+    throw new Exception("couldn't divide by k! or (n - k)!");
 
   return result;
 }
