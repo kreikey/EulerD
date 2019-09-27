@@ -10,7 +10,7 @@ import kreikey.intmath;
 void main () {
   StopWatch timer;
   auto p = new Primes!long();
-  long num = 600851475143;
+  ulong num = 600851475143;
 
 
   timer.start();

@@ -5,10 +5,10 @@ import std.datetime.stopwatch;
 
 void main() {
   StopWatch timer;
-  int fibNum;
-  int fibA = 0;
-  int fibB = 1;
-  int fibEvenSum;
+  ulong fibNum;
+  ulong fibA = 0;
+  ulong fibB = 1;
+  ulong fibEvenSum;
 
   timer.start();
   while (fibNum <= 4000000) {

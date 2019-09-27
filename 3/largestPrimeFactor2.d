@@ -11,8 +11,8 @@ import kreikey.primes;
 
 void main () {
   StopWatch timer;
-  auto p = new Primes!long();
-  long num = 600851475143;
+  auto p = new Primes!ulong();
+  ulong num = 600851475143;
 
   timer.start();
 
@@ -24,8 +24,8 @@ void main () {
   writeln("finished in ", timer.peek.total!"msecs"(), " milliseconds");
 }
 
-bool delegate(long) quotientCompareInit(long num) {
-  long dividend = num;
+bool delegate(long) quotientCompareInit(ulong num) {
+  ulong dividend = num;
 
   bool equalsDividend(long divisor) {
     if (dividend % divisor == 0) {

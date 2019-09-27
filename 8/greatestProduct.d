@@ -9,7 +9,7 @@ import productIter;
 void main() {
   StopWatch timer;
   string digits;
-  int product;
+  ulong product;
   ProductIter prodFive;
 
   timer.start();

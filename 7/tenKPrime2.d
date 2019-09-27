@@ -9,12 +9,12 @@ import kreikey.primes;
 
 void main(string[] args) {
   StopWatch timer;
-  int limit = 10001;
-  auto p = new Primes!int();
+  ulong limit = 10001;
+  auto p = new Primes!ulong();
 
   timer.start();
   if (args.length > 1)
-    limit = args[1].to!(int);
+    limit = args[1].to!(ulong);
 
   p[limit - 1].writeln();
   //p.drop(limit - 1).front.writeln();

@@ -5,7 +5,7 @@ final class Primes(T)
 if (isIntegral!T) {
 private:
   T num;
-  T ndx;
+  ulong ndx;
   T root;
   T nextSquare;
   T[] primes;
@@ -79,7 +79,7 @@ public:
     return ret;
   }
 
-  T opIndex(uint i) {
+  T opIndex(size_t i) {
     T ret;
 
     if (i < primes.length) {

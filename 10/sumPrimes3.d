@@ -8,12 +8,12 @@ import kreikey.primes;
 
 void main(string[] args) {
   StopWatch timer;
-  auto p = new Primes!int(1000);
-  int limit = 2_000_000;
-  int sum;
+  auto p = new Primes!ulong(1000);
+  ulong limit = 2_000_000;
+  ulong sum;
 
   if (args.length > 1)
-    limit = args[1].parse!(int);
+    limit = args[1].parse!(ulong);
 
   timer.start();
 

@@ -9,17 +9,17 @@ import std.range;
 
 void main(string[] args) {
   StopWatch timer;
-  int topNum = 100;
-  int[] arr;
+  ulong topNum = 100;
+  ulong[] arr;
 
   if (args.length > 1)
-    topNum = args[1].parse!(int);
+    topNum = args[1].parse!(ulong);
 
   timer.start();
-  arr = iota(1, topNum + 1).array();
-  int sumsquares = reduce!((a, b) => a + b * b)(0, arr);
-  int sum = reduce!((a, b) => a + b)(0, arr);
-  int difference = sum * sum - sumsquares;
+  arr = iota!ulong(1, topNum + 1).array();
+  ulong sumsquares = arr.reduce!((a, b) => a + b * b)();
+  ulong sum = arr.reduce!((a, b) => a + b)();
+  ulong difference = sum * sum - sumsquares;
   timer.stop();
 
   writeln(difference);

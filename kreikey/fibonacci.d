@@ -5,6 +5,7 @@ private:
   ulong a;
   ulong b;
   ulong _front;
+
 public:
   this() {
     this.b = 1;
@@ -35,5 +36,4 @@ public:
     this.b = 1;
     popFront();
   }
-
 }

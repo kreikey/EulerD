@@ -7,9 +7,9 @@ import pythagoreanTriplet;
 import std.datetime.stopwatch;
 
 void main() {
-  int abcSum;
-  int b;
-  int c;
+  ulong abcSum;
+  ulong b;
+  ulong c;
   StopWatch timer;
 
   PythagoreanTriplet pyTrip = new PythagoreanTriplet(1000);
@@ -28,7 +28,7 @@ void main() {
 
   // implemented a more efficient, more specialized algorithm here.
 /*  timer.start();
-  for (int a = 1; a < 500; a++) {
+  for (ulong a = 1; a < 500; a++) {
     if (1000 * (500 - a) % (1000 - a) == 0) {
       b = 1000 * (500 - a) / (1000 - a);
       c = 1000 - a - b;

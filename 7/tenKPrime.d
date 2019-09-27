@@ -7,12 +7,12 @@ import kreikey.primes;
 
 void main(string[] args) {
   StopWatch timer;
-  int topNum = 10001;
-  auto p = new Primes!int();
+  ulong topNum = 10001;
+  auto p = new Primes!ulong();
 
   timer.start();
   if (args.length > 1)
-    topNum = args[1].to!(int);
+    topNum = args[1].to!(ulong);
 
   foreach (i; 1 .. topNum) {
     p.popFront();

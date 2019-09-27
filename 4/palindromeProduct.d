@@ -7,12 +7,12 @@ import std.algorithm;
 
 void main() {
   StopWatch timer;
-  long num = 0;
-  long largestPal = 0;
+  ulong num = 0;
+  ulong largestPal = 0;
 
   timer.start();
-  foreach (int i; 100..1000) {
-    foreach (int j; 100..1000) {
+  foreach (ulong i; 100..1000) {
+    foreach (ulong j; 100..1000) {
       num = i * j;
       if (num.isPalindrome() && num > largestPal)
         largestPal = num;
@@ -24,7 +24,7 @@ void main() {
   writeln("finished in ", timer.peek.total!"msecs"(), " milliseconds");
 }
 
-bool isPalindrome(long num) {
+bool isPalindrome(ulong num) {
   string bleh = num.to!(string);
 
   if (bleh == bleh.dup.reverse)

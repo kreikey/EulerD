@@ -7,7 +7,7 @@ import std.traits;
 
 void main() {
   StopWatch timer;
-  int sum;
+  ulong sum;
 
   timer.start();
   foreach (i; 1 .. 1000) {
