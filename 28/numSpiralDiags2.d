@@ -1,4 +1,4 @@
-#!/usr/bin/env rdmd -I..
+#!/usr/bin/env rdmd -i -I..
 
 import std.stdio;
 import std.datetime.stopwatch;
