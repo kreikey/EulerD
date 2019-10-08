@@ -5,33 +5,23 @@ import std.datetime.stopwatch;
 import std.range;
 import std.algorithm;
 import std.conv;
+import std.typecons;
 
 void main() {
   StopWatch timer;
   int[] digits = iota(1, 10).array();
-  int[] productDigs = [];
-  ulong left = 0;
-  ulong right = 0;
-  ulong product = 0;
   ulong sum = 0;
 
   timer.start();
 
-  do {
-    if (digits[0..4] == productDigs)
-      continue;
-
-    foreach (i; 5..(digits.length-1)) {
-      left = digits[4..i].toNumber();
-      right = digits[i..$].toNumber();
-      product = digits[0..4].toNumber();
-
-      if (left * right == product) {
-        productDigs = digits[0..4].dup;
-        sum += product;
-      }
-    }
-  } while (digits.nextPermutation());
+  sum = digits
+    .permutations
+    .map!(a => a.array())
+    .map!(a => tuple(a[0..5], a[5..$].toNumber()))
+    .filter!(a => isProductIdentity(a.expand))
+    .map!(a => a[1])
+    .uniq
+    .sum();
 
   timer.stop();
   writeln("The sum of all products whose multiplicand/multiplier/product identity can be written as 1 through 9 pandigital is:\n", sum);
@@ -73,3 +63,11 @@ ulong toNumber(int[] digits) {
   return result;
 }
 
+bool isProductIdentity(int[] digits, ulong number) {
+  foreach (i; 1..digits.length) {
+    if (digits[0..i].toNumber() * digits[i..$].toNumber() == number)
+      return true;
+  }
+
+  return false;
+}
