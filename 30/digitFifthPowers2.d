@@ -49,17 +49,16 @@ ubyte[] toUbytes(ulong source) {
   ulong maxPowTen = 1;
   ubyte[] result;
 
+  if (source == 0) {
+    return [0];
+  }
+
   while (maxPowTen <= source) {
     maxPowTen *= 10;
   } 
 
   maxPowTen /= 10;
 
-  if (maxPowTen == 0) {
-    result ~= 0;
-    return result;
-  }
-  
   while (maxPowTen > 0) {
     result ~= cast(ubyte)(source / maxPowTen);
     source %= maxPowTen;
