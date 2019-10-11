@@ -19,12 +19,12 @@ void main() {
   timer.start();
   sums = 
     iota(2, topNumber)
-    .map!(a => a.toUbytes.asort())
+    .map!(a => a.toDigits.asort())
     .array
     .sort
     .uniq
     .map!((a => a), (a => a.fold!((a, b) => a + b ^^ exponent)(0uL)))
-    .filter!(a => a[0] == a[1].toUbytes.asort())
+    .filter!(a => a[0] == a[1].toDigits.asort())
     .map!(a => a[1])
     .array();
 
@@ -44,12 +44,12 @@ ulong getMaxDigits() {
     sum = 0;
     digits ~= 9;
     sum = digits.map!(a => a ^^ exponent).sum();
-  } while (digits.length <= sum.toUbytes().length);
+  } while (digits.length <= sum.toDigits().length);
 
   return digits.length - 1;
 }
 
-ubyte[] toUbytes(ulong source) {
+ubyte[] toDigits(ulong source) {
   ulong maxPowTen = 1;
   ubyte[] result;
 

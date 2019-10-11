@@ -18,12 +18,12 @@ void main() {
   timer.start();
 
   //foreach (x; 2 .. topNumber) {
-    //if (x == x.toUbytes.map!(a => a ^^ exponent).sum())
+    //if (x == x.toDigits.map!(a => a ^^ exponent).sum())
       //sums ~= x;
   //}
 
   sums = iota(2, topNumber)
-    .filter!(x => x.toUbytes.fold!((a, b) => a + b ^^ exponent)(0uL) == x)
+    .filter!(x => x.toDigits.fold!((a, b) => a + b ^^ exponent)(0uL) == x)
     .array();
 
   writefln("The numbers that can be written as the sum of fifth powers of their digits are:\n%(%s, %)", sums);
@@ -40,12 +40,12 @@ ulong getMaxDigits() {
     sum = 0;
     digits ~= 9;
     sum = digits.map!(a => a ^^ exponent).sum();
-  } while (digits.length <= sum.toUbytes().length);
+  } while (digits.length <= sum.toDigits().length);
 
   return digits.length - 1;
 }
 
-ubyte[] toUbytes(ulong source) {
+ubyte[] toDigits(ulong source) {
   ulong maxPowTen = 1;
   ubyte[] result;
 

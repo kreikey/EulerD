@@ -164,3 +164,39 @@ bool isPrime(ulong number) {
   //writeln(factors);
   return factors.length == 1;
 }
+
+int[] toDigits(ulong source) {
+  ulong maxPowTen = 1;
+  int[] result;
+
+  if (source == 0) {
+    return [0];
+  }
+
+  while (maxPowTen <= source) {
+    maxPowTen *= 10;
+  } 
+
+  maxPowTen /= 10;
+
+  while (maxPowTen > 0) {
+    result ~= cast(int)(source / maxPowTen);
+    source %= maxPowTen;
+    maxPowTen /= 10;
+  }
+
+  return result;
+}
+
+ulong toNumber(int[] digits) {
+  ulong result = 0;
+
+  int i = 0;
+  foreach (n; digits.retro()) {
+    result += n * 10 ^^ i;
+    i++;
+  }
+
+  return result;
+}
+
