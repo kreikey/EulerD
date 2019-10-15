@@ -1,31 +1,30 @@
-#!/usr/bin/env rdmd -i -I..
+#!/usr/bin/env rdmd -I.. -i
 
 import std.stdio;
 import std.datetime.stopwatch;
+import std.traits;
 import std.range;
 import std.algorithm;
-import std.conv;
 
 alias asortDescending = (ubyte[] a) => sort!((b, c) => c < b)(a).array();
-enum exponent = 5;
 
 void main() {
   StopWatch timer;
+  enum maxDigits = getMaxDigits();
   ubyte[] digits;
   ubyte[] sumDigs;
   ulong sum;
   ulong[] sums;
-  enum maxDigits = getMaxDigits();
 
   timer.start();
 
   digits ~= 1;
 
   do {
-    sum = digits.map!(a => a ^^ exponent).sum();
+    sum = digits.map!(factorial).sum();
     sumDigs = sum.toDigits.asortDescending();
 
-    if (sum != 1 && digits == sumDigs) {
+    if (sum > 2 && digits == sumDigs) {
       sums ~= sum;
     }
 
@@ -39,24 +38,52 @@ void main() {
 
   } while (digits.length <= maxDigits);
 
-  writefln("The numbers that can be written as the sum of fifth powers of their digits are:\n%(%s, %)", sums);
+  writefln("The numbers that are equal to the sum of factorials of their digits are:\n%(%s, %)", sums);
   writefln("sum of these numbers is: %s", sums.sum());
 
   timer.stop();
   writeln("finished in ", timer.peek.total!"msecs"(), " milliseconds.");
 }
 
+void incrementDigitsCombo(ref ubyte[] digits) {
+  for (ulong i = digits.length - 1; i > 0; i--) {
+    if (digits[i] < digits[i - 1]) {
+      digits[i]++;
+      if (i < digits.length - 1)
+        digits[i + 1 .. $] = 0;
+      return;
+    }
+  }
+
+  if (digits[0] < 9) {
+    digits[0]++;
+    if (digits.length > 1)
+      digits[1 .. $] = 0;
+  } else
+    digits.length++;
+}
+
+ulong factorial(ulong number) {
+  ulong result = 1;
+
+  foreach (n; 1..number+1)
+    result *= n;
+
+  return result;
+}
+
 ulong getMaxDigits() {
-  ulong sum = 0;
-  ubyte[] digits;
+  ulong result = 0;
+  ulong digitCount = 0;
 
   do {
-    sum = 0;
-    digits ~= 9;
-    sum = digits.map!(a => a ^^ exponent).sum();
-  } while (digits.length <= sum.toDigits().length);
+    digitCount++;
+    result += factorial(9);
+  } while (digitCount <= result.toDigits.length);
 
-  return digits.length - 1;
+  digitCount--;
+
+  return digitCount;
 }
 
 ubyte[] toDigits(ulong source) {
@@ -82,20 +109,3 @@ ubyte[] toDigits(ulong source) {
   return result;
 }
 
-void incrementDigitsCombo(ref ubyte[] digits) {
-  for (ulong i = digits.length - 1; i > 0; i--) {
-    if (digits[i] < digits[i - 1]) {
-      digits[i]++;
-      if (i < digits.length - 1)
-        digits[i + 1 .. $] = 0;
-      return;
-    }
-  }
-
-  if (digits[0] < 9) {
-    digits[0]++;
-    if (digits.length > 1)
-      digits[1 .. $] = 0;
-  } else
-    digits.length++;
-}

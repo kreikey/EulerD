@@ -200,3 +200,12 @@ ulong toNumber(int[] digits) {
   return result;
 }
 
+ulong factorial(ulong number) {
+  ulong result = 1;
+
+  foreach (n; 1..number+1)
+    result *= n;
+
+  return result;
+}
+
