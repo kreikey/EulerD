@@ -5,29 +5,28 @@ import std.algorithm;
 import std.stdio;
 import std.array;
 
-alias rstr = (const byte[] value) => value.retro.map!(a => cast(immutable(char))(a + '0')).array();
-alias rbytes = (const char[] value) => value.retro.map!(a => cast(byte)(a - '0')).array();
-alias isNotEqualTo = (const(byte)[] left, const(byte)[] right) => left.compare(right) != 0;
-alias isEqualTo = (const(byte)[] left, const(byte)[] right) => left.compare(right) == 0;
-alias isGreaterThan = (const(byte)[] left, const(byte)[] right) => left.compare(right) > 0;
-alias isLessThan = (const(byte)[] left, const(byte)[] right) => left.compare(right) < 0;
-alias isGreaterThanOrEqualTo = (const(byte)[] left, const(byte)[] right) => left.compare(right) >= 0;
-alias isLessThanOrEqualTo = (const(byte)[] left, const(byte)[] right) => left.compare(right) <= 0;
+alias rstr = (const ubyte[] value) => value.retro.map!(a => cast(immutable(char))(a + '0')).array();
+alias rbytes = (const char[] value) => value.retro.map!(a => cast(ubyte)(a - '0')).array();
+alias isNotEqualTo = (const(ubyte)[] left, const(ubyte)[] right) => left.compare(right) != 0;
+alias isEqualTo = (const(ubyte)[] left, const(ubyte)[] right) => left.compare(right) == 0;
+alias isGreaterThan = (const(ubyte)[] left, const(ubyte)[] right) => left.compare(right) > 0;
+alias isLessThan = (const(ubyte)[] left, const(ubyte)[] right) => left.compare(right) < 0;
+alias isGreaterThanOrEqualTo = (const(ubyte)[] left, const(ubyte)[] right) => left.compare(right) >= 0;
+alias isLessThanOrEqualTo = (const(ubyte)[] left, const(ubyte)[] right) => left.compare(right) <= 0;
 
-byte[] add(const(byte)[] left, const(byte)[] right) {
+ubyte[] add(const(ubyte)[] left, const(ubyte)[] right) {
 
-  if (left.length < right.length) {
+  if (left.length < right.length)
     swap(left, right);
-  }
 
-  byte[] result = left.dup;
+  ubyte[] result = left.dup;
   result.accumulate(right);
 
   return result;
 }
 
-byte[] accumulate(ref byte[] left, const(byte)[] right) {
-  byte carry = 0;
+ubyte[] accumulate(ref ubyte[] left, const(ubyte)[] right) {
+  ubyte carry = 0;
 
   if (left.length < right.length)
     throw new Exception("left is shorter than right");
@@ -44,20 +43,20 @@ byte[] accumulate(ref byte[] left, const(byte)[] right) {
   return left;
 }
 
-byte[] sub(const(byte)[] left, const(byte)[] right) {
+ubyte[] sub(const(ubyte)[] left, const(ubyte)[] right) {
   if (left.isLessThan(right)) {
     writefln("sub left: %s\tright: %s", left.rstr(), right.rstr());
     throw new Exception("left is less than right");
   }
 
-  byte[] result = left.dup;
+  ubyte[] result = left.dup;
   result.decumulate(right);
 
   return result;
 }
 unittest {
-  byte[] left = "456".rbytes();
-  byte[] right = "123".rbytes();
+  ubyte[] left = "456".rbytes();
+  ubyte[] right = "123".rbytes();
   string result;
 
   result = left.sub(right).rstr();
@@ -66,18 +65,18 @@ unittest {
   result = left.sub(right).rstr();
   assert(result == "0");
   right = "457".rbytes();
-  try {
+
+  try
     left.sub(right);
-  } catch (Exception e) {
+  catch (Exception e)
     writeln("exception caught: ", e.msg);
-  }
 }
 
-byte[] decumulate(ref byte[] left, const(byte)[] right) {
+ubyte[] decumulate(ref ubyte[] left, const(ubyte)[] right) {
   if (left.isLessThan(right))
     throw new Exception("left is less than right");
 
-  byte[] toAdd = new byte[left.length];
+  ubyte[] toAdd = new ubyte[left.length];
   toAdd[] = 9;
   toAdd[0 .. right.length] -= right[];
   left.accumulate(toAdd);
@@ -90,7 +89,7 @@ byte[] decumulate(ref byte[] left, const(byte)[] right) {
   return left;
 }
 
-int compare(const(byte)[] left, const(byte)[] right) {
+int compare(const(ubyte)[] left, const(ubyte)[] right) {
   if (left.length < right.length)
     return -1;
   else if (left.length > right.length)
@@ -105,10 +104,10 @@ int compare(const(byte)[] left, const(byte)[] right) {
   return 0;
 }
 
-byte[] mul(const(byte)[] left, const(byte)[] right) {
-  byte[] z0;
-  byte[] z1;
-  byte[] z2;
+ubyte[] mul(const(ubyte)[] left, const(ubyte)[] right) {
+  ubyte[] z0;
+  ubyte[] z1;
+  ubyte[] z2;
   ulong m;
 
   // Take care of base case where one or both operands are of length 1
@@ -120,9 +119,9 @@ byte[] mul(const(byte)[] left, const(byte)[] right) {
   m = left.length > right.length ? left.length / 2 : right.length / 2;
 
   // Split and handle out-of-bounds indices
-  auto highLeft = m >= left.length ? cast(byte[])[0] : left[m .. $];
+  auto highLeft = m >= left.length ? cast(ubyte[])[0] : left[m .. $];
   auto lowLeft = m >= left.length ? left : left[0 .. m];
-  auto highRight = m >= right.length ? cast(byte[])[0] : right[m .. $];
+  auto highRight = m >= right.length ? cast(ubyte[])[0] : right[m .. $];
   auto lowRight = m >= right.length ? right : right[0 .. m];
 
   // Handle leading zeros
@@ -144,9 +143,9 @@ byte[] mul(const(byte)[] left, const(byte)[] right) {
     .add(z0);
 }
 
-byte[] mulSingleDigit(const(byte)[] left, byte digit) {
-  byte[] result = left.dup;
-  byte carry = 0;
+ubyte[] mulSingleDigit(const(ubyte)[] left, ubyte digit) {
+  ubyte[] result = left.dup;
+  ubyte carry = 0;
 
   for (ulong i = 0; i < result.length; i++) {
     result[i] *= digit;
@@ -164,8 +163,8 @@ byte[] mulSingleDigit(const(byte)[] left, byte digit) {
   return result;
 }
 
-byte[] shiftBig(const(byte)[] digits, ulong amount) {
-  byte[] result = new byte[digits.length + amount];
+ubyte[] shiftBig(const(ubyte)[] digits, ulong amount) {
+  ubyte[] result = new ubyte[digits.length + amount];
 
   result[0 .. amount] = 0;
   result[amount .. $] = digits[];

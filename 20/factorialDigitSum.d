@@ -8,7 +8,7 @@ import kreikey.bytemath;
 
 void main(string[] args) {
   StopWatch timer;
-  byte[] digits = "100".dup.rbytes();
+  ubyte[] digits = "100".dup.rbytes();
   int offset = 0;
   int sum;
 
@@ -18,9 +18,9 @@ void main(string[] args) {
 
   timer.start();
 
-  byte[] result = digits.dup;
+  ubyte[] result = digits.dup;
 
-  for (byte[] x = result.sub([1]); x.isGreaterThan([1]); x.decumulate([1])) {
+  for (ubyte[] x = result.sub([1]); x.isGreaterThan([1]); x.decumulate([1])) {
     result = result.mul(x);
   }
 

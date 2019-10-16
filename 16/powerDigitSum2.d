@@ -8,7 +8,7 @@ import kreikey.bytemath;
 
 void main(string[] args) {
   StopWatch timer;
-  byte[] digits = [2];
+  ubyte[] digits = [2];
   int sum = 0;
   int pow = 1000;
 

@@ -6,39 +6,33 @@ import std.range;
 import std.algorithm;
 import std.conv;
 import std.typecons;
+import kreikey.intmath;
 
 void main() {
   StopWatch timer;
 
   timer.start();
 
-  auto numerators = iota(10, 99).array();
-  auto denominators = iota(11, 100).array();
-
-  auto fractions = denominators
-    .map!(a => numerators.until(a).map!(b => b, b => a)())
+  auto fractions = iota(11, 100)
+    .map!(a => iota(10, 99).until(a).map!(b => b, b => a)())
     .join
-    .map!(a => toDigits(a[0]), a => toDigits(a[1]), a => tuple(a[0], a[1]))
-    .filter!(a => (a[0][1] != 0 && a[1][1] != 0) && (a[0][0] != a[0][1] && a[1][0] != a[1][1]) && commonDigits(a.expand[0..2]))
-    .map!(a => a[2], a => uniqueDigits(a.expand[0..2]))
-    .filter!(a => reduceFrac(a[0]) == reduceFrac(a[1]))
+    .map!(a => a, a => tuple(toDigits(a[0]), toDigits(a[1])))
+    .filter!(a => isNonTrivial(a[1].expand) && hasCommonDigits(a[1].expand))
+    .map!(a => a[0], a => uniqueDigits(a[1].expand))
+    .filter!(a => reduceFrac(a[0].expand) == reduceFrac(a[1].expand))
     .array();
 
   writeln("Nontrivial digit cancelling fractions found: ", fractions.length);
 
   foreach (frac; fractions) {
-    writefln("%(%s/%s%) = %(%s/%s%) = %(%s/%s%)", frac.expand, reduceFrac(frac[1]));
+    writefln("%(%s/%s%) = %(%s/%s%) = %(%s/%s%)", frac.expand, reduceFrac(frac[1].expand));
   }
   
-  auto numerProduct = fractions
-    .map!(a => a[0][0])
-    .fold!((a, b) => a * b)();
+  auto product = fractions
+    .map!(a => a[0])
+    .fold!((a, b) => tuple(a[0] * b[0], a[1] * b[1]))(tuple(1, 1));
 
-  auto denomProduct = fractions
-    .map!(a => a[0][1])
-    .fold!((a, b) => a * b)();
-
-  auto reducedFrac = reduceFrac(tuple(numerProduct, denomProduct));
+  auto reducedFrac = reduceFrac(product.expand);
 
   writefln("reduced product: %(%s/%s%)", reducedFrac);
   timer.stop();
@@ -46,86 +40,42 @@ void main() {
   writeln("finished in ", timer.peek.total!"msecs"(), " milliseconds.");
 }
 
-// gcd with subtraction is about twice as fast as gcd with modulo
-int gcd(int a, int b) {
-  int t;
-
-  while (b != a) {
-    if (a > b)
-      a = a - b;
-    else
-      b = b - a;
-  }
-
-  return b;
+Tuple!(ulong, ulong) reduceFrac(ulong numerator, ulong denominator) {
+  ulong divisor = gcd(numerator, denominator);
+  return tuple(numerator/divisor, denominator/divisor);
 }
 
-Tuple!(int, int) reduceFrac(Tuple!(int, int) f) {
-  int divisor = gcd(f[0], f[1]);
-  return tuple(f[0]/divisor, f[1]/divisor);
-}
-
-int[] toDigits(ulong source) {
-  ulong maxPowTen = 1;
-  int[] result;
-
-  if (source == 0) {
-    return [0];
-  }
-
-  while (maxPowTen <= source) {
-    maxPowTen *= 10;
-  } 
-
-  maxPowTen /= 10;
-
-  while (maxPowTen > 0) {
-    result ~= cast(int)(source / maxPowTen);
-    source %= maxPowTen;
-    maxPowTen /= 10;
-  }
-
-  return result;
-}
-
-ulong toNumber(int[] digits) {
-  ulong result = 0;
-
-  int i = 0;
-  foreach (n; digits.retro()) {
-    result += n * 10 ^^ i;
-    i++;
-  }
-
-  return result;
-}
-
-bool commonDigits(int[] numerator, int[] denominator) {
-  foreach (d; numerator) {
-    foreach (e; denominator) {
-      if (d == e) {
+bool hasCommonDigits(ubyte[] numerator, ubyte[] denominator) {
+  foreach (d; numerator)
+    foreach (e; denominator)
+      if (d == e)
         return true;
-      }
-    }
-  }
 
   return false;
 }
 
-Tuple!(int, int) uniqueDigits(int[] numerator, int[] denominator) {
-  int commonDigit = 0;
+Tuple!(ubyte, ubyte) uniqueDigits(ubyte[] numerator, ubyte[] denominator) {
+  ubyte commonDigit = 0;
 
-  foreach (d; numerator) {
-    foreach (e; denominator) {
-      if (d == e) {
+  foreach (d; numerator)
+    foreach (e; denominator)
+      if (d == e)
         commonDigit = d;
-      }
-    }
-  }
 
-  int numeratorResult = numerator[0] != commonDigit ? numerator[0] : numerator[1];
-  int denominatorResult = denominator[0] != commonDigit ? denominator[0] : denominator[1];
+  ubyte numeratorResult = numerator[0] != commonDigit ? numerator[0] : numerator[1];
+  ubyte denominatorResult = denominator[0] != commonDigit ? denominator[0] : denominator[1];
 
   return tuple(numeratorResult, denominatorResult);
 }
 
+bool isNonTrivial(ubyte[] numerator, ubyte[] denominator) {
+  bool hasMultipleOf10() {
+    return numerator[1] == 0 || denominator[1] == 0;
+  }
+
+  bool hasMultipleOf11() {
+    return numerator[0] == numerator[1] || denominator[0] == denominator[1];
+  }
+
+  return !hasMultipleOf10() && !hasMultipleOf11();
+}

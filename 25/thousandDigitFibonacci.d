@@ -9,9 +9,9 @@ import kreikey.bytemath;
 
 void main(string[] args) {
   StopWatch timer;
-  byte[] result;
-  byte[] addend1;
-  byte[] addend2;
+  ubyte[] result;
+  ubyte[] addend1;
+  ubyte[] addend2;
   int limit = 1000;
   int term = 2;
 

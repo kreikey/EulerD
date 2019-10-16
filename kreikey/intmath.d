@@ -36,7 +36,6 @@ long[] getFactors(long number) {
   return factors;
 }
 
-
 ulong mulOrder(ulong a, ulong n) {
   ulong order = 1;
   auto product = BigInt(a);
@@ -98,7 +97,6 @@ ulong gcd(ulong a, ulong b) {
   return b;
 }
 
-
 ulong lcm(ulong a, ulong b) {
   ulong amul = a;
   ulong bmul = b;
@@ -118,13 +116,13 @@ string recipDigits(int divisor, int length) {
   int quotient = 0;
   int remainder = 0;
   int digitCount = 0;
-  byte[] digits;
+  ubyte[] digits;
 
   do {
     quotient = dividend / divisor;
     remainder = dividend % divisor;
     dividend = remainder * 10;
-    digits ~= cast(byte)quotient;
+    digits ~= cast(ubyte)quotient;
     digitCount++;
   } while (remainder != 0 && digitCount != length);
 
@@ -161,26 +159,20 @@ Factor maxMultiplicity(Factor a, Factor b) {
 
 bool isPrime(ulong number) {
   ulong[] factors = primeFactors(number);
-  //writeln(factors);
   return factors.length == 1;
 }
 
-int[] toDigits(ulong source) {
+ubyte[] toDigits(ulong source) {
   ulong maxPowTen = 1;
-  int[] result;
+  ubyte[] result;
 
-  if (source == 0) {
-    return [0];
-  }
-
-  while (maxPowTen <= source) {
+  while (maxPowTen <= source)
     maxPowTen *= 10;
-  } 
 
-  maxPowTen /= 10;
+  maxPowTen /= source != 0 ? 10 : 1;
 
   while (maxPowTen > 0) {
-    result ~= cast(int)(source / maxPowTen);
+    result ~= cast(ubyte)(source / maxPowTen);
     source %= maxPowTen;
     maxPowTen /= 10;
   }
@@ -188,14 +180,11 @@ int[] toDigits(ulong source) {
   return result;
 }
 
-ulong toNumber(int[] digits) {
+ulong toNumber(ubyte[] digits) {
   ulong result = 0;
 
-  int i = 0;
-  foreach (n; digits.retro()) {
-    result += n * 10 ^^ i;
-    i++;
-  }
+  foreach (i, n; digits)
+    result += n * 10 ^^ (digits.length - 1 - i);
 
   return result;
 }
@@ -207,5 +196,31 @@ ulong factorial(ulong number) {
     result *= n;
 
   return result;
+}
+
+ubyte[] dror(ubyte[] digits) {
+  ubyte temp;
+
+  temp = digits[$-1];
+
+  for (size_t i = digits.length-1; i > 0; i--)
+    digits[i] = digits[i-1];
+
+  digits[0] = temp;
+
+  return digits;
+}
+
+ubyte[] drol(ubyte[] digits) {
+  ubyte temp;
+
+  temp = digits[0];
+
+  for (size_t i = 0; i < digits.length-1; i++)
+    digits[i] = digits[i+1];
+
+  digits[$-1] = temp;
+
+  return digits;
 }
 

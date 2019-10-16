@@ -1271,18 +1271,8 @@ public:
         return false;
       else
         return true;
-    } else static if (is(T == ulong)) {
-      ulong result = 0;
-
-      foreach (i, n; this.mant)
-        result += n * 10 ^^ i;
-
-      if (this.sign)
-        result = -result;
-
-      return result;
-    } else static if (is(T == long)) {
-      long result = 0;
+    } else static if (is(T == long) || is(T == ulong)) {
+      T result = 0;
 
       foreach (i, n; this.mant)
         result += n * 10 ^^ i;

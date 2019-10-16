@@ -5,6 +5,7 @@ import std.datetime.stopwatch;
 import std.range;
 import std.algorithm;
 import std.conv;
+import kreikey.intmath;
 
 alias asortDescending = (ubyte[] a) => sort!((b, c) => c < b)(a).array();
 enum exponent = 5;
@@ -45,25 +46,3 @@ ulong getMaxDigits() {
   return digits.length - 1;
 }
 
-ubyte[] toDigits(ulong source) {
-  ulong maxPowTen = 1;
-  ubyte[] result;
-
-  if (source == 0) {
-    return [0];
-  }
-
-  while (maxPowTen <= source) {
-    maxPowTen *= 10;
-  } 
-
-  maxPowTen /= 10;
-
-  while (maxPowTen > 0) {
-    result ~= cast(ubyte)(source / maxPowTen);
-    source %= maxPowTen;
-    maxPowTen /= 10;
-  }
-
-  return result;
-}
