@@ -157,9 +157,54 @@ Factor maxMultiplicity(Factor a, Factor b) {
   return a.multiplicity > b.multiplicity ? a : b;
 }
 
-bool isPrime(ulong number) {
-  ulong[] factors = primeFactors(number);
-  return factors.length == 1;
+//bool isPrime(ulong number) {
+  //ulong[] factors = primeFactors(number);
+  //return factors.length == 1;
+//}
+
+auto isPrimeInit() {
+  bool[ulong] primes;
+  ulong[ulong] rootFloor;
+  ulong topRoot = 1;
+  ulong topNum = 1;
+  primes[0] = false;
+  primes[1] = false;
+
+  bool isPrime(ulong number) {
+    ulong oldRoot = topRoot;
+    ulong oldNum = topNum;
+    bool* prime;
+
+    prime = number in primes;
+
+    if (prime != null)
+      return *prime;
+
+    while (number > topNum) {
+      topRoot += 1;
+      topNum = topRoot ^^ 2;
+
+      foreach (n; oldNum + 1 .. topNum)
+        rootFloor[n] = oldRoot;
+
+      rootFloor[topNum] = topRoot;
+
+      oldRoot = topRoot;
+      oldNum = topNum;
+    }
+
+    foreach (root; 2 .. rootFloor[number] + 1) {
+      if (number % root == 0) {
+        primes[number] = false;
+        return false;
+      }
+    }
+
+    primes[number] = true;
+    return true;
+  }
+
+  return &isPrime;
 }
 
 ubyte[] toDigits(ulong source) {
