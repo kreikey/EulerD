@@ -1,18 +1,19 @@
 module kreikey.primes;
 import std.traits;
+import std.stdio;
 
 final class Primes(T)
 if (isIntegral!T) {
 private:
   T num;
   ulong ndx;
-  T root;
-  T nextSquare;
-  T[] primes;
+  static T root;
+  static T nextSquare;
+  static T[] primes;
 
   bool isPrime() {
-    if (num < 2)
-      return false;
+    if (num in cache)
+      return true;
     foreach (i; 0 .. primes.length) {
       if (primes[i] > root) {
         break;
@@ -25,6 +26,8 @@ private:
   }
 
 public:
+  static bool[T] cache = null;
+
   // ------- Constructors -------
   this() {
     primes.reserve(1000);
@@ -33,6 +36,7 @@ public:
     nextSquare = (root + 1) ^^ 2;
     ndx = 0;
     popFront();
+    cache[num] = true;
   }
 
   this(int initialCapacity) {
@@ -41,7 +45,6 @@ public:
     root = 1;
     nextSquare = (root + 1) ^^ 2;
     ndx = 0;
-    popFront();
   }
 
   // ------- Range Primitives -------
@@ -54,14 +57,16 @@ public:
     }
     do {
       num++;
-      if (num >= nextSquare) {
+      if (num == nextSquare) {
         root++;
         nextSquare = (root + 1) ^^ 2;
+        num++;
       }
     } while (!isPrime());
     if (primes.length == primes.capacity)
       primes.reserve(primes.capacity * 2);
     primes ~= num;
+    cache[num] = true;
     ndx++;
   }
 
@@ -73,9 +78,6 @@ public:
     auto ret = new typeof(this)();
     ret.num = this.num;
     ret.ndx = this.ndx;
-    ret.root = this.root;
-    ret.nextSquare = this.nextSquare;
-    ret.primes = this.primes.dup;
     return ret;
   }
 
@@ -104,5 +106,9 @@ public:
     num = 1;
     ndx = 0;
     popFront();
+  }
+
+  T topPrime() @property {
+    return primes[$-1];
   }
 }

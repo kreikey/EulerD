@@ -9,16 +9,19 @@ import kreikey.primes;
 import kreikey.intmath;
 
 bool delegate(ulong) isPrime;
+Primes!ulong primes;
 
 static this() {
-  isPrime = isPrimeInit();
+  primes = new Primes!ulong();
+  isPrime = isPrimeInit!ulong(primes.save);
 }
 
 void main() {
   StopWatch timer;
-  auto primes = recurrence!((a, n) => a[n-1] + 2)(2uL, 3uL).filter!isPrime;
 
   timer.start();
+
+  writeln("circular primes: ");
 
   auto circularPrimesCount = primes
     .until!(a => a >= 1_000_000)
@@ -38,8 +41,9 @@ bool isCircularPrime(ulong number) {
 
   foreach (n; 0..length-1) {
     number = number.ror();
-    if (!number.isPrime())
+    if (!number.isPrime()) {
       return false;
+    }
   }
 
   return true;

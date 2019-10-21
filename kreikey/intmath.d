@@ -4,6 +4,8 @@ import kreikey.bigint;
 import std.algorithm;
 import std.stdio;
 import std.traits;
+import kreikey.primes;
+import std.range;
 
 long[] getFactors(long number) {
   static long[][long] factorsCache;
@@ -162,46 +164,61 @@ Factor maxMultiplicity(Factor a, Factor b) {
   //return factors.length == 1;
 //}
 
-auto isPrimeInit() {
-  bool[ulong] primes;
-  ulong[ulong] rootFloor;
-  ulong topRoot = 1;
-  ulong topNum = 1;
-  primes[0] = false;
-  primes[1] = false;
+//auto isPrimeInit() {
+  //bool[ulong] primes;
+  //ulong[] roots = [0, 1];
+  //ulong topRoot = 1;
+  //ulong topNum = 1;
+  //primes[0] = false;
+  //primes[1] = false;
 
-  bool isPrime(ulong number) {
-    ulong oldRoot = topRoot;
-    ulong oldNum = topNum;
-    bool* prime;
+  //bool isPrime(ulong number) {
+    //ulong oldRoot = topRoot;
+    //ulong oldNum = topNum;
+    //bool* prime;
 
-    prime = number in primes;
+    //prime = number in primes;
 
-    if (prime != null)
-      return *prime;
+    //if (prime != null)
+      //return *prime;
 
-    while (number > topNum) {
-      topRoot += 1;
-      topNum = topRoot ^^ 2;
+    //while (number > topNum) {
+      //topRoot += 1;
+      //topNum = topRoot ^^ 2;
 
-      foreach (n; oldNum + 1 .. topNum)
-        rootFloor[n] = oldRoot;
+      //foreach (n; oldNum + 1 .. topNum)
+        //roots ~= oldRoot;
 
-      rootFloor[topNum] = topRoot;
+      //roots ~= topRoot;
 
-      oldRoot = topRoot;
-      oldNum = topNum;
-    }
+      //oldRoot = topRoot;
+      //oldNum = topNum;
+    //}
 
-    foreach (root; 2 .. rootFloor[number] + 1) {
-      if (number % root == 0) {
-        primes[number] = false;
-        return false;
-      }
-    }
+    //foreach (root; 2 .. roots[number] + 1) {
+      //if (number % root == 0) {
+        //primes[number] = false;
+        //return false;
+      //}
+    //}
 
-    primes[number] = true;
-    return true;
+    //primes[number] = true;
+    //return true;
+  //}
+
+  //return &isPrime;
+//}
+
+auto isPrimeInit(T)(Primes!T primes) if (isIntegral!T) {
+  bool[T] primesCache;
+  primesCache = primes.cache;
+
+  bool isPrime(T number) {
+    if (number > primes.topPrime)
+      primes
+        .find!((a, b) => a >= b)(number);
+
+    return number in primesCache ? true : false;
   }
 
   return &isPrime;

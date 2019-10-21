@@ -7,17 +7,22 @@ import std.range;
 import std.conv;
 import std.math;
 import kreikey.primes;
+import kreikey.intmath;
 
 bool delegate(int) isPrime;
+Primes!int pns;
+
+static this() {
+  pns = new Primes!int();
+  isPrime = isPrimeInit!int(pns);
+}
 
 void main(string[] args) {
   StopWatch timer;
 
   timer.start();
 
-  isPrime = isPrimeInit();
   int[] as = iota(-999, 1000, 2).array();
-  auto pns = new Primes!int();
   int[] bs = pns.until!(x => x > 1000).array();
   int[] mostPrimes;
   int[] primes;
@@ -29,18 +34,14 @@ void main(string[] args) {
   foreach(a; as) {
     foreach(b; bs) {
       primes = generatePrimes(a, b);
-      //writefln("n^2 + %dn + %d", a, b);
 
       if (primes.length > mostPrimes.length) {
         mostPrimes = primes;
         polyMostPrimes = [a, b];
-        //writefln("n^2 + %dn + %d", a, b);
-        //writeln(primes);
       }
     }
   }
 
-  //writeln(mostPrimes.length);
   timer.stop();
 
   writeln("The polynomial that generates the most primes is: ");
@@ -69,29 +70,5 @@ int[] generatePrimes(int a, int b) {
 
 int eulerPrimeGen(int a, int b, int n) {
   return n ^^ 2 + a * n + b;
-}
-
-bool delegate(int) isPrimeInit() {
-  auto p = new Primes!int();
-  int[int] savedPrimes;
-  int pndx;
-  savedPrimes[p.front] = pndx++;
-
-  bool isPrime(int number) {
-    if (number < 2)
-      return false;
-
-    if (number > p.front) {
-      p.until!(x => x >= number)(OpenRight.no)
-        .each!(a => savedPrimes[a] = pndx++);
-    }
-
-    if ((number in savedPrimes) !is null)
-      return true;
-    else
-      return false;
-  }
-
-  return &isPrime;
 }
 
