@@ -19,9 +19,8 @@ static this() {
 void main() {
   StopWatch timer;
 
-  timer.start();
-
   writeln("circular primes: ");
+  timer.start();
 
   auto circularPrimesCount = primes
     .until!(a => a >= 1_000_000)

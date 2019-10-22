@@ -5,6 +5,8 @@ import std.datetime.stopwatch;
 import std.traits;
 import std.range;
 import std.algorithm;
+import kreikey.bigint;
+import kreikey.intmath;
 
 alias asortDescending = (ubyte[] a) => sort!((b, c) => c < b)(a).array();
 
@@ -16,6 +18,7 @@ void main() {
   ulong sum;
   ulong[] sums;
 
+  writeln("digit factorials");
   timer.start();
 
   digits ~= 1;
@@ -84,28 +87,5 @@ ulong getMaxDigits() {
   digitCount--;
 
   return digitCount;
-}
-
-ubyte[] toDigits(ulong source) {
-  ulong maxPowTen = 1;
-  ubyte[] result;
-
-  if (source == 0) {
-    return [0];
-  }
-
-  while (maxPowTen <= source) {
-    maxPowTen *= 10;
-  } 
-
-  maxPowTen /= 10;
-
-  while (maxPowTen > 0) {
-    result ~= cast(ubyte)(source / maxPowTen);
-    source %= maxPowTen;
-    maxPowTen /= 10;
-  }
-
-  return result;
 }
 

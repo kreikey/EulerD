@@ -17,7 +17,9 @@ void main() {
   immutable static topNumber = 10 ^^ maxDigits;
   ulong[] sums;
 
+  writeln("digit fifth powers");
   timer.start();
+
   sums = 
     iota(2, topNumber)
     .map!(a => a.toDigits.asort())

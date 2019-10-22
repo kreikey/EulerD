@@ -11,6 +11,7 @@ import kreikey.intmath;
 void main() {
   StopWatch timer;
 
+  writeln("digit cancelling fractions");
   timer.start();
 
   auto fractions = iota(11, 100)

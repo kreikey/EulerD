@@ -18,6 +18,7 @@ void main() {
   ulong[] sums;
   enum maxDigits = getMaxDigits();
 
+  writeln("digit fifth powers");
   timer.start();
 
   digits ~= 1;

@@ -12,6 +12,7 @@ void main() {
   int[] digits = iota(1, 10).array();
   ulong sum = 0;
 
+  writeln("pandigital products");
   timer.start();
 
   sum = digits

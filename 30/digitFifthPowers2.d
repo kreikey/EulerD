@@ -16,6 +16,7 @@ void main() {
   immutable static topNumber = 10 ^^ maxDigits;
   ulong[] sums;
 
+  writeln("digit fifth powers");
   timer.start();
 
   //foreach (x; 2 .. topNumber) {

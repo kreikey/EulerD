@@ -159,64 +159,13 @@ Factor maxMultiplicity(Factor a, Factor b) {
   return a.multiplicity > b.multiplicity ? a : b;
 }
 
-//bool isPrime(ulong number) {
-  //ulong[] factors = primeFactors(number);
-  //return factors.length == 1;
-//}
-
-//auto isPrimeInit() {
-  //bool[ulong] primes;
-  //ulong[] roots = [0, 1];
-  //ulong topRoot = 1;
-  //ulong topNum = 1;
-  //primes[0] = false;
-  //primes[1] = false;
-
-  //bool isPrime(ulong number) {
-    //ulong oldRoot = topRoot;
-    //ulong oldNum = topNum;
-    //bool* prime;
-
-    //prime = number in primes;
-
-    //if (prime != null)
-      //return *prime;
-
-    //while (number > topNum) {
-      //topRoot += 1;
-      //topNum = topRoot ^^ 2;
-
-      //foreach (n; oldNum + 1 .. topNum)
-        //roots ~= oldRoot;
-
-      //roots ~= topRoot;
-
-      //oldRoot = topRoot;
-      //oldNum = topNum;
-    //}
-
-    //foreach (root; 2 .. roots[number] + 1) {
-      //if (number % root == 0) {
-        //primes[number] = false;
-        //return false;
-      //}
-    //}
-
-    //primes[number] = true;
-    //return true;
-  //}
-
-  //return &isPrime;
-//}
-
 auto isPrimeInit(T)(Primes!T primes) if (isIntegral!T) {
   bool[T] primesCache;
   primesCache = primes.cache;
 
   bool isPrime(T number) {
     if (number > primes.topPrime)
-      primes
-        .find!((a, b) => a >= b)(number);
+      primes.find!((a, b) => a >= b)(number);
 
     return number in primesCache ? true : false;
   }
@@ -231,7 +180,8 @@ ubyte[] toDigits(ulong source) {
   while (maxPowTen <= source)
     maxPowTen *= 10;
 
-  maxPowTen /= source != 0 ? 10 : 1;
+  if (source != 0)
+    maxPowTen /= 10;
 
   while (maxPowTen > 0) {
     result ~= cast(ubyte)(source / maxPowTen);
@@ -260,7 +210,7 @@ ulong factorial(ulong number) {
   return result;
 }
 
-ubyte[] dror(ubyte[] digits) {
+T[] dror(T)(T[] digits) {
   ubyte temp;
 
   temp = digits[$-1];

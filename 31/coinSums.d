@@ -12,6 +12,7 @@ void main() {
   uint[] coins = [200, 100, 50, 20, 10, 5, 2, 1];
   uint maxSum = 200;
 
+  writeln("coin sums");
   timer.start();
 
   count = countCoinSums(coins, maxSum);

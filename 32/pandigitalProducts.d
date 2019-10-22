@@ -15,6 +15,7 @@ void main() {
   ulong product = 0;
   ulong sum = 0;
 
+  writeln("pandigital products");
   timer.start();
 
   do {
