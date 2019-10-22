@@ -163,7 +163,7 @@ auto isPrimeInit(T)(Primes!T primes)
 if (isIntegral!T) {
   bool isPrime(T number) {
     if (number > primes.topPrime)
-      primes.find!((a, b) => a >= b)(number);
+      primes.find!(a => a >= number)();
 
     return number in primes.cache ? true : false;
   }
