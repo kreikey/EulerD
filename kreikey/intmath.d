@@ -159,15 +159,13 @@ Factor maxMultiplicity(Factor a, Factor b) {
   return a.multiplicity > b.multiplicity ? a : b;
 }
 
-auto isPrimeInit(T)(Primes!T primes) if (isIntegral!T) {
-  bool[T] primesCache;
-  primesCache = primes.cache;
-
+auto isPrimeInit(T)(Primes!T primes)
+if (isIntegral!T) {
   bool isPrime(T number) {
     if (number > primes.topPrime)
       primes.find!((a, b) => a >= b)(number);
 
-    return number in primesCache ? true : false;
+    return number in primes.cache ? true : false;
   }
 
   return &isPrime;
