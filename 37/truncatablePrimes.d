@@ -17,27 +17,31 @@ static this() {
   isPrime = isPrimeInit!ulong(primes.save);
 }
 
-void main(string[] args) {
+void main() {
   StopWatch timer;
-  ulong limit = 1_000_000;
-
-  if (args.length > 1)
-    limit = args[1].parse!ulong();
+  ulong truncatablePrimesSum = 0;
 
   writeln("truncatable primes");
   timer.start();
 
-  auto truncatablePrimesSum = primes
-    .until!(a => a >= 1_000_000)
-    .drop(4)
-    .filter!isTruncatablePrime
-    .tee!(a => write(a, " "))
-    .sum();
-  writeln();
+  auto truncPrimes = primes.drop(4).filter!isTruncatablePrime();
+  auto somePrimes = truncPrimes.take(10).array();
+  somePrimes ~= truncPrimes.front;
+  writefln("%(%d, %)", somePrimes);
+  truncatablePrimesSum = somePrimes.sum();
+
+  //foreach (i; 0..10) {
+    //writeln(filteredPrimes.front);
+    //truncatablePrimesSum += filteredPrimes.front;
+    //filteredPrimes.popFront;
+  //}
+
+  //writeln(filteredPrimes.front);
+  //truncatablePrimesSum += filteredPrimes.front; 
 
   timer.stop();
 
-  writefln("The sum of truncatable primes below %s is:\n%s", limit, truncatablePrimesSum);
+  writefln("The sum of all 11 truncatable primes is:\n%s", truncatablePrimesSum);
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }
 
@@ -45,17 +49,13 @@ bool isTruncatablePrime(ulong number) {
   auto digits = number.toDigits();
 
   foreach (n; 1..digits.length) {
-    //writeln(digits[n..$]);
-    if (!digits[n..$].toNumber.isPrime()) {
+    if (!digits[n..$].toNumber.isPrime())
       return false;
-    }
   }
 
   foreach (n; 1..digits.length) {
-    //writeln(digits[0..$-n]);
-    if (!digits[0..$-n].toNumber.isPrime()) {
+    if (!digits[0..$-n].toNumber.isPrime())
       return false;
-    }
   }
 
   return true;

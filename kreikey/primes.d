@@ -12,8 +12,6 @@ private:
   static T[] primes;
 
   bool isPrime() {
-    if (num in cache)
-      return true;
     foreach (i; 0 .. primes.length) {
       if (primes[i] > root) {
         break;
@@ -82,23 +80,19 @@ public:
   }
 
   T opIndex(size_t i) {
-    T ret;
-
     if (i < primes.length) {
       ndx = i;
-      popFront();
-      ret = num;
-    } else {
-      num = primes[$ - 1];
-      ndx = cast(T)primes.length;
-      do {
-        popFront();
-      } while (ndx <= i);
-      ret = num;
+      num = primes[ndx];
+      return num;
     }
 
-    reset();
-    return ret;
+    num = primes[$ - 1];
+    ndx = cast(T)primes.length;
+    do {
+      popFront();
+    } while (ndx <= i);
+
+    return num;
   }
 
   // ------- Other useful methods -------
