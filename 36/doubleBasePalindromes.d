@@ -13,11 +13,11 @@ void main(string[] args) {
   StopWatch timer;
   ulong limit = 1_000_000;
 
-  writeln("double-base palindromes");
-  timer.start();
-
   if (args.length > 1)
     limit = args[1].parse!ulong();
+
+  writeln("double-base palindromes");
+  timer.start();
 
   auto sum = iota!ulong(0, limit)
     .map!(a => a, a => a.to!string(), a => format("%b", a))

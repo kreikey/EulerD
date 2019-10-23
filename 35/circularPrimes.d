@@ -18,12 +18,13 @@ static this() {
 
 void main() {
   StopWatch timer;
+  enum top = 1_000_000;
 
   writeln("circular primes: ");
   timer.start();
 
   auto circularPrimesCount = primes
-    .until!(a => a >= 1_000_000)
+    .until!(a => a >= top)
     .filter!isCircularPrime
     .tee!(a => write(a, " "))
     .count();
@@ -31,7 +32,7 @@ void main() {
 
   timer.stop();
 
-  writefln("There are %s circular primes below 1,000,000", circularPrimesCount);
+  writefln("There are %s circular primes below %s", circularPrimesCount, top);
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }
 

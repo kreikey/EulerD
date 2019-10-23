@@ -8,13 +8,13 @@ import std.algorithm;
 import kreikey.bigint;
 import kreikey.intmath;
 
-alias asortDescending = (ubyte[] a) => sort!((b, c) => c < b)(a).array();
+alias asortDescending = (uint[] a) => sort!((b, c) => c < b)(a).array();
 
 void main() {
   StopWatch timer;
   enum maxDigits = getMaxDigits();
-  ubyte[] digits;
-  ubyte[] sumDigs;
+  uint[] digits;
+  uint[] sumDigs;
   ulong sum;
   ulong[] sums;
 
@@ -48,7 +48,7 @@ void main() {
   writeln("finished in ", timer.peek.total!"msecs"(), " milliseconds.");
 }
 
-void incrementDigitsCombo(ref ubyte[] digits) {
+void incrementDigitsCombo(ref uint[] digits) {
   for (ulong i = digits.length - 1; i > 0; i--) {
     if (digits[i] < digits[i - 1]) {
       digits[i]++;
@@ -64,15 +64,6 @@ void incrementDigitsCombo(ref ubyte[] digits) {
       digits[1 .. $] = 0;
   } else
     digits.length++;
-}
-
-ulong factorial(ulong number) {
-  ulong result = 1;
-
-  foreach (n; 1..number+1)
-    result *= n;
-
-  return result;
 }
 
 ulong getMaxDigits() {

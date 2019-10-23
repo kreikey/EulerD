@@ -17,7 +17,7 @@ static this() {
   isPrime = isPrimeInit!int(pns);
 }
 
-void main(string[] args) {
+void main() {
   StopWatch timer;
 
   timer.start();

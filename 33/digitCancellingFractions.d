@@ -46,7 +46,7 @@ Tuple!(ulong, ulong) reduceFrac(ulong numerator, ulong denominator) {
   return tuple(numerator/divisor, denominator/divisor);
 }
 
-bool hasCommonDigits(ubyte[] numerator, ubyte[] denominator) {
+bool hasCommonDigits(uint[] numerator, uint[] denominator) {
   foreach (d; numerator)
     foreach (e; denominator)
       if (d == e)
@@ -55,21 +55,21 @@ bool hasCommonDigits(ubyte[] numerator, ubyte[] denominator) {
   return false;
 }
 
-Tuple!(ubyte, ubyte) uniqueDigits(ubyte[] numerator, ubyte[] denominator) {
-  ubyte commonDigit = 0;
+Tuple!(uint, uint) uniqueDigits(uint[] numerator, uint[] denominator) {
+  uint commonDigit = 0;
 
   foreach (d; numerator)
     foreach (e; denominator)
       if (d == e)
         commonDigit = d;
 
-  ubyte numeratorResult = numerator[0] != commonDigit ? numerator[0] : numerator[1];
-  ubyte denominatorResult = denominator[0] != commonDigit ? denominator[0] : denominator[1];
+  uint numeratorResult = numerator[0] != commonDigit ? numerator[0] : numerator[1];
+  uint denominatorResult = denominator[0] != commonDigit ? denominator[0] : denominator[1];
 
   return tuple(numeratorResult, denominatorResult);
 }
 
-bool isNonTrivial(ubyte[] numerator, ubyte[] denominator) {
+bool isNonTrivial(uint[] numerator, uint[] denominator) {
   bool hasMultipleOf10() {
     return numerator[1] == 0 || denominator[1] == 0;
   }

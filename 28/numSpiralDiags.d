@@ -13,7 +13,7 @@ void main(string[] args) {
   timer.start();
 
   if (args.length > 1)
-    width = args[1].to!ulong();
+    width = args[1].parse!ulong();
 
   spiralDiagonalsInit.generate.take(width.countDiagonals()).sum.writeln();
 

@@ -6,10 +6,11 @@ import std.range;
 import std.algorithm;
 import std.conv;
 import std.typecons;
+import kreikey.intmath;
 
 void main() {
   StopWatch timer;
-  int[] digits = iota(1, 10).array();
+  uint[] digits = iota(1u, 10).array();
   ulong sum = 0;
 
   writeln("pandigital products");
@@ -29,42 +30,7 @@ void main() {
   writeln("finished in ", timer.peek.total!"msecs"(), " milliseconds.");
 }
 
-int[] toDigits(ulong source) {
-  ulong maxPowTen = 1;
-  int[] result;
-
-  if (source == 0) {
-    return [0];
-  }
-
-  while (maxPowTen <= source) {
-    maxPowTen *= 10;
-  } 
-
-  maxPowTen /= 10;
-
-  while (maxPowTen > 0) {
-    result ~= cast(int)(source / maxPowTen);
-    source %= maxPowTen;
-    maxPowTen /= 10;
-  }
-
-  return result;
-}
-
-ulong toNumber(int[] digits) {
-  ulong result = 0;
-
-  int i = 0;
-  foreach (n; digits.retro()) {
-    result += n * 10 ^^ i;
-    i++;
-  }
-
-  return result;
-}
-
-bool isProductIdentity(int[] digits, ulong number) {
+bool isProductIdentity(uint[] digits, ulong number) {
   foreach (i; 1..digits.length) {
     if (digits[0..i].toNumber() * digits[i..$].toNumber() == number)
       return true;

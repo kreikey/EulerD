@@ -133,7 +133,6 @@ string recipDigits(int divisor, int length) {
   return cast(string)digits;
 }
 
-
 T[] primeFactors(T)(T num) 
 if (isIntegral!T) {
   T[] factors;
@@ -171,9 +170,9 @@ if (isIntegral!T) {
   return &isPrime;
 }
 
-ubyte[] toDigits(ulong source) {
-  ulong maxPowTen = 1;
-  ubyte[] result;
+uint[] toDigits(ulong source) {
+  uint maxPowTen = 1;
+  uint[] result;
 
   while (maxPowTen <= source)
     maxPowTen *= 10;
@@ -182,7 +181,7 @@ ubyte[] toDigits(ulong source) {
     maxPowTen /= 10;
 
   while (maxPowTen > 0) {
-    result ~= cast(ubyte)(source / maxPowTen);
+    result ~= cast(uint)source / maxPowTen;
     source %= maxPowTen;
     maxPowTen /= 10;
   }
@@ -190,7 +189,7 @@ ubyte[] toDigits(ulong source) {
   return result;
 }
 
-ulong toNumber(ubyte[] digits) {
+ulong toNumber(uint[] digits) {
   ulong result = 0;
 
   foreach (i, n; digits)
@@ -209,7 +208,7 @@ ulong factorial(ulong number) {
 }
 
 T[] dror(T)(T[] digits) {
-  ubyte temp;
+  T temp;
 
   temp = digits[$-1];
 
@@ -221,8 +220,8 @@ T[] dror(T)(T[] digits) {
   return digits;
 }
 
-ubyte[] drol(ubyte[] digits) {
-  ubyte temp;
+T[] drol(T)(T[] digits) {
+  T temp;
 
   temp = digits[0];
 
