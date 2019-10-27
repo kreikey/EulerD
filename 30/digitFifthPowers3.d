@@ -7,8 +7,8 @@ import std.algorithm;
 import std.conv;
 import kreikey.intmath;
 
-alias asortDescending = (ubyte[] a) {a.sort!((b, c) => c < b)(); return a;};
-alias asort = (ubyte[] a) {a.sort(); return a;};
+alias asortDescending = (uint[] a) {a.sort!((b, c) => c < b)(); return a;};
+alias asort = (uint[] a) {a.sort(); return a;};
 enum exponent = 5;
 
 void main() {
@@ -41,7 +41,7 @@ void main() {
 
 ulong getMaxDigits() {
   ulong sum = 0;
-  ubyte[] digits;
+  uint[] digits;
 
   do {
     sum = 0;
