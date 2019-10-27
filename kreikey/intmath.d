@@ -171,7 +171,7 @@ if (isIntegral!T) {
 }
 
 uint[] toDigits(ulong source) {
-  uint maxPowTen = 1;
+  ulong maxPowTen = 1;
   uint[] result;
 
   while (maxPowTen <= source)
