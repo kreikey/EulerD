@@ -4,6 +4,7 @@ import std.datetime.stopwatch;
 import std.conv;
 import std.functional;
 import std.string;
+import std.experimental.checkedint;
 
 struct NK {
   ulong n;
@@ -20,11 +21,16 @@ void main(string[] args) {
   }
 
   timer.start();
-  pathCount = nChooseK((width + height), height);
-  timer.stop();
-  writefln("The number of lattice paths in a %sx%s grid from top left to bottom right are:\n%s",
+
+  try {
+    pathCount = nChooseK((width + height), height);
+    timer.stop();
+    writefln("The number of lattice paths in a %sx%s grid from top left to bottom right are:\n%s",
       width, height, pathCount);
-  writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
+    writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
+  } catch (Exception e) {
+    writeln("Overflow! Those input numbers are too big to yield an accurate result.");
+  }
 }
 
 ulong nChooseK(ulong n, ulong k) {
@@ -35,28 +41,19 @@ ulong nChooseK(ulong n, ulong k) {
 
   NK left = NK(k, k);
   NK right = NK(n - k, 0);
-  ulong sum = 0;
-  ulong oldSum;
+  auto sum = checked!Throw(0uL);
   ulong leftSum;
   ulong rightSum;
   ulong product;
 
   do {
-    oldSum = sum;
-    leftSum = memoize!nChooseK(left.n, left.k);
-    rightSum = memoize!nChooseK(right.n, right.k);
-    product = leftSum * rightSum;
-    if (product < leftSum || product < rightSum) {
-      throw new Exception(format("overflow: product %s < leftSum %s OR product %s < rightSum %s", product, leftSum, product, rightSum));
-    }
+    leftSum = nChooseK(left.n, left.k);
+    rightSum = nChooseK(right.n, right.k);
+    product = (checked!Throw(leftSum) * rightSum).get;
     sum += product;
-    if (sum <= oldSum) {
-      throw new Exception(format("overflow: sum %s <= oldSum %s", sum, oldSum));
-    }
-    assert (sum > oldSum);
     left.k--;
     right.k++;
   } while (left.k < ulong.max && right.k <= right.n);
 
-  return sum;
+  return sum.get;
 }
