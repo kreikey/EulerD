@@ -17,9 +17,8 @@ void main() {
   uint[] digits = iota!uint(9, 0, -1).array();
   ulong largest = 0;
 
-  while (!digits.isConcatProduct()) {
-    digits[1..$].nextPermutation!((a, b) => a > b)();
-  }
+  while (!digits.isConcatProduct())
+    digits.nextPermutation!((a, b) => a > b)();
   
   largest = digits.toNumber();
 

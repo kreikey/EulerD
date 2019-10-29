@@ -27,17 +27,13 @@ void main() {
     sum = digits.map!(factorial).sum();
     sumDigs = sum.toDigits.asortDescending();
 
-    if (sum > 2 && digits == sumDigs) {
+    if (sum > 2 && digits == sumDigs)
       sums ~= sum;
-    }
 
-    if (sumDigs.length > digits.length) {
-      digits.length++;
-    } else if (sumDigs.length < digits.length) {
-      digits.length--;
-    } else {
+    if (sumDigs.length != digits.length)
+      digits.length = sumDigs.length;
+    else
       digits.incrementDigitsCombo();
-    }
 
   } while (digits.length <= maxDigits);
 
