@@ -6,20 +6,19 @@ final class Primes(T)
 if (isIntegral!T) {
 private:
   T num;
-  ulong ndx;
+  size_t ndx;
   static T root;
   static T nextSquare;
   static T[] primes;
 
   bool isPrime() {
     foreach (i; 0 .. primes.length) {
-      if (primes[i] > root) {
+      if (primes[i] > root)
         break;
-      }
-      if (num % primes[i] == 0) {
+      if (num % primes[i] == 0)
         return false;
-      }
     }
+
     return true;
   }
 
@@ -53,6 +52,7 @@ public:
       num = primes[ndx++];
       return;
     }
+
     do {
       num++;
       if (num == nextSquare) {
@@ -61,8 +61,10 @@ public:
         num++;
       }
     } while (!isPrime());
+
     if (primes.length == primes.capacity)
       primes.reserve(primes.capacity * 2);
+
     primes ~= num;
     cache[num] = true;
     ndx++;
@@ -87,10 +89,10 @@ public:
     }
 
     num = primes[$ - 1];
-    ndx = cast(T)primes.length;
-    do {
-      popFront();
-    } while (ndx <= i);
+    ndx = primes.length;
+
+    do popFront();
+    while (ndx <= i);
 
     return num;
   }
