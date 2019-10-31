@@ -45,14 +45,13 @@ void main() {
 }
 
 void incrementDigitsCombo(ref uint[] digits) {
-  for (ulong i = digits.length - 1; i > 0; i--) {
+  for (ulong i = digits.length - 1; i > 0; i--)
     if (digits[i] < digits[i - 1]) {
       digits[i]++;
       if (i < digits.length - 1)
         digits[i + 1 .. $] = 0;
       return;
     }
-  }
 
   if (digits[0] < 9) {
     digits[0]++;
