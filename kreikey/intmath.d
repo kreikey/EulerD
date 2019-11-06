@@ -7,6 +7,9 @@ import std.traits;
 import kreikey.primes;
 import std.range;
 
+alias asort = (a) {a.sort(); return a;};
+alias asortDescending = (a) => sort!((b, c) => c < b)(a).array();
+
 long[] getFactors(long number) {
   static long[][long] factorsCache;
   long[] factors;

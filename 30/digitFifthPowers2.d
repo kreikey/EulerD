@@ -7,7 +7,6 @@ import std.algorithm;
 import std.conv;
 import kreikey.intmath;
 
-alias asortDescending = (ubyte[] a) => sort!((b, c) => c < b)(a).array();
 enum exponent = 5;
 
 void main() {

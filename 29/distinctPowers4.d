@@ -10,7 +10,7 @@ import kreikey.intmath;
 import kreikey.bigint;
 
 alias primeFactorsFast = memoize!(primeFactors!ulong);
-alias asort = a => std.algorithm.sort(a).array();
+alias asort = (a) {a.sort(); return a;};
 
 void main(string[] args) {
   StopWatch timer;

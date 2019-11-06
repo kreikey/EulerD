@@ -1,4 +1,4 @@
-#!/usr/bin/env rdmd -I.. -i
+#!/usr/bin/env rdmd -i -I..
 
 import std.stdio;
 import std.datetime.stopwatch;
@@ -8,7 +8,7 @@ import std.algorithm;
 import kreikey.bigint;
 import kreikey.intmath;
 
-alias asortDescending = (uint[] a) => sort!((b, c) => c < b)(a).array();
+alias asortDescending = (a) {a.sort!((b, c) => c < b)(); return a;};
 
 void main() {
   StopWatch timer;
