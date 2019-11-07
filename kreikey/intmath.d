@@ -6,6 +6,9 @@ import std.stdio;
 import std.traits;
 import kreikey.primes;
 import std.range;
+import std.math;
+import std.conv;
+import std.typecons;
 
 alias asort = (a) {a.sort(); return a;};
 alias asortDescending = (a) => sort!((b, c) => c < b)(a).array();
@@ -234,5 +237,30 @@ T[] drol(T)(T[] digits) {
   digits[$-1] = temp;
 
   return digits;
+}
+
+auto getTriplets(ulong perimeter) {
+  enum real pdiv = sqrt(real(2)) + 1;
+  Tuple!(ulong, ulong, ulong)[] triplets = [];
+  ulong c = ceil(perimeter / pdiv).to!ulong();
+  ulong b = ceil(real(perimeter - c) / 2).to!ulong();
+  ulong a = perimeter - c - b;
+  ulong csq = c ^^ 2;
+  ulong absq = a ^^ 2 + b ^^ 2;
+
+  do {
+    if (absq == csq) {
+      triplets ~= tuple(a, b, c);
+    } else if (absq > csq) {
+      c++;
+      a--;
+      csq = c ^^ 2;
+    }
+    b++;
+    a--;
+    absq = a ^^ 2 + b ^^ 2;
+  } while (a > 0);
+
+  return triplets;
 }
 
