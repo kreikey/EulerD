@@ -25,7 +25,7 @@ void main() {
   timer.start();
 
   auto truncPrimes = primes.drop(4).filter!isTruncatablePrime();
-  auto somePrimes = truncPrimes.take(10).array();
+  auto somePrimes = truncPrimes.take(10).cache.array();
   somePrimes ~= truncPrimes.front;
   writefln("%(%d, %)", somePrimes);
   truncatablePrimesSum = somePrimes.sum();
