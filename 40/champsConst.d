@@ -19,7 +19,7 @@ void main() {
   timer.start();
 
   foreach (e; 0..7) {
-    product *= champ[1 * 10 ^^ e];
+    product *= champ3[1 * 10 ^^ e];
   }
 
   timer.stop();

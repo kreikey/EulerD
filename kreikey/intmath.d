@@ -264,3 +264,38 @@ auto getTriplets(ulong perimeter) {
   return triplets;
 }
 
+bool nextPermutation(T)(ref T[] digits) {
+  ulong i;
+  ulong j;
+
+  for (i = digits.length - 2; i < size_t.max; i--) {
+    if (digits[i] < digits[i + 1]) {
+      break;
+    }
+  }
+
+  if (i == size_t.max) {
+    digits.sort();
+    return false;
+  }
+
+  for (j = digits.length-1; j > i; j--) {
+    if (digits[j] > digits[i])
+      break;
+  }
+
+  swap(digits[i], digits[j]);
+  sort(digits[i+1..$]);
+
+  return true;
+}
+
+T[] nthPermutation(T)(ref T[] digits, ulong n) {
+  ulong count = 0;
+
+  while (count++ < n) {
+    digits.nextPermutation();
+  }
+
+  return digits;
+}

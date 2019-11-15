@@ -5,32 +5,24 @@ import std.algorithm;
 import std.conv;
 import std.array;
 import std.range;
+import kreikey.intmath;
+
+alias nthPermutation = kreikey.intmath.nthPermutation;
 
 void main(string[] args) {
   StopWatch timer;
   int[] digits;
-  ulong permCount = 1;
-  ulong n;
-  ulong sNdx;
+  ulong permCount = 1000000;
+  //ulong permCount = 3628800;
+
+  if (args.length > 1) {
+    permCount = args[1].parse!ulong();
+  }
 
   timer.start();
   digits = iota(10).array();
-  n = digits.length - 1;
 
-  while (permCount < 1000000) {
-    while (n > 0 && digits[n-1] > digits[n]) {
-      n--;
-    }
-    sNdx = n;
-    foreach (i, digit; digits[n+1..$]) {
-      if (digit < digits[sNdx] && digit > digits[n-1])
-        sNdx = i + n + 1;
-    }
-    swap(digits[sNdx], digits[n-1]);
-    sort(digits[n..$]);
-    permCount++;
-    n = cast(int)digits.length - 1;
-  }
+  digits.nthPermutation(permCount - 1);
 
   timer.stop();
   writefln("The %sth permutation of digits 0 - 9 is: %s", permCount, digits.map!(a => cast(char)(a + '0'))());
