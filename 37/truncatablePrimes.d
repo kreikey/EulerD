@@ -13,8 +13,8 @@ bool delegate(ulong) isPrime;
 Primes!ulong primes;
 
 static this() {
-  primes = new Primes!ulong();
-  isPrime = isPrimeInit!ulong(primes.save);
+  primes = new Primes!()();
+  isPrime = isPrimeInit!()(primes.save);
 }
 
 void main() {

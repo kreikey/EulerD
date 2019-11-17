@@ -19,7 +19,7 @@ void main() {
   sum = digits
     .permutations
     .map!(a => a.array())
-    .map!(a => tuple(a[0..5], a[5..$].toNumber()))
+    .map!(a => a[0..5], a => a[5..$].toNumber())
     .filter!(a => isProductIdentity(a.expand))
     .map!(a => a[1])
     .uniq

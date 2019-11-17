@@ -11,7 +11,8 @@ import std.conv;
 import std.typecons;
 
 alias asort = (a) {a.sort(); return a;};
-alias asortDescending = (a) => sort!((b, c) => c < b)(a).array();
+alias asortDescending = (a) {a.sort!((b, c) => c < b)(); return a;};
+alias toString = digits => digits.map!(a => cast(immutable(char))(a + '0')).array();
 
 long[] getFactors(long number) {
   static long[][long] factorsCache;
@@ -164,7 +165,7 @@ Factor maxMultiplicity(Factor a, Factor b) {
   return a.multiplicity > b.multiplicity ? a : b;
 }
 
-auto isPrimeInit(T)(Primes!T primes)
+auto isPrimeInit(T = ulong)(Primes!T primes)
 if (isIntegral!T) {
   bool isPrime(T number) {
     if (number > primes.topPrime)
@@ -176,30 +177,32 @@ if (isIntegral!T) {
   return &isPrime;
 }
 
-uint[] toDigits(ulong source) {
-  ulong maxPowTen = 1;
+uint[] toDigits(alias base = 10)(ulong source) 
+if (isIntegral!(typeof(base))) {
+  ulong maxPowB = 1;
   uint[] result;
 
-  while (maxPowTen <= source)
-    maxPowTen *= 10;
+  while (maxPowB <= source)
+    maxPowB *= base;
 
   if (source != 0)
-    maxPowTen /= 10;
+    maxPowB /= base;
 
-  while (maxPowTen > 0) {
-    result ~= cast(uint)source / maxPowTen;
-    source %= maxPowTen;
-    maxPowTen /= 10;
+  while (maxPowB > 0) {
+    result ~= cast(uint)source / maxPowB;
+    source %= maxPowB;
+    maxPowB /= base;
   }
 
   return result;
 }
 
-ulong toNumber(uint[] digits) {
+ulong toNumber(alias base = 10)(uint[] digits) 
+if (isIntegral!(typeof(base))) {
   ulong result = 0;
 
   foreach (i, n; digits)
-    result += n * 10 ^^ (digits.length - 1 - i);
+    result += n * base ^^ (digits.length - 1 - i);
 
   return result;
 }
@@ -226,6 +229,11 @@ T[] dror(T)(T[] digits) {
   return digits;
 }
 
+ulong dror(T)(T source)
+if(isIntegral!T) {
+  return source.toDigits.dror.toNumber();
+}
+
 T[] drol(T)(T[] digits) {
   T temp;
 
@@ -237,6 +245,11 @@ T[] drol(T)(T[] digits) {
   digits[$-1] = temp;
 
   return digits;
+}
+
+ulong drol(T)(T source)
+if(isIntegral!T) {
+  return source.toDigits.drol.toNumber();
 }
 
 auto getTriplets(ulong perimeter) {
@@ -264,28 +277,28 @@ auto getTriplets(ulong perimeter) {
   return triplets;
 }
 
-bool nextPermutation(T)(ref T[] digits) {
+bool nextPermutation(alias less = (a, b) => a < b, T)(ref T[] digits) {
   ulong i;
   ulong j;
 
   for (i = digits.length - 2; i < size_t.max; i--) {
-    if (digits[i] < digits[i + 1]) {
+    if (less(digits[i], digits[i + 1])) {
       break;
     }
   }
 
   if (i == size_t.max) {
-    digits.sort();
+    digits.sort!less();
     return false;
   }
 
   for (j = digits.length-1; j > i; j--) {
-    if (digits[j] > digits[i])
+    if (!less(digits[j], digits[i]))
       break;
   }
 
   swap(digits[i], digits[j]);
-  sort(digits[i+1..$]);
+  sort!less(digits[i+1..$]);
 
   return true;
 }

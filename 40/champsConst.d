@@ -10,10 +10,10 @@ import champernowne;
 
 void main() {
   StopWatch timer;
+  auto champ = Champernowne();
   auto champ2 = sequence!champernowne2();
   auto champ3 = sequence!champernowne3();
   assert(isRandomAccessRange!Champernowne);
-  auto champ = Champernowne();
   uint product = 1;
 
   timer.start();

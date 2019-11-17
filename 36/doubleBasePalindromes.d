@@ -9,6 +9,8 @@ import std.array;
 import std.range;
 import kreikey.intmath;
 
+alias isPalindrome = digits => digits == digits.dup.reverse();
+
 void main(string[] args) {
   StopWatch timer;
   ulong limit = 1_000_000;
@@ -20,9 +22,9 @@ void main(string[] args) {
   timer.start();
 
   auto sum = iota!ulong(0, limit)
-    .map!(a => a, a => a.to!string(), a => format("%b", a))
+    .map!(a => a, toDigits!10, toDigits!2)
     .filter!(a => a[1].isPalindrome() && a[2].isPalindrome())
-    .tee!(a => writeln(a[1], "\t", a[2]))
+    .tee!(a => writeln(a[1].toString(), "\t", a[2].toString()))
     .map!(a => a[0])
     .sum();
 
@@ -32,6 +34,3 @@ void main(string[] args) {
   writeln("finished in ", timer.peek.total!"msecs"(), " milliseconds");
 }
 
-bool isPalindrome(string num) {
-  return num == num.dup.reverse;
-}

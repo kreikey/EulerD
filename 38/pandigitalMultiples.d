@@ -8,6 +8,9 @@ import std.conv;
 import std.typecons;
 import kreikey.intmath;
 
+alias nextPermutation = kreikey.intmath.nextPermutation;
+//alias nextPermutation = std.algorithm.nextPermutation;
+
 void main() {
   StopWatch timer;
 

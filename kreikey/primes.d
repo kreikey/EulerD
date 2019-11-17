@@ -2,7 +2,7 @@ module kreikey.primes;
 import std.traits;
 import std.stdio;
 
-final class Primes(T)
+class Primes(T = ulong)
 if (isIntegral!T) {
 private:
   T num;

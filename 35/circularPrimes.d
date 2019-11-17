@@ -12,8 +12,8 @@ bool delegate(ulong) isPrime;
 Primes!ulong primes;
 
 static this() {
-  primes = new Primes!ulong();
-  isPrime = isPrimeInit!ulong(primes.save);
+  primes = new Primes!()();
+  isPrime = isPrimeInit!()(primes.save);
 }
 
 void main() {
@@ -40,16 +40,12 @@ bool isCircularPrime(ulong number) {
   auto length = number.toDigits().length;
 
   foreach (n; 0..length-1) {
-    number = number.ror();
+    number = number.dror();
     if (!number.isPrime()) {
       return false;
     }
   }
 
   return true;
-}
-
-ulong ror(ulong source) {
-  return source.toDigits.dror.toNumber();
 }
 

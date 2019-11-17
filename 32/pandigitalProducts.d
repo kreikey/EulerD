@@ -7,9 +7,11 @@ import std.algorithm;
 import std.conv;
 import kreikey.intmath;
 
+alias nextPermutation = kreikey.intmath.nextPermutation;
+
 void main() {
   StopWatch timer;
-  uint[] digits = iota(1u, 10).array();
+  uint[] digits = iota!uint(1, 10).array();
   uint[] productDigs = [];
   ulong left = 0;
   ulong right = 0;
