@@ -14,7 +14,7 @@ Primes!ulong primes;
 
 static this() {
   primes = new Primes!()();
-  isPrime = isPrimeInit!()(primes.save);
+  isPrime = isPrimeInit(primes.save);
 }
 
 void main() {

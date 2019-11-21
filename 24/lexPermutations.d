@@ -5,9 +5,9 @@ import std.algorithm;
 import std.conv;
 import std.array;
 import std.range;
-import kreikey.intmath;
+import kreikey.combinatorics;
 
-alias nthPermutation = kreikey.intmath.nthPermutation;
+alias nthPermutation = kreikey.combinatorics.nthPermutation;
 
 void main(string[] args) {
   StopWatch timer;

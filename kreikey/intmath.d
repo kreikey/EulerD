@@ -165,13 +165,24 @@ Factor maxMultiplicity(Factor a, Factor b) {
   return a.multiplicity > b.multiplicity ? a : b;
 }
 
-auto isPrimeInit(T = ulong)(Primes!T primes)
+auto isPrimeInit(T = ulong)()
 if (isIntegral!T) {
-  bool isPrime(T number) {
-    if (number > primes.topPrime)
-      primes.find!(a => a >= number)();
+  Primes!T primes = new Primes!T();
 
-    return number in primes.cache ? true : false;
+  bool isPrime(T number) {
+    auto primesCopy = primes.save;
+    auto root = std.math.sqrt(real(number)).to!T();
+
+    if (number > primesCopy.topPrime) {
+      foreach (p; primesCopy.until!((a, b) => a > b)(root)) {
+        if (number % p == 0)
+          return false;
+      }
+
+      return true;
+    } else {
+      return number in primes.cache ? true : false;
+    }
   }
 
   return &isPrime;
@@ -277,38 +288,3 @@ auto getTriplets(ulong perimeter) {
   return triplets;
 }
 
-bool nextPermutation(alias less = (a, b) => a < b, T)(ref T[] digits) {
-  ulong i;
-  ulong j;
-
-  for (i = digits.length - 2; i < size_t.max; i--) {
-    if (less(digits[i], digits[i + 1])) {
-      break;
-    }
-  }
-
-  if (i == size_t.max) {
-    digits.sort!less();
-    return false;
-  }
-
-  for (j = digits.length-1; j > i; j--) {
-    if (!less(digits[j], digits[i]))
-      break;
-  }
-
-  swap(digits[i], digits[j]);
-  sort!less(digits[i+1..$]);
-
-  return true;
-}
-
-T[] nthPermutation(T)(ref T[] digits, ulong n) {
-  ulong count = 0;
-
-  while (count++ < n) {
-    digits.nextPermutation();
-  }
-
-  return digits;
-}
