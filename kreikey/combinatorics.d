@@ -1,7 +1,7 @@
 module kreikey.combinatorics;
 
 import kreikey.stack;
-import std.stdio;
+//import std.stdio;
 import std.typecons;
 import std.algorithm;
 
@@ -20,12 +20,10 @@ struct Permutations(T) {
   }
 
   T[] front() @property {
-    //writeln(digits);
     return digits.dup;
   }
 
   void popFront() {
-    //writeln("stack: ", permStack.items);
     if (permStack.empty) {
       _empty = true;
       return;

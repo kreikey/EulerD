@@ -5,11 +5,11 @@ import std.stdio;
 class Primes(T = ulong)
 if (isIntegral!T) {
 private:
-  T num;
+  T num = 2;
   size_t ndx;
-  static T root;
-  static T nextSquare;
-  static T[] primes;
+  static T root = 1;
+  static T nextSquare = 4;
+  static T[] primes = [2];
 
   bool isPrime() {
     foreach (i; 0 .. primes.length) {
@@ -28,28 +28,18 @@ public:
   // ------- Constructors -------
   this() {
     primes.reserve(1000);
-    num = 1;
-    root = 1;
-    nextSquare = (root + 1) ^^ 2;
+    num = 2;
     ndx = 0;
-    popFront();
-    cache[num] = true;
-  }
-
-  this(int initialCapacity) {
-    primes.reserve(initialCapacity);
-    num = 1;
-    root = 1;
-    nextSquare = (root + 1) ^^ 2;
-    ndx = 0;
+    cache[2] = true;
   }
 
   // ------- Range Primitives -------
   enum bool empty = false;
 
   void popFront() {
+    ndx++;
+
     if (ndx < primes.length) {
-      num = primes[ndx++];
       return;
     }
 
@@ -62,16 +52,12 @@ public:
       }
     } while (!isPrime());
 
-    if (primes.length == primes.capacity)
-      primes.reserve(primes.capacity * 2);
-
     primes ~= num;
     cache[num] = true;
-    ndx++;
   }
 
   T front() @property {
-    return num;
+    return primes[ndx];
   }
 
   typeof(this) save() @property {
@@ -99,9 +85,8 @@ public:
 
   // ------- Other useful methods -------
   void reset() {
-    num = 1;
+    num = 2;
     ndx = 0;
-    popFront();
   }
 
   T topPrime() @property {

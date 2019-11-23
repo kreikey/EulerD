@@ -165,47 +165,70 @@ Factor maxMultiplicity(Factor a, Factor b) {
   return a.multiplicity > b.multiplicity ? a : b;
 }
 
+//auto isPrimeInit(T = ulong)()
+//if (isIntegral!T) {
+  //Primes!T primes = new Primes!T();
+
+  //bool isPrime(T number) {
+    //auto primesCopy = primes.save;
+    //auto root = std.math.sqrt(real(number)).to!T();
+
+    //if (number > primesCopy.topPrime) {
+      //foreach (p; primesCopy.until!((a, b) => a >= b)(root, OpenRight.no)) {
+        //if (number % p == 0)
+          //return false;
+      //}
+
+      //return true;
+    //} else {
+      //return number in primes.cache ? true : false;
+    //}
+  //}
+
+  //return &isPrime;
+//}
+
 auto isPrimeInit(T = ulong)()
 if (isIntegral!T) {
   Primes!T primes = new Primes!T();
 
   bool isPrime(T number) {
-    auto primesCopy = primes.save;
-    auto root = std.math.sqrt(real(number)).to!T();
+    if (number > primes.topPrime)
+      primes.find!(a => a >= number)();
 
-    if (number > primesCopy.topPrime) {
-      foreach (p; primesCopy.until!((a, b) => a > b)(root)) {
-        if (number % p == 0)
-          return false;
-      }
-
-      return true;
-    } else {
-      return number in primes.cache ? true : false;
-    }
+    return number in primes.cache ? true : false;
   }
 
   return &isPrime;
 }
 
-uint[] toDigits(alias base = 10)(ulong source) 
+
+//uint[] toDigits(alias base = 10)(ulong source)
+//if (isIntegral!(typeof(base))) {
+  //ulong maxPowB = 1;
+  //uint[] result;
+
+  //while (maxPowB <= source)
+    //maxPowB *= base;
+
+  //if (source != 0)
+    //maxPowB /= base;
+
+  //while (maxPowB > 0) {
+    //result ~= cast(uint)source / maxPowB;
+    //source %= maxPowB;
+    //maxPowB /= base;
+  //}
+
+  //return result;
+//}
+
+uint[] toDigits(alias base = 10)(ulong source)
 if (isIntegral!(typeof(base))) {
-  ulong maxPowB = 1;
-  uint[] result;
+  if (source == 0)
+    return [];
 
-  while (maxPowB <= source)
-    maxPowB *= base;
-
-  if (source != 0)
-    maxPowB /= base;
-
-  while (maxPowB > 0) {
-    result ~= cast(uint)source / maxPowB;
-    source %= maxPowB;
-    maxPowB /= base;
-  }
-
-  return result;
+  return toDigits(source / base) ~ cast(uint)(source % base);
 }
 
 ulong toNumber(alias base = 10)(uint[] digits) 

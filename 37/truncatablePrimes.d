@@ -14,11 +14,12 @@ Primes!ulong primes;
 
 static this() {
   primes = new Primes!()();
-  isPrime = isPrimeInit(primes.save);
+  isPrime = isPrimeInit();
 }
 
 void main() {
   StopWatch timer;
+  auto primes = new Primes!()();
   ulong truncatablePrimesSum = 0;
 
   writeln("truncatable primes");
@@ -31,13 +32,10 @@ void main() {
   truncatablePrimesSum = somePrimes.sum();
 
   //foreach (i; 0..10) {
-    //writeln(filteredPrimes.front);
-    //truncatablePrimesSum += filteredPrimes.front;
-    //filteredPrimes.popFront;
+    //writeln(truncPrimes.front);
+    //truncatablePrimesSum += truncPrimes.front;
+    //truncPrimes.popFront;
   //}
-
-  //writeln(filteredPrimes.front);
-  //truncatablePrimesSum += filteredPrimes.front; 
 
   timer.stop();
 

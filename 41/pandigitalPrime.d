@@ -21,32 +21,30 @@ static this() {
 
 void main() {
   StopWatch timer;
-  auto digits = iota!uint(1, 5).array();
-  auto perms = permutations(digits).map!(a => a.array()).array();
 
   timer.start();
 
   writeln("The largest n-digit pandigital prime is:");
 
-  getPandigitals.filter!(a => a.sum() % 3 != 0)
-    .map!permutations
-    .join
-    .filter!(a => a[$-1] % 2 != 0 && a[$-1] != 5)
+  auto pandigitals = getPandigitalsDescending.filter!(a => a.sum() % 3 != 0).array();
+  uint[][] permutations;
+
+  foreach (pandigital; pandigitals) {
+    do {
+      permutations ~= pandigital.dup;
+    } while (pandigital.nextPermutation!((a, b) => a > b)());
+  }
+
+  permutations.filter!(a => a[$-1] % 2 != 0 && a[$-1] != 5)
     .map!(toNumber!10)
-    .array
-    .asortDescending
     .find!isPrime
     .front
     .writeln();
 
-  //auto pandigitals = getPandigitals.filter!(a => a.sum() % 3 != 0).array();
-  //uint[][] permutations;
-  //foreach (pandigital; pandigitals) {
-    //do {
-      //permutations ~= pandigital.dup;
-    //} while (pandigital.nextPermutation());
-  //}
-  //permutations.filter!(a => a[$-1] % 2 != 0 && a[$-1] != 5)
+  //getPandigitals.filter!(a => a.sum() % 3 != 0)
+    //.map!permutations
+    //.join
+    //.filter!(a => a[$-1] % 2 != 0 && a[$-1] != 5)
     //.map!(toNumber!10)
     //.array
     //.asortDescending
@@ -59,13 +57,13 @@ void main() {
 }
 
 uint[][] getPandigitals() {
-  uint[] digits;
-  uint[][] pandigitals;
+  return iota(3, 11)
+    .map!(a => iota!uint(1, a).array)
+    .array();
+}
 
-  foreach (n; 3..11) {
-    digits = iota!uint(1, n).array();
-    pandigitals ~= digits;
-  }
-
-  return pandigitals;
+uint[][] getPandigitalsDescending() {
+  return iota(9, 2, -1)
+    .map!(a => iota!uint(a, 0, -1).array())
+    .array();
 }
