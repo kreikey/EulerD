@@ -4,6 +4,7 @@ import kreikey.stack;
 //import std.stdio;
 import std.typecons;
 import std.algorithm;
+import std.range;
 
 auto permutations(T)(ref T[] digits) {
   return Permutations!T(digits);
@@ -43,19 +44,11 @@ struct Permutations(T) {
   }
 
   void fillStack(size_t ndx) {
-    ulong window = digits.length - ndx;
-    ulong offset = window - 2;
-
-    while (window > 1) {
-      permStack.push(tuple(ndx, window % 2 == 0 ? offset : 0));
-      offset--;
-
-      if (offset == ulong.max) {
-        ndx++;
-        window--;
-        offset = window - 2;
+    foreach (i; iota(1, digits.length-ndx).retro()) {
+      foreach (j; iota(i).retro()) {
+        permStack.push(tuple(digits.length-1-i, (i+1)%2 == 0 ? j : 0));
       }
-    } 
+    }
   }
 }
 
@@ -64,7 +57,7 @@ bool nextPermutation(alias less = (a, b) => a < b, T)(ref T[] digits) {
   ulong j;
 
   for (i = digits.length - 2; i < size_t.max; i--) {
-    if (less(digits[i], digits[i + 1])) {
+    if (less(digits[i], digits[i+1])) {
       break;
     }
   }

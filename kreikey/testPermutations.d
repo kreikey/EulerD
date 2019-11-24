@@ -9,7 +9,7 @@ alias permutations = kreikey.combinatorics.permutations;
 
 void main() {
   auto digits = iota(1, 5).array();
-  auto digits2 = iota(5, 10).array();
+  auto digits2 = iota(1, 10).array();
 
   digits
     .permutations
