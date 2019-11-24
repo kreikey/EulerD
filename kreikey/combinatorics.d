@@ -31,13 +31,9 @@ struct Permutations(T) {
 
     auto item = permStack.pop();
     auto ndx = item[0];
-    auto count = item[1];
+    auto offset = item[1];
 
-    if ((digits.length - ndx) % 2 == 0) {
-      swap(digits[ndx], digits[$-1-count]);
-    } else {
-      swap(digits[ndx], digits[$-1]);
-    }
+    swap(digits[ndx], digits[$-1-offset]);
 
     fillStack(ndx + 1);
   }
@@ -47,15 +43,17 @@ struct Permutations(T) {
   }
 
   void fillStack(size_t ndx) {
-    ulong count = 1;
+    ulong window = digits.length - ndx;
+    ulong offset = window - 2;
 
-    while (ndx < digits.length - 1) {
-      permStack.push(tuple(ndx, digits.length - 1 - ndx - count));
-      count++;
+    while (window > 1) {
+      permStack.push(tuple(ndx, window % 2 == 0 ? offset : 0));
+      offset--;
 
-      if (count == digits.length - ndx) {
-        count = 1;
+      if (offset == ulong.max) {
         ndx++;
+        window--;
+        offset = window - 2;
       }
     } 
   }

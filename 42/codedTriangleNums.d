@@ -43,19 +43,16 @@ void main() {
 }
 
 auto isTriangularInit() {
-  auto triangulars = sequence!((s, n) => (n+1)*(n+2)/2)();
+  alias Triangulars = typeof(sequence!((s, n) => (n+1)*(n+2)/2)());
+  auto triangulars = new Triangulars();
   bool[ulong] cache = null;
 
   bool isTriangular(ulong num) {
-    if (num < triangulars.front)
-      return num in cache ? true: false;
+    if (triangulars.front <= num)
+      triangulars.tee!(a => cache[a] = true)
+        .find!(a => a > num)();
 
-    while (triangulars.front < num) {
-      cache[triangulars.front] = true;
-      triangulars.popFront();
-    }
-
-    return num == triangulars.front;
+    return num in cache ? true: false;
   }
 
   return &isTriangular;

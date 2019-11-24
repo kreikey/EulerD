@@ -14,7 +14,7 @@ Primes!int pns;
 
 static this() {
   pns = new Primes!int();
-  isPrime = isPrimeInit!int(pns);
+  isPrime = isPrimeInit!int();
 }
 
 void main() {

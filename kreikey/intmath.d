@@ -165,42 +165,46 @@ Factor maxMultiplicity(Factor a, Factor b) {
   return a.multiplicity > b.multiplicity ? a : b;
 }
 
-//auto isPrimeInit(T = ulong)()
-//if (isIntegral!T) {
-  //Primes!T primes = new Primes!T();
-
-  //bool isPrime(T number) {
-    //auto primesCopy = primes.save;
-    //auto root = std.math.sqrt(real(number)).to!T();
-
-    //if (number > primesCopy.topPrime) {
-      //foreach (p; primesCopy.until!((a, b) => a >= b)(root, OpenRight.no)) {
-        //if (number % p == 0)
-          //return false;
-      //}
-
-      //return true;
-    //} else {
-      //return number in primes.cache ? true : false;
-    //}
-  //}
-
-  //return &isPrime;
-//}
-
 auto isPrimeInit(T = ulong)()
 if (isIntegral!T) {
   Primes!T primes = new Primes!T();
 
   bool isPrime(T number) {
-    if (number > primes.topPrime)
-      primes.find!(a => a >= number)();
+    static if (isSigned!T) {
+      if (number < 0) {
+        return false;
+      }
+    }
 
-    return number in primes.cache ? true : false;
+    auto primesCopy = primes.save;
+    auto root = std.math.sqrt(real(number)).to!T();
+
+    if (number <= primesCopy.topPrime)
+      return number in primes.cache ? true : false;
+
+    foreach (p; primesCopy.until!((a, b) => a >= b)(root, OpenRight.no))
+      if (number % p == 0)
+        return false;
+
+    return true;
   }
 
   return &isPrime;
 }
+
+//auto isPrimeInit(T = ulong)()
+//if (isIntegral!T) {
+  //Primes!T primes = new Primes!T();
+
+  //bool isPrime(T number) {
+    //if (number > primes.topPrime)
+      //primes.find!(a => a >= number)();
+
+    //return number in primes.cache ? true : false;
+  //}
+
+  //return &isPrime;
+//}
 
 
 //uint[] toDigits(alias base = 10)(ulong source)
