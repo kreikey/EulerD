@@ -28,18 +28,22 @@ void main() {
 
   auto pandigitals = getPandigitalsDescending.filter!(a => a.sum() % 3 != 0).array();
   uint[][] perms;
+  bool done = false;
+  ulong number;
 
   foreach (pandigital; pandigitals) {
     do {
-      perms ~= pandigital.dup;
-    } while (pandigital.nextPermutation!((a, b) => a > b)());
+      writeln(pandigital);
+      number = pandigital.toNumber();
+      if (number.isPrime()) {
+        done = true;
+      }
+    } while (pandigital.nextPermutation!((a, b) => a > b)() && !done);
+    if (done)
+      break;
   }
 
-  perms
-    .map!toNumber
-    .find!isPrime
-    .front
-    .writeln();
+  number.writeln();
 
   //getPandigitals
     //.filter!(a => a.sum() % 3 != 0)

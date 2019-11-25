@@ -170,18 +170,12 @@ if (isIntegral!T) {
   Primes!T primes = new Primes!T();
 
   bool isPrime(T number) {
-    static if (isSigned!T) {
-      if (number < 0) {
-        return false;
-      }
-    }
-
     auto primesCopy = primes.save;
-    auto root = std.math.sqrt(real(number)).to!T();
 
     if (number <= primesCopy.topPrime)
       return number in primes.cache ? true : false;
 
+    auto root = std.math.sqrt(real(number)).to!T();
     auto found = primesCopy.find!(p => number % p == 0 || p > root)().front;
     return found > root;
   }
@@ -250,9 +244,7 @@ ulong factorial(ulong number) {
 }
 
 T[] dror(T)(T[] digits) {
-  T temp;
-
-  temp = digits[$-1];
+  T temp = digits[$-1];
 
   for (size_t i = digits.length-1; i > 0; i--)
     digits[i] = digits[i-1];
@@ -268,9 +260,7 @@ if(isIntegral!T) {
 }
 
 T[] drol(T)(T[] digits) {
-  T temp;
-
-  temp = digits[0];
+  T temp = digits[0];
 
   for (size_t i = 0; i < digits.length-1; i++)
     digits[i] = digits[i+1];
