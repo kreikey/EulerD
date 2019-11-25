@@ -182,11 +182,8 @@ if (isIntegral!T) {
     if (number <= primesCopy.topPrime)
       return number in primes.cache ? true : false;
 
-    foreach (p; primesCopy.until!((a, b) => a >= b)(root, OpenRight.no))
-      if (number % p == 0)
-        return false;
-
-    return true;
+    auto found = primesCopy.find!(p => number % p == 0 || p > root)().front;
+    return found > root;
   }
 
   return &isPrime;
@@ -232,17 +229,15 @@ if (isIntegral!(typeof(base))) {
   if (source == 0)
     return [];
 
-  return toDigits(source / base) ~ cast(uint)(source % base);
+  return toDigits!base(source / base) ~ cast(uint)(source % base);
 }
 
 ulong toNumber(alias base = 10)(uint[] digits) 
 if (isIntegral!(typeof(base))) {
-  ulong result = 0;
+  if (digits.length == 0)
+    return 0;
 
-  foreach (i, n; digits)
-    result += n * base ^^ (digits.length - 1 - i);
-
-  return result;
+  return toNumber!base(digits[1..$]) + digits[0] * base ^^ (digits.length - 1);
 }
 
 ulong factorial(ulong number) {

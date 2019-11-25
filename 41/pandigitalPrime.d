@@ -26,32 +26,32 @@ void main() {
 
   writeln("The largest n-digit pandigital prime is:");
 
-  //auto pandigitals = getPandigitalsDescending.filter!(a => a.sum() % 3 != 0).array();
-  //uint[][] perms;
+  auto pandigitals = getPandigitalsDescending.filter!(a => a.sum() % 3 != 0).array();
+  uint[][] perms;
 
-  //foreach (pandigital; pandigitals) {
-    //do {
-      //perms ~= pandigital.dup;
-    //} while (pandigital.nextPermutation!((a, b) => a > b)());
-  //}
+  foreach (pandigital; pandigitals) {
+    do {
+      perms ~= pandigital.dup;
+    } while (pandigital.nextPermutation!((a, b) => a > b)());
+  }
 
-  //perms.filter!(a => a[$-1] % 2 != 0 && a[$-1] != 5)
-    //.map!(toNumber!10)
-    //.find!isPrime
-    //.front
-    //.writeln();
-
-  getPandigitals
-    .filter!(a => a.sum() % 3 != 0)
-    .map!permutations
-    .join
-    .filter!(a => a[$-1] % 2 != 0 && a[$-1] != 5)
+  perms
     .map!toNumber
-    .array
-    .asortDescending
     .find!isPrime
     .front
     .writeln();
+
+  //getPandigitals
+    //.filter!(a => a.sum() % 3 != 0)
+    //.map!permutations
+    //.join
+    //.filter!(a => a[$-1] % 2 != 0 && a[$-1] != 5)
+    //.map!toNumber
+    //.array
+    //.asortDescending
+    //.find!isPrime
+    //.front
+    //.writeln();
 
   timer.stop();
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
