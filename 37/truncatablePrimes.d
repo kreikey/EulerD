@@ -26,16 +26,20 @@ void main() {
   timer.start();
 
   auto truncPrimes = primes.drop(4).filter!isTruncatablePrime();
-  auto somePrimes = truncPrimes.take(10).array();
-  somePrimes ~= truncPrimes.front;
-  writefln("%(%d, %)", somePrimes);
-  truncatablePrimesSum = somePrimes.sum();
 
-  //foreach (i; 0..10) {
-    //writeln(truncPrimes.front);
-    //truncatablePrimesSum += truncPrimes.front;
-    //truncPrimes.popFront;
-  //}
+  truncatablePrimesSum += truncPrimes.front;
+  write(truncPrimes.front, ", ");
+
+  foreach (i; 0..10) {
+    truncPrimes.popFront();
+
+    if (i < 9)
+      write(truncPrimes.front, ", ");
+    else
+      writeln(truncPrimes.front);
+
+    truncatablePrimesSum += truncPrimes.front;
+  }
 
   timer.stop();
 
