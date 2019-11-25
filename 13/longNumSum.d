@@ -7,8 +7,8 @@ import kreikey.bytemath;
 
 void main(string[] args) {
   StopWatch timer;
-  byte[][] longNumbers;
-  byte[] accumulator;
+  ubyte[][] longNumbers;
+  ubyte[] accumulator;
 
   timer.start();
   File inFile = File("longNumbers.txt", "r");

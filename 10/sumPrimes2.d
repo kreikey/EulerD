@@ -8,7 +8,7 @@ import kreikey.primes;
 
 void main(string[] args) {
   StopWatch timer;
-  auto p = new Primes!ulong(1000);
+  auto p = new Primes!ulong();
   ulong limit = 2_000_000;
   ulong sum;
 

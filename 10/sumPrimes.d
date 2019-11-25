@@ -7,7 +7,7 @@ import kreikey.primes;
 void main(string[] args) {
   ulong belowNum = 2_000_000;
   ulong sum = 0;
-  auto p = new Primes!ulong(1000);
+  auto p = new Primes!ulong();
 
   if (args.length > 1)
     belowNum = args[1].parse!(ulong);
