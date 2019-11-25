@@ -28,18 +28,17 @@ ulong countLatticePaths(int width, int height) {
   int rightCount, downCount;
   ulong pathCount;
 
-/*  auto rightPathTask = task!takePath(RIGHT, width, height, 0, 0);
+  auto rightPathTask = task!takePath(RIGHT, width, height, 0, 0);
   rightPathTask.executeInNewThread();
   pathCount += takePath(DOWN, width, height, 0, 0);
   pathCount += rightPathTask.yieldForce();
-*/
 
-  if (width == height) {
-    pathCount += 2 * takePath(RIGHT, width, height, 0, 0);
-  } else {
-    pathCount += takePath(RIGHT, width, height, 0, 0);
-    pathCount += takePath(DOWN, width, height, 0, 0);
-  }
+  //if (width == height) {
+    //pathCount += 2 * takePath(RIGHT, width, height, 0, 0);
+  //} else {
+    //pathCount += takePath(RIGHT, width, height, 0, 0);
+    //pathCount += takePath(DOWN, width, height, 0, 0);
+  //}
 
   return pathCount;
 }
