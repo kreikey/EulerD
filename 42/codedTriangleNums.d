@@ -10,7 +10,7 @@ import std.datetime.stopwatch;
 import std.typecons;
 
 //alias isTriangularFast = memoize!(isTriangular);
-bool delegate(ulong) isTriangular;
+typeof(isTriangularInit()) isTriangular;
 
 static this() {
   isTriangular = isTriangularInit();
@@ -43,8 +43,9 @@ void main() {
 }
 
 auto isTriangularInit() {
-  alias Triangulars = typeof(sequence!((s, n) => (n+1)*(n+2)/2)());
-  auto triangulars = new Triangulars();
+  auto temp = recurrence!((a, n) => a[n-1] + n)(0);
+  auto triangulars = new typeof(temp)();
+  *triangulars = temp;
   bool[ulong] cache = null;
 
   bool isTriangular(ulong num) {
