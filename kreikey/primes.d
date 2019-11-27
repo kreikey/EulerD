@@ -1,17 +1,18 @@
 module kreikey.primes;
 import std.traits;
 import std.stdio;
+import std.stdio;
+import std.format;
 
 class Primes(T = ulong)
 if (isIntegral!T) {
 private:
-  T num = 2;
   size_t ndx;
   static T root = 1;
   static T nextSquare = 4;
   static T[] primes = [2];
 
-  bool isPrime() {
+  bool isPrime(T num) {
     foreach (i; 0 .. primes.length) {
       if (primes[i] > root)
         break;
@@ -28,7 +29,6 @@ public:
   // ------- Constructors -------
   this() {
     primes.reserve(1000);
-    num = 2;
     ndx = 0;
     cache[2] = true;
   }
@@ -43,6 +43,8 @@ public:
       return;
     }
 
+    T num = primes[$-1];
+
     do {
       num++;
       if (num == nextSquare) {
@@ -50,7 +52,7 @@ public:
         nextSquare = (root + 1) ^^ 2;
         num++;
       }
-    } while (!isPrime());
+    } while (!isPrime(num));
 
     primes ~= num;
     cache[num] = true;
@@ -62,7 +64,6 @@ public:
 
   typeof(this) save() @property {
     auto ret = new typeof(this)();
-    ret.num = this.num;
     ret.ndx = this.ndx;
     return ret;
   }
@@ -70,26 +71,27 @@ public:
   T opIndex(size_t i) {
     if (i < primes.length) {
       ndx = i;
-      num = primes[ndx];
-      return num;
+      return primes[ndx];
     }
 
-    num = primes[$ - 1];
     ndx = primes.length;
 
     do popFront();
     while (ndx <= i);
 
-    return num;
+    return primes[ndx];
   }
 
   // ------- Other useful methods -------
   void reset() {
-    num = 2;
     ndx = 0;
   }
 
   T topPrime() @property {
     return primes[$-1];
+  }
+
+  override string toString() {
+    return format("%s\t%s\t%s\n%s", ndx, root, nextSquare, primes);
   }
 }
