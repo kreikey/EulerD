@@ -32,12 +32,7 @@ void main() {
 
   foreach (i; 0..10) {
     truncPrimes.popFront();
-
-    if (i < 9)
-      write(truncPrimes.front, ", ");
-    else
-      writeln(truncPrimes.front);
-
+    write(truncPrimes.front, (i < 9) ? ", " : "\n");
     truncatablePrimesSum += truncPrimes.front;
   }
 
