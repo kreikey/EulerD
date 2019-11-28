@@ -26,10 +26,11 @@ void main(string[] args) {
 
   auto result = iota!ulong(4, pmax + 1, 2)
     .map!(a => a, getTriplets)
-    .fold!((a, b) => b[1].length > a[1].length ? b : a)();
+    .map!(a => a[1].length, a => a[0], a => a[1])
+    .fold!max();
 
-  triplets = result[1];
-  pmost = result[0];
+  triplets = result[2];
+  pmost = result[1];
 
   writefln("For all perimeters P <= %s, P = %s yields the most integer right triangles.", pmax, pmost);
   writeln("Its triangles are: ");
