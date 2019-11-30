@@ -24,6 +24,8 @@ void main() {
     //.tee!writeln
     .count();
 
+  //auto arr = perms.array();
+
   timer.stop();
 
   writefln("There are %s 10-digit pandigital permutations.", number);

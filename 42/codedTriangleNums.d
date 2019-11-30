@@ -53,7 +53,7 @@ auto isTriangularInit() {
       triangulars.tee!(a => cache[a] = true)
         .find!(a => a > num)();
 
-    return num in cache ? true: false;
+    return num in cache ? true : false;
   }
 
   return &isTriangular;

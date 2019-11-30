@@ -4,6 +4,7 @@ import std.stdio;
 import std.range;
 import std.algorithm;
 import kreikey.combinatorics;
+import kreikey.intmath;
 
 alias permutations = kreikey.combinatorics.permutations;
 
@@ -13,6 +14,8 @@ void main() {
 
   digits
     .permutations
+    .array
+    .asort
     .group
-    .each!((a, b) => writeln(a, " ", b));
+    .each!(a => writefln("%(%s\t%s%)", a));
 }
