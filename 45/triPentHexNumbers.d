@@ -17,12 +17,10 @@ void main() {
   auto pentagonals = recurrence!((a, n) => a[n-1] + 3*n + 1)(1);
   auto hexagonals = recurrence!((a, n) => a[n-1] + 4*n + 1)(1);
 
-  auto found = triangulars
-    .merge(pentagonals)
-    .merge(hexagonals)
+  auto found = merge(triangulars, pentagonals, hexagonals)
     .group
-    //.tee!(a => writefln("%(%s\t%s%)", a))
     .filter!(a => a[1] == 3)
+    .tee!(a => writefln("%(%s\t%s%)", a))
     .take(3)
     .tail(1)
     .front;

@@ -25,16 +25,23 @@ void main() {
   writeln("truncatable primes");
   timer.start();
 
-  auto truncPrimes = primes.drop(4).filter!isTruncatablePrime();
+  truncatablePrimesSum += primes
+    .drop(4)
+    .filter!isTruncatablePrime()
+    .take(11)
+    .tee!(a => truncatablePrimesSum += a)
+    .tail(1)
+    .front;
 
-  truncatablePrimesSum += truncPrimes.front;
-  write(truncPrimes.front, ", ");
+  //auto truncPrimes = primes.drop(4).filter!isTruncatablePrime();
+  //truncatablePrimesSum += truncPrimes.front;
+  //write(truncPrimes.front, ", ");
 
-  foreach (i; 0..10) {
-    truncPrimes.popFront();
-    write(truncPrimes.front, (i < 9) ? ", " : "\n");
-    truncatablePrimesSum += truncPrimes.front;
-  }
+  //foreach (i; 0..10) {
+    //truncPrimes.popFront();
+    //write(truncPrimes.front, (i < 9) ? ", " : "\n");
+    //truncatablePrimesSum += truncPrimes.front;
+  //}
 
   timer.stop();
 

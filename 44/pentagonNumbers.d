@@ -28,8 +28,9 @@ void main() {
   long pj = 0;
   long pk = 0;
 
+  writeln("Please wait for about a minute...");
   auto found = distGen.enumerate
-    .tee!(a => writeln(pentagonals[a[0]]))
+    //.tee!(a => writeln(pentagonals[a[0]]))
     .map!(a => iota(a[0]+1, a[0]+a[1]+1)
         .map!(b => pentagonals[a[0]], b => pentagonals[b])
         )
