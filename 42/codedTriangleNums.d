@@ -8,11 +8,17 @@ import kreikey.intmath;
 import std.functional;
 import std.datetime.stopwatch;
 import std.typecons;
+import std.traits;
 
 //alias isTriangularFast = memoize!(isTriangular);
 typeof(isTriangularInit()) isTriangular;
+alias TriGen = (a, n) => a[n - 1] + n;
+//alias Triangulars = typeof(recurrence!(TriGen)(0));
+//alias Triangulars = ReturnType!(recurrence!(TriGen, int));
 
 static this() {
+  //writeln(typeof(recurrence!((a, n) => a[n-1] + n)(0)).stringof);
+  //writeln(Triangulars.stringof);
   isTriangular = isTriangularInit();
 }
 
@@ -43,9 +49,11 @@ void main() {
 }
 
 auto isTriangularInit() {
-  auto temp = recurrence!((a, n) => a[n-1] + n)(0);
-  auto triangulars = new typeof(temp)();
-  *triangulars = temp;
+  //auto triangulars = new Triangulars([0]);
+  auto temp = recurrence!(TriGen)(0);
+  auto temp2 = new typeof(temp);
+  *temp2 = temp;
+  auto triangulars = refRange(temp2);
   bool[ulong] cache = null;
 
   bool isTriangular(ulong num) {
