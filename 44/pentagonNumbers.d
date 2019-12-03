@@ -10,7 +10,7 @@ import std.typecons;
 
 alias PentagonalGenerator = (a, n) => n*(3*n-1)/2;
 //alias Pentagonals = ReturnType!(sequence!(PentagonalGenerator, int));
-alias Pentagonals = typeof(sequence!(PentagonalGenerator)(0));
+alias Pentagonals = typeof(sequence!(PentagonalGenerator)());
 ReturnType!isPentagonalInit isPentagonal;
 
 static this() {
@@ -22,9 +22,7 @@ void main() {
   StopWatch timer;
   timer.start();
   writeln("Pentagon Numbers");
-  Pentagonals pentagonals = sequence!PentagonalGenerator(0).dropOne();
-  Pentagonals p2 = Pentagonals(tuple(0));
-  auto p3 = new Pentagonals(tuple(0));
+  //Pentagonals pentagonals = sequence!PentagonalGenerator().dropOne();
   //auto diffDiffGen = recurrence!((a, n) => (n - 2)%3==0 ? 0 : a[n-1]+1)(0, 0, 0, 2, 2);
   //auto diffGen = diffDiffGen.cumulativeFold!((a, b) => a + b)(0);
   //auto distGen = diffGen.cumulativeFold!((a,b) => a + b)(1);
@@ -65,7 +63,7 @@ void main() {
 
 auto isPentagonalInit() {
   //auto pentagonals = new Pentagonals(tuple(0)).dropOne();
-  auto temp = sequence!PentagonalGenerator(0).dropOne();
+  auto temp = sequence!PentagonalGenerator().dropOne();
   auto temp2 = new typeof(temp);
   *temp2 = temp;
   auto pentagonals = refRange(temp2);
@@ -111,7 +109,7 @@ auto isPentagonalInit() {
 Tuple!(long, long) findSpecialPentagonals() {
   //auto pentagonals = refRange(new Pentagonals(tuple(0)));
   //pentagonals.dropOne();
-  auto pentagonals = sequence!PentagonalGenerator(0).dropOne();
+  auto pentagonals = sequence!PentagonalGenerator().dropOne();
   long sum;
   ulong j=0;
 
