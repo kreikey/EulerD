@@ -28,6 +28,7 @@ void main() {
   string[] words;
 
   timer.start();
+  Writeln("Coded triangle numbers");
 
   //wordsFile = File("p042_words.txt");
   //wordsFile.rawRead(rawData);

@@ -15,6 +15,8 @@ void main() {
   alias InfIota = recurrence!((a, n) => a[n-1]+1, ulong);
 
   timer.start();
+  writeln("Distinct prime factors");
+
   auto fourDistinctPrimeFactors = InfIota(1uL)
     .map!(a => a, a => distinctPrimeFactors(a).length)
     .group!((a, b) => a[1] == b[1])

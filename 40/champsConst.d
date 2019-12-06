@@ -17,6 +17,7 @@ void main() {
   uint product = 1;
 
   timer.start();
+  writeln("Champernowne's constant");
 
   foreach (e; 0..7) {
     product *= champ3[1 * 10 ^^ e];

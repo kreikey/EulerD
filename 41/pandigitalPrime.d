@@ -23,7 +23,7 @@ void main() {
   StopWatch timer;
 
   timer.start();
-
+  writeln("Pandigital prime");
   writeln("The largest n-digit pandigital prime is:");
 
   ulong number = getLargestPandigitalPrime();
