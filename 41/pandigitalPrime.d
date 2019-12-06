@@ -26,25 +26,10 @@ void main() {
 
   writeln("The largest n-digit pandigital prime is:");
 
-  auto pandigitals = getPandigitalsDescending.filter!(a => a.sum() % 3 != 0).array();
-  uint[][] perms;
-  bool done = false;
-  ulong number;
-
-  foreach (pandigital; pandigitals) {
-    do {
-      writeln(pandigital);
-      number = pandigital.toNumber();
-      if (number.isPrime()) {
-        done = true;
-      }
-    } while (pandigital.nextPermutation!((a, b) => a > b)() && !done);
-    if (done)
-      break;
-  }
-
+  ulong number = getLargestPandigitalPrime();
   number.writeln();
 
+  //auto pandigitals = getPandigitalsDescending.filter!(a => a.sum() % 3 != 0).array();
   //getPandigitals
     //.filter!(a => a.sum() % 3 != 0)
     //.map!permutations
@@ -71,4 +56,20 @@ uint[][] getPandigitalsDescending() {
   return iota(9, 2, -1)
     .map!(a => iota!uint(a, 0, -1).array())
     .array();
+}
+
+ulong getLargestPandigitalPrime() {
+  auto pandigitals = getPandigitalsDescending.filter!(a => a.sum() % 3 != 0).array();
+  ulong number = 0;
+
+  foreach (pandigital; pandigitals) {
+    do {
+      writeln(pandigital);
+      number = pandigital.toNumber();
+      if (number.isPrime())
+        return number;
+    } while (pandigital.nextPermutation!((a, b) => a > b)());
+  }
+
+  return number;
 }

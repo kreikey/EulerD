@@ -15,6 +15,8 @@ static this() {
   isPrime = isPrimeInit();
 }
 
+ulong max = short.max;
+
 void main() {
   StopWatch timer;
   bool compSum = false;
@@ -22,37 +24,39 @@ void main() {
 
   timer.start();
   writeln("Goldbach's Other Conjecture");
-  auto primes = new Primes!ulong();
-  auto twiceSquares = sequence!((a, n) => 2 * n ^^ 2)().dropOne();
+  number = findNonGoldbachNumber();
 
-  for (ulong n = 9; n > 1; n += 2) {
-    //writeln(n, ":");
-    compSum = false;
+  if (number != 0) {
+    writeln("Found number that's not the sum of twice a square and a prime!");
+    writefln("The first number that fails Goldbach's other conjecture: %s", number);
+  } else {
+    writefln("Found no number below %s that fails Goldbach's other conjecture.", max);
+  }
+    
+  timer.stop();
+  writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
+}
+
+ulong findNonGoldbachNumber() {
+  for (ulong n = 9; n < max; n += 2) {
     if (n.isPrime())
       continue;
 
-    foreach (p; primes.save.until!(a => a > n)) {
-      //writeln("\t", p);
-      foreach (s; twiceSquares.until!(a => a > n)) {
-        //writeln("\t\t", s);
-        if (p + s == n) {
-          compSum = true;
-          break;
-        }
-      }
-      if (compSum)
-        break;
-    }
-
-    if (!compSum) {
-      writeln("Found number that's not the sum of twice a square and a prime!");
-      number = n;
-      break;
-    }
-
+    if (!isGoldbachNumber(n))
+      return n;
   }
 
-  timer.stop();
-  writefln("Non-Goldbach number: %s", number);
-  writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
+  return 0;
+}
+
+bool isGoldbachNumber(ulong number) {
+  auto twiceSquares = sequence!((a, n) => 2 * n ^^ 2)().dropOne();
+  auto primes = new Primes!ulong();
+
+  foreach (p; primes.save.until!((a, n) => a >= n)(number))
+    foreach (s; twiceSquares.until!((a, n) => a >= n)(number))
+      if (p + s == number)
+        return true;
+
+  return false;
 }

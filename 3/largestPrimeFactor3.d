@@ -6,6 +6,9 @@ import std.range;
 import std.array;
 import kreikey.primes;
 import kreikey.intmath;
+import std.functional;
+
+alias primeFactors = memoize!(primeFactors2!ulong);
 
 void main () {
   StopWatch timer;

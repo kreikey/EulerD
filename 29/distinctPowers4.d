@@ -10,6 +10,8 @@ import kreikey.intmath;
 import kreikey.bigint;
 
 alias primeFactorsFast = memoize!(primeFactors!ulong);
+//alias primeFactorsFast = memoize!(primeFactorsImpl!ulong);
+//alias primeFactorsFast = primeFactors;
 alias asort = (a) {a.sort(); return a;};
 
 void main(string[] args) {

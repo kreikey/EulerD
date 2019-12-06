@@ -67,12 +67,12 @@ int champernowne3(S)(S state, size_t nth) {
   assert(nth > 0);
   ulong nIdx = nth - 1;
 
-  auto infiniteIota = recurrence!((a, n) => a[n-1] + 1)(0uL);
+  alias InfIota = recurrence!((a, n) => a[n-1]+1, ulong);
   auto r1 = recurrence!((a, n) => a[n-1] * 10)(0uL, 9uL);
   auto r2 = r1.enumerate.map!(a => a[1] * a[0])();
   auto r3 = r1.cumulativeFold!((a, b) => a + b)();
   auto r4 = r2.cumulativeFold!((a, b) => a + b)();
-  auto r5 = zip(infiniteIota, r3, r4).cache();
+  auto r5 = zip(InfIota(0uL), r3, r4).cache();
 
   auto theTail = r5.until!((h, n) => h[2] > n)(nIdx , OpenRight.no).tail(2).array();
   auto numDigs = theTail[1][0];

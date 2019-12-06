@@ -31,10 +31,9 @@ void main() {
 
   auto sum = perms
     .filter!areSubstringsDivisible
-    //.filter!(a => zip(iota(1u, 8), somePrimes)
+    //.filter!(a => !zip(iota(1u, 8), somePrimes)
         //.map!(b => a[b[0]..b[0]+3].toNumber() % b[1] == 0)
-        //.until!(z => z == false)(OpenRight.no)
-        //.fold!((c, d) => c && d))
+        //.canFind(false))
     .map!toNumber
     .tee!writeln
     .sum();
@@ -58,11 +57,10 @@ auto areSubstringsDivisibleInit() {
   auto somePrimes = primes.save.take(7).array();
 
   bool areSubstringsDivisible(uint[] digits) {
-    foreach (i, p; lockstep(iota(1u, 8), somePrimes)) {
-      if (digits[i..i+3].toNumber() % p != 0) {
+    foreach (i, p; lockstep(iota(1u, 8), somePrimes))
+      if (digits[i..i+3].toNumber() % p != 0)
         return false;
-      }        
-    }
+
     return true;
   }
 

@@ -9,12 +9,18 @@ import std.range;
 import std.math;
 import std.conv;
 import std.typecons;
+import std.functional;
 
 alias asort = (a) {a.sort(); return a;};
 alias asortDescending = (a) {a.sort!((b, c) => c < b)(); return a;};
 alias toString = digits => digits.map!(a => cast(immutable(char))(a + '0')).array();
 
-long[] getFactors(long number) {
+//ReturnType!(primeFactorsInit) PrimeFactors;
+//static this() {
+  //PrimeFactors primeFactors = primeFactorsInit();
+//}
+
+long[] properDivisors(long number) {
   static long[][long] factorsCache;
   long[] factors;
   long[] factorsBig;
@@ -140,7 +146,27 @@ string recipDigits(int divisor, int length) {
   return cast(string)digits;
 }
 
-T[] primeFactors(T)(T num) 
+T[] primeFactors2(T)(T num)
+if (isIntegral!T) {
+  T[] factors;
+  T n = 2;
+
+  if (num == 1) {
+    return [];
+  }
+
+  while (num % n != 0) {
+    n++;
+  }
+
+  if (num % n == 0) {
+    factors ~= n;
+  }
+
+  return factors ~ memoize!(primeFactors2!T)(num / n);
+}
+
+T[] primeFactors1(T)(T num) 
 if (isIntegral!T) {
   T[] factors;
   T n = 2;
@@ -151,6 +177,47 @@ if (isIntegral!T) {
       num /= n;
     }
     n++;
+  }
+
+  return factors;
+}
+
+T[] distinctPrimeFactors2(T)(T num)
+if (isIntegral!T) {
+  T[] factors;
+  T n = 2;
+
+  if (num == 1)
+    return [];
+
+  while (num % n != 0) {
+    n++;
+  }
+
+  factors ~= n;
+
+  while (num % n == 0) {
+    num /= n;
+  }
+
+  return n ~ memoize!(distinctPrimeFactors2!T)(num);
+}
+
+T[] distinctPrimeFactors1(T)(T num)
+if (isIntegral!T) {
+  T[] factors;
+  T n = 2;
+
+  while (num > 1) {
+    while (num % n != 0) {
+      n++;
+    }
+
+    factors ~= n;
+
+    while (num % n == 0) {
+      num /= n;
+    }
   }
 
   return factors;
@@ -198,46 +265,67 @@ if (isIntegral!T) {
 //}
 
 
-//uint[] toDigits(alias base = 10)(ulong source)
-//if (isIntegral!(typeof(base))) {
-  //ulong maxPowB = 1;
-  //uint[] result;
-
-  //while (maxPowB <= source)
-    //maxPowB *= base;
-
-  //if (source != 0)
-    //maxPowB /= base;
-
-  //while (maxPowB > 0) {
-    //result ~= cast(uint)source / maxPowB;
-    //source %= maxPowB;
-    //maxPowB /= base;
-  //}
-
-  //return result;
-//}
-
 uint[] toDigits(alias base = 10)(ulong source)
 if (isIntegral!(typeof(base))) {
-  if (source == 0)
-    return [];
+  ulong maxPowB = 1;
+  uint[] result;
 
-  return toDigits!base(source / base) ~ cast(uint)(source % base);
+  while (maxPowB <= source)
+    maxPowB *= base;
+
+  if (source != 0)
+    maxPowB /= base;
+
+  while (maxPowB > 0) {
+    result ~= cast(uint)source / maxPowB;
+    source %= maxPowB;
+    maxPowB /= base;
+  }
+
+  return result;
 }
+
+//uint[] toDigits(alias base = 10)(ulong source)
+//if (isIntegral!(typeof(base))) {
+  //if (source == 0)
+    //return [];
+
+  //return toDigits!base(source / base) ~ cast(uint)(source % base);
+//}
 
 ulong toNumber(alias base = 10)(uint[] digits) 
 if (isIntegral!(typeof(base))) {
-  if (digits.length == 0)
-    return 0;
+  ulong result;
 
-  return toNumber!base(digits[1..$]) + digits[0] * base ^^ (digits.length - 1);
+  for (size_t i = 0; i < digits.length; i++) {
+    result += digits[i] * base ^^ (digits.length - i - 1);
+  }
+
+  return result;
 }
+
+//ulong toNumber(alias base = 10)(uint[] digits) 
+//if (isIntegral!(typeof(base))) {
+  //if (digits.length == 0)
+    //return 0;
+
+  //return digits[0] * base ^^ (digits.length - 1) + toNumber!base(digits[1..$]);
+//}
+
+//alias factorial = memoize!factorialImpl;
+//ulong factorialImpl(ulong number) {
+  //if (number == 0 || number == 1)
+    //return 1;
+  //return number * memoize!factorialImpl(number - 1);
+//}
 
 ulong factorial(ulong number) {
   ulong result = 1;
 
-  foreach (n; 1..number+1)
+  if (number == 0)
+    return result;
+
+  for (size_t n = 1; n < number + 1; n++)
     result *= n;
 
   return result;

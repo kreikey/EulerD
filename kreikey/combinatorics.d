@@ -44,11 +44,9 @@ struct Permutations(T) {
   }
 
   void fillStack(size_t ndx) {
-    foreach (i; iota(1, digits.length-ndx).retro()) {
-      foreach (j; iota(i).retro()) {
+    foreach (i; iota(1, digits.length-ndx).retro())
+      foreach (j; iota(i).retro())
         permStack.push(tuple(digits.length-1-i, (i+1)%2 == 0 ? j : 0));
-      }
-    }
   }
 }
 
@@ -57,9 +55,8 @@ bool nextPermutation(alias less = (a, b) => a < b, T)(ref T[] digits) {
   ulong j;
 
   for (i = digits.length - 2; i < size_t.max; i--) {
-    if (less(digits[i], digits[i+1])) {
+    if (less(digits[i], digits[i+1]))
       break;
-    }
   }
 
   if (i == size_t.max) {
@@ -81,9 +78,8 @@ bool nextPermutation(alias less = (a, b) => a < b, T)(ref T[] digits) {
 T[] nthPermutation(T)(ref T[] digits, ulong n) {
   ulong count = 0;
 
-  while (count++ < n) {
+  while (count++ < n)
     digits.nextPermutation();
-  }
 
   return digits;
 }

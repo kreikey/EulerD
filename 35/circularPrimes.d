@@ -9,16 +9,15 @@ import kreikey.primes;
 import kreikey.intmath;
 
 bool delegate(ulong) isPrime;
-Primes!ulong primes;
 
 static this() {
-  primes = new Primes!()();
   isPrime = isPrimeInit();
 }
 
 void main() {
   StopWatch timer;
   enum top = 1_000_000;
+  auto primes = new Primes!()();
 
   writeln("circular primes: ");
   timer.start();
@@ -41,9 +40,8 @@ bool isCircularPrime(ulong number) {
 
   foreach (n; 0..length-1) {
     number = number.dror();
-    if (!number.isPrime()) {
+    if (!number.isPrime())
       return false;
-    }
   }
 
   return true;

@@ -9,8 +9,8 @@ import std.parallelism;
 import std.typecons;
 
 alias PentagonalGenerator = (a, n) => n*(3*n-1)/2;
-//alias Pentagonals = ReturnType!(sequence!(PentagonalGenerator, int));
-alias Pentagonals = typeof(sequence!(PentagonalGenerator)());
+alias Pentagonals = ReturnType!(sequence!(PentagonalGenerator));
+//alias Pentagonals = typeof(sequence!(PentagonalGenerator)());
 ReturnType!isPentagonalInit isPentagonal;
 
 static this() {
@@ -22,32 +22,29 @@ void main() {
   StopWatch timer;
   timer.start();
   writeln("Pentagon Numbers");
-  //Pentagonals pentagonals = sequence!PentagonalGenerator().dropOne();
-  //auto diffDiffGen = recurrence!((a, n) => (n - 2)%3==0 ? 0 : a[n-1]+1)(0, 0, 0, 2, 2);
-  //auto diffGen = diffDiffGen.cumulativeFold!((a, b) => a + b)(0);
-  //auto distGen = diffGen.cumulativeFold!((a,b) => a + b)(1);
   long pj = 0;
   long pk = 0;
 
   writeln("Please wait for about a minute...");
+  auto found = findSpecialPentagonals();
+
+  //Pentagonals pentagonals = Pentagonals().dropOne();
+
+  //auto diffDiffGen = recurrence!((a, n) => (n - 2)%3==0 ? 0 : a[n-1]+1)(0, 0, 0, 2, 2);
+  //auto diffGen = diffDiffGen.cumulativeFold!((a, b) => a + b)(0);
+  //auto distGen = diffGen.cumulativeFold!((a,b) => a + b)(1);
   //auto found = distGen.enumerate
-    //.tee!(a => writeln(pentagonals[a[0]]))
     //.map!(a => iota(a[0]+1, a[0]+a[1]+1)
-        //.map!(b => pentagonals[a[0]], b => pentagonals[b])
-        //)
+        //.map!(b => pentagonals[a[0]], b => pentagonals[b]))
     //.joiner
     //.find!(a => isPentagonal(a[1] - a[0]) && isPentagonal(a[0] + a[1]))
     //.front;
 
-  auto found = findSpecialPentagonals();
-
   //alias InfIota = recurrence!((a, n) => a[n-1]+1, ulong);
-
   //auto found = InfIota(1)
     //.map!(a => InfIota(a+1)
         //.until!(b => pentagonals[a] + pentagonals[b] <= pentagonals[b+1])(OpenRight.no)
-        //.map!(b => pentagonals[a], b => pentagonals[b])
-        //)
+        //.map!(b => pentagonals[a], b => pentagonals[b]))
     //.joiner
     //.find!(a => isPentagonal(a[1] - a[0]) && isPentagonal(a[0] + a[1]))
     //.front;

@@ -10,10 +10,8 @@ import kreikey.primes;
 import kreikey.intmath;
 
 bool delegate(ulong) isPrime;
-Primes!ulong primes;
 
 static this() {
-  primes = new Primes!()();
   isPrime = isPrimeInit();
 }
 
@@ -52,15 +50,13 @@ void main() {
 bool isTruncatablePrime(ulong number) {
   auto digits = number.toDigits();
 
-  foreach (n; 1..digits.length) {
+  foreach (n; 1..digits.length)
     if (!digits[n..$].toNumber.isPrime())
       return false;
-  }
 
-  foreach (n; 1..digits.length) {
+  foreach (n; 1..digits.length)
     if (!digits[0..$-n].toNumber.isPrime())
       return false;
-  }
 
   return true;
 }

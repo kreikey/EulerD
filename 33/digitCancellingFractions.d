@@ -25,9 +25,8 @@ void main() {
 
   writeln("Nontrivial digit cancelling fractions found: ", fractions.length);
 
-  foreach (frac; fractions) {
+  foreach (frac; fractions)
     writefln("%(%s/%s%) = %(%s/%s%) = %(%s/%s%)", frac.expand, reduceFrac(frac[1].expand));
-  }
   
   auto product = fractions
     .map!(a => a[0])
