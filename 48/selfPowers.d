@@ -8,10 +8,7 @@ import kreikey.bigint;
 void main() {
   StopWatch timer;
   BigInt sum = 0;
-  byte[] zeros = repeat!byte(0, 10).array();
-  //auto someBytes = iota!ubyte(0, 10).array();
-  //writeln(zeros);
-  //writeln(someBytes);
+
   timer.start();
   writeln("Self powers");
   writeln("Please wait for about two minutes.");

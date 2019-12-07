@@ -6,7 +6,7 @@ import std.typecons;
 import std.algorithm;
 import std.range;
 
-auto permutations(T)(ref T[] digits) {
+auto permutations(T)(T[] digits) {
   return Permutations!T(digits);
 }
 
@@ -15,7 +15,7 @@ struct Permutations(T) {
   Stack!(Tuple!(size_t, size_t)) permStack;
   bool _empty = false;
 
-  this(ref T[] _digits) {
+  this(T[] _digits) {
     digits = _digits;
     fillStack(0);
   }
