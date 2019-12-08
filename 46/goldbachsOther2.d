@@ -27,18 +27,16 @@ void main() {
   auto twiceSquares = sequence!((a, n) => 2 * n ^^ 2)().dropOne();
   auto odds = recurrence!((a, n) => a[n-1] + 2)(9uL);
 
-  odds
+  number = odds
     .cache
     .filter!(not!isPrime)
     .cache
-    .map!(a => a, a => twiceSquares.until!(b => b >= a)
+    .find!(a => !twiceSquares.cache.until!(b => b >= a)
         .map!(b => primes.save.until!(c => c >= a)
-          .map!(c => b + c)).join.canFind(a))
-    .find!(a => !a[1])
-    .front[0]
-    .writeln();
+          .map!(c => b + c)).joiner.canFind(a))
+    .front;
 
   timer.stop();
-  //writefln("The first number that fails Goldbach's other conjecture: %s", number);
+  writefln("The first number that fails Goldbach's other conjecture: %s", number);
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }

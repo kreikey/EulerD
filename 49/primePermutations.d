@@ -28,11 +28,12 @@ void main() {
         .map!(a => cast(long)toNumber(a))
         .cache
         .filter!(a => a.isPrime() && a > 999)
-        .uniq
         .array
-        .asort())
+        .sort
+        .uniq
+        .array())
     .cache
-    .filter!(a => a.length > 2 && !a.slide(2).canFind!(b => b[0] == b[1]))
+    .filter!(a => a.length > 2)
     .array
     .asort
     .uniq
