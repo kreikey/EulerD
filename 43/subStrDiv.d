@@ -30,10 +30,9 @@ void main() {
   auto perms = permutations(pandigital);
 
   auto sum = perms
-    .filter!areSubstringsDivisible
-    //.filter!(a => !zip(iota(1u, 8), somePrimes)
-        //.map!(b => a[b[0]..b[0]+3].toNumber() % b[1] == 0)
-        //.canFind(false))
+    //.filter!areSubstringsDivisible
+    .filter!(a => !zip(a[1..$].slide(3), somePrimes)
+        .canFind!(b => b[0].toNumber() % b[1] != 0)())
     .map!toNumber
     .tee!writeln
     .sum();
