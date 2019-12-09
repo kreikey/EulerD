@@ -28,9 +28,7 @@ void main() {
   auto odds = recurrence!((a, n) => a[n-1] + 2)(9uL);
 
   number = odds
-    .cache
     .filter!(not!isPrime)
-    .cache
     .find!(a => !twiceSquares.cache.until!(b => b >= a)
         .map!(b => primes.save.until!(c => c >= a)
           .map!(c => b + c)).joiner.canFind(a))

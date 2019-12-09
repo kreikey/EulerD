@@ -35,7 +35,7 @@ void main() {
     .cache
     .filter!(a => a.length > 2)
     .array
-    .asort
+    .sort
     .uniq
     .map!(a => a, a => iota(1, a.length).retro()
         .map!(i => iota(i).retro()
