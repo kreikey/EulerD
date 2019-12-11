@@ -21,7 +21,9 @@ void main() {
 
   timer.start();
   
-  auto primePermutations = primes.save.find!(a => a > 999)
+  auto primePermutations = primes
+    .save
+    .find!(a => a > 999)
     .until!(a => a > 9999)
     .map!(a => a.toDigits
         .permutations!uint
@@ -37,16 +39,13 @@ void main() {
     .array
     .sort
     .uniq
-    .map!(a => a, a => iota(1, a.length).retro()
-        .map!(i => iota(i).retro()
-          .map!(j => a[i] - a[j])
-          .array())
-        .join
-        .asort())
     .cache
-    .filter!(a => a[1].slide(2).canFind!(c => c[0] == c[1])() && a[1].canFind(3330))
-    .map!(a => a[0].find!(b => a[0].canFind(b + 3330)).front)
-    .map!(a => recurrence!((a, n) => a[n-1] + 3330)(a).take(3).array())
+    .filter!(a => a.canFind!(b => a.canFind(b + 3330)) && a.canFind!(b => a.canFind(b + 3330 * 2)))
+    .map!(a => a.find!(b => a.canFind(b + 3330))
+        .front
+        .recurrence!((a, n) => a[n-1] + 3330)
+        .take(3)
+        .array())
     .tee!(a => writefln("%(%s, %)", a))
     .array();
 
