@@ -6,6 +6,13 @@ import std.algorithm;
 import std.range;
 import kreikey.intmath;
 import kreikey.primes;
+import std.typecons;
+
+typeof(primeSumLengthInit()) primeSumLength;
+
+static this() {
+  primeSumLength = primeSumLengthInit();
+}
 
 void main() {
   StopWatch timer;
@@ -15,7 +22,6 @@ void main() {
   auto lenSum = primes
     .until!((a, n) => a >= n)(1000000uL)
     .map!(a => a.primeSumLength(), a => a)
-    .tee!writeln
     .fold!max();
   timer.stop();
 
@@ -23,24 +29,36 @@ void main() {
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }
 
-ulong primeSumLength(ulong num) {
+ulong delegate(ulong) primeSumLengthInit() {
   auto primes = new Primes!();
-  auto addPrimes = primes.until(num, OpenRight.no).array();
-  auto subPrimes = addPrimes;
-  ulong sum = 0;
-  ulong count;
+  ulong[] primesArray = [primes.topPrime];
+  primesArray.reserve(500000);
 
-  do {
-    sum += addPrimes.front;
-    addPrimes.popFront();
-    count++;
+  ulong primeSumLength(ulong num) {
+    ulong sum = 0;
+    ulong length;
+    size_t i = 0;
+    size_t j = 0;
 
-    while (sum > num) {
-      sum -= subPrimes.front;
-      subPrimes.popFront();
-      count--;
+    if (num > primesArray[$-1]) {
+      primes
+        .tee!(a => primesArray ~= a)
+        .find!(a => a > num)
+        .front;
     }
-  } while (sum != num);
 
-  return count;
+    do {
+      sum += primesArray[j++];
+      length++;
+
+      while (sum > num) {
+        sum -= primesArray[i++];
+        length--;
+      }
+    } while (sum != num);
+
+    return length;
+  }
+
+  return &primeSumLength;
 }
