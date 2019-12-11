@@ -31,7 +31,6 @@ ulong primeSumLength(ulong num) {
   ulong count;
 
   do {
-    //if (sum < num) {
     sum += addPrimes.front;
     addPrimes.popFront();
     count++;
