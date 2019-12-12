@@ -7,6 +7,7 @@ import std.range;
 import kreikey.intmath;
 import kreikey.primes;
 import std.typecons;
+import std.conv;
 
 typeof(primeSumLengthInit()) primeSumLength;
 
@@ -14,13 +15,17 @@ static this() {
   primeSumLength = primeSumLengthInit();
 }
 
-void main() {
+void main(string[] args) {
   StopWatch timer;
   auto primes = new Primes!();
+  ulong top = 1000000uL;
+
+  if (args.length > 1)
+    top = args[1].to!ulong();
 
   timer.start();
   auto lenSum = primes
-    .until!((a, n) => a >= n)(1000000uL)
+    .until!((a, n) => a >= n)(top)
     .map!(a => a.primeSumLength(), a => a)
     .fold!max();
   timer.stop();
@@ -31,8 +36,9 @@ void main() {
 
 ulong delegate(ulong) primeSumLengthInit() {
   auto primes = new Primes!();
-  ulong[] primesArray = [primes.topPrime];
-  primesArray.reserve(500000);
+  ulong[] primesArray;
+  primesArray ~= primes.topPrime;
+  primes.popFront();
 
   ulong primeSumLength(ulong num) {
     ulong sum = 0;
@@ -43,8 +49,7 @@ ulong delegate(ulong) primeSumLengthInit() {
     if (num > primesArray[$-1]) {
       primes
         .tee!(a => primesArray ~= a)
-        .find!(a => a > num)
-        .front;
+        .find!(a => a > num)();
     }
 
     do {
