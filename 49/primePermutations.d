@@ -21,7 +21,7 @@ void main() {
 
   timer.start();
   
-  auto primePermutations = primes
+  primes
     .save
     .find!(a => a > 999)
     .until!(a => a > 9999)
@@ -47,13 +47,12 @@ void main() {
         .take(3)
         .array())
     .tee!(a => writefln("%(%s, %)", a))
-    .array();
-
-    primePermutations[$-1]
-      .map!(toDigits)
-      .join
-      .toString
-      .writeln();
+    .array
+    .back
+    .map!toDigits
+    .join
+    .toString
+    .writeln();
 
   timer.stop();
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());

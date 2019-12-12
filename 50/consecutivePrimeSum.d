@@ -37,7 +37,7 @@ void main(string[] args) {
 ulong delegate(ulong) primeSumLengthInit() {
   auto primes = new Primes!();
   ulong[] primesArray;
-  primesArray ~= primes.topPrime;
+  primesArray ~= primes.front;
   primes.popFront();
 
   ulong primeSumLength(ulong num) {
