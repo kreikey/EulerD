@@ -40,7 +40,7 @@ void main() {
     .sort
     .uniq
     .cache
-    .filter!(a => a.canFind!(b => a.canFind(b + 3330)) && a.canFind!(b => a.canFind(b + 3330 * 2)))
+    .filter!(a => a.canFind!(b => a.canFind(b + 3330) && a.canFind(b + 3330 * 2)))
     .map!(a => a.find!(b => a.canFind(b + 3330))
         .front
         .recurrence!((a, n) => a[n-1] + 3330)
