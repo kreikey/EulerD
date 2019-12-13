@@ -21,10 +21,11 @@ void main(string[] args) {
   writeln("double-base palindromes");
   timer.start();
 
-  auto sum = iota!ulong(0, limit)
-    .map!(a => a, toDigits!10, toDigits!2)
-    .filter!(a => a[1].isPalindrome() && a[2].isPalindrome())
-    .tee!(a => writeln(a[1].toString(), "\t", a[2].toString()))
+  auto palindromes = palindromesInit.generate();
+  auto sum = palindromes.until!(a => a >= limit)
+    .map!(a => a, toDigits!2)
+    .filter!(a => a[1].isPalindrome())
+    .tee!(a => writeln(a[0], "\t", a[1].toString()))
     .map!(a => a[0])
     .sum();
 
@@ -34,3 +35,30 @@ void main(string[] args) {
   writeln("finished in ", timer.peek.total!"msecs"(), " milliseconds");
 }
 
+auto palindromesInit() {
+  ulong palindromeLength = 1;
+  ulong sourceLength = palindromeLength / 2 + palindromeLength % 2;
+  ulong sourceMin = 10 ^^ (sourceLength - 1);
+  ulong sourceMax = 10 ^^ sourceLength - 1;
+  ulong source = 0;
+
+  auto palindromes() {
+    if (source > sourceMax) {
+      palindromeLength++;
+      sourceLength = palindromeLength / 2 + palindromeLength % 2;
+      sourceMin = 10 ^^ (sourceLength - 1);
+      sourceMax = 10 ^^ sourceLength - 1;
+      source = sourceMin;
+    }
+
+    auto digits = source.toDigits();
+    auto rightHalf = digits[0..palindromeLength/2].dup;
+    reverse(rightHalf);
+    auto palindrome = digits ~ rightHalf;
+    source++;
+
+    return palindrome.toNumber();
+  }
+
+  return &palindromes;
+}
