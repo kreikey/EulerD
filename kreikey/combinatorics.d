@@ -65,7 +65,7 @@ bool nextPermutation(alias less = (a, b) => a < b, T)(ref T[] digits) {
   }
 
   for (j = digits.length-1; j > i; j--) {
-    if (!less(digits[j], digits[i]))
+    if (!(less(digits[j], digits[i]) || digits[j] == digits[i]))
       break;
   }
 
