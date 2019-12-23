@@ -39,8 +39,7 @@ void main(string[] args) {
         .group
         .array
         .map!(a => a[1], a => a[0])
-        .array()
-    )
+        .array())
     .joiner
     .find!(a => a[0] == family)
     .tee!writeln()
