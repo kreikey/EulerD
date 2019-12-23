@@ -86,16 +86,7 @@ ulong carmichael(ulong n) {
 }
 
 bool areCoprime(ulong a, ulong b) {
-  ulong t;
-
-  while (b != a) {
-    if (a > b)
-      a = a - b;
-    else
-      b = b - a;
-  }
-
-  return b == 1;
+  return gcd(a, b) == 1;
 }
 
 // gcd with subtraction is about twice as fast as gcd with modulo
