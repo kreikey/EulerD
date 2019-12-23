@@ -82,7 +82,6 @@ uint[][] maskings(uint[][] source) {
 bool applyMask(ref uint[] digits, uint[] mask) {
   ulong seedNdx = mask.countUntil(10);
   uint seed = digits[seedNdx];
-  
 
   foreach (ref d, m; lockstep(digits, mask)) {
     if (m == 10 && d != seed)
