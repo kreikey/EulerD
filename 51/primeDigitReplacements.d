@@ -97,7 +97,6 @@ bool applyMask(ref uint[] digits, uint[] mask) {
 }
 
 uint[][] replacements(uint[] digits) {
-  auto ones = iota(0, 10).array();
   uint[][] result;
   uint[] row;
 
