@@ -1306,12 +1306,12 @@ public:
     //writeln("toString unittest passed");
   }
 
-  const(char)[] digitString() const {
+  immutable(char)[] digitString() const {
     //return this.mant.retro.map!(d => cast(immutable(char))(d + '0')).array();
     byte[] digits = this.mant.dup;
     digits[] += '0';
     std.algorithm.reverse(digits);
-    return cast(char[])digits;
+    return cast(immutable(char)[])digits;
   }
 
   const(byte)[] digitBytes() const {

@@ -4,9 +4,9 @@ import std.range;
 import std.algorithm;
 import std.stdio;
 import std.array;
+import std.traits;
 
 alias rstr = (const ubyte[] value) => value.retro.map!(a => cast(immutable(char))(a + '0')).array();
-alias rbytes = (const char[] value) => value.retro.map!(a => cast(ubyte)(a - '0')).array();
 alias isNotEqualTo = (const(ubyte)[] left, const(ubyte)[] right) => left.compare(right) != 0;
 alias isEqualTo = (const(ubyte)[] left, const(ubyte)[] right) => left.compare(right) == 0;
 alias isGreaterThan = (const(ubyte)[] left, const(ubyte)[] right) => left.compare(right) > 0;
@@ -163,6 +163,23 @@ ubyte[] mulSingleDigit(const(ubyte)[] left, ubyte digit) {
   return result;
 }
 
+void mulSingleDigitInPlace(ref ubyte[] left, ubyte digit) {
+  ubyte carry = 0;
+
+  for (ubyte i = 0; i < left.length; i++) {
+    left[i] *= digit;
+    left[i] += carry;
+    carry = left[i] / 10;
+    left[i] %= 10;
+  }
+
+  if (carry)
+    left ~= carry;
+
+  while (left.length > 1 && left[$-1] == 0)
+    left.length--;
+}
+
 ubyte[] shiftBig(const(ubyte)[] digits, ulong amount) {
   ubyte[] result = new ubyte[digits.length + amount];
 
@@ -175,3 +192,30 @@ ubyte[] shiftBig(const(ubyte)[] digits, ulong amount) {
   return result;
 }
 
+uint[] toDigits(alias base = 10)(ulong source)
+if (isIntegral!(typeof(base))) {
+  ulong maxPowB = 1;
+  uint[] result;
+
+  while (maxPowB <= source)
+    maxPowB *= base;
+
+  if (source != 0)
+    maxPowB /= base;
+
+  while (maxPowB > 0) {
+    result ~= cast(uint)source / maxPowB;
+    source %= maxPowB;
+    maxPowB /= base;
+  }
+
+  return result;
+}
+
+ubyte[] rbytes(const char[] value) {
+  return value.retro.map!(a => cast(ubyte)(a - '0')).array();
+}
+
+ubyte[] rbytes(ulong value) {
+  return value.toDigits.retro.map!(a => cast(ubyte)(a)).array();
+}
