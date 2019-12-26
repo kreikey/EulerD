@@ -10,7 +10,6 @@ import kreikey.intmath;
 import kreikey.combinatorics;
 import std.array;
 
-alias permutations = kreikey.combinatorics.permutations;
 alias nextPermutation = kreikey.combinatorics.nextPermutation;
 
 typeof(isPrimeInit()) isPrime;
@@ -28,6 +27,7 @@ void main(string[] args) {
     family = args[1].parse!int();
 
   timer.start();
+  writeln("Prime Digit Replacements");
 
   auto smallest = primes
     .map!toDigits
@@ -37,13 +37,10 @@ void main(string[] args) {
         .maskings
         .sort
         .group
-        .array
-        .map!(a => a[1], a => a[0])
         .array())
     .joiner
-    .find!(a => a[0] == family)
-    .tee!writeln()
-    .front[1]
+    .find!(a => a[1] == family)
+    .front[0]
     .replacements
     .map!toNumber
     .find!isPrime
