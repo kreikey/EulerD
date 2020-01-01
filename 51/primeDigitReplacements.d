@@ -11,6 +11,7 @@ import kreikey.combinatorics;
 import std.array;
 
 alias nextPermutation = kreikey.combinatorics.nextPermutation;
+alias permutations = kreikey.combinatorics.permutations;
 
 typeof(isPrimeInit()) isPrime;
 
@@ -63,6 +64,7 @@ uint[][] maskings(uint[][] source) {
   
   foreach (k; iota(1, n)) {
     mask[$-k..$] = 10;
+
     do {
       foreach (e; source) {
         row = e.dup;
@@ -70,6 +72,7 @@ uint[][] maskings(uint[][] source) {
           result ~= row;
       }
     } while (mask.nextPermutation());
+
     mask[] = 0;
   }
 
@@ -80,15 +83,13 @@ bool applyMask(ref uint[] digits, uint[] mask) {
   ulong seedNdx = mask.countUntil(10);
   uint seed = digits[seedNdx];
 
-  foreach (ref d, m; lockstep(digits, mask)) {
+  foreach (ref d, m; lockstep(digits, mask))
     if (m == 10 && d != seed)
       return false;
-  }
 
-  foreach (ref d, m; lockstep(digits, mask)) {
+  foreach (ref d, m; lockstep(digits, mask))
     if (m == 10)
       d = 10;
-  }
 
   return true;
 }
@@ -106,5 +107,6 @@ uint[][] replacements(uint[] digits) {
         e = d;
     result ~= row;
   }
+
   return result;
 }

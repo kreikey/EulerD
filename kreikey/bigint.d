@@ -1059,8 +1059,32 @@ public:
     assert(c.mant == e.mant);
     assert(c.mant !is d.mant);
     assert(c.mant !is e.mant);
+    assert(c.sign == d.sign);
     //writeln("this(byte[]) unittest passed");
   }
+
+  private this(const(byte)[] source) nothrow {
+    this.mant = source.dup;
+    this.sign = false;
+  }
+  unittest {
+    //writeln("this(byte[]) unittest");
+    auto c = BigInt("68630377364883");
+    auto d = BigInt(c.mant);
+    BigInt e = c;
+    //c.mant[5] = 4;
+    assert(c.mant == d.mant);
+    assert(c.mant == e.mant);
+    assert(c.mant !is d.mant);
+    assert(c.mant !is e.mant);
+    assert(c.sign == d.sign);
+    c = BigInt("-45871846722");
+    d = BigInt(c.mant);
+    assert(c.mant == d.mant);
+    assert(c.sign != d.sign);
+    //writeln("this(byte[]) unittest passed");
+  }
+
 
   this(this) nothrow {
     mant = mant.dup;
