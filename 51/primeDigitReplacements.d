@@ -11,7 +11,6 @@ import kreikey.combinatorics;
 import std.array;
 
 alias nextPermutation = kreikey.combinatorics.nextPermutation;
-alias permutations = kreikey.combinatorics.permutations;
 
 typeof(isPrimeInit()) isPrime;
 
