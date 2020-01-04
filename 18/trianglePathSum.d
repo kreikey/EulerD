@@ -18,7 +18,7 @@ void main(string[] args) {
 
   timer.start();
   inFile = File(fileName);
-  triangle = inFile.byLine.map!(line => line.split(" ").map!(numstr => numstr.parse!(int)).array).array();
+  triangle = inFile.byLine.map!(line => line.split(" ").map!(numstr => numstr.parse!(int)).array()).array();
   sum = biggestPathSum(triangle, 0, 0);
   writeln(sum);
   timer.stop();
