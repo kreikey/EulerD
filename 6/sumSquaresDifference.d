@@ -17,8 +17,8 @@ void main(string[] args) {
 
   timer.start();
   arr = iota!ulong(1, topNum + 1).array();
-  ulong sumsquares = arr.reduce!((a, b) => a + b * b)();
-  ulong sum = arr.reduce!((a, b) => a + b)();
+  ulong sumsquares = arr.map!(a => a ^^ 2).sum();
+  ulong sum = arr.sum();
   ulong difference = sum * sum - sumsquares;
   timer.stop();
 

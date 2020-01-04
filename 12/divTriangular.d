@@ -45,9 +45,10 @@ int countFactors(int num) {
   int max = num;
   int fac = 1;
 
-  if (num in facCounts) {
+  if (num == 1)
+    return 1;
+  else if (num in facCounts)
     return facCounts[num];
-  }
 
   while (fac < max) {
     if (num % fac == 0) {
@@ -58,9 +59,6 @@ int countFactors(int num) {
     }
     fac++;
   }
-
-  if (num == 1)
-    count = 1;
 
   facCounts[num] = count;
 

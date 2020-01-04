@@ -14,7 +14,6 @@ void main() {
   File inFile = File("gridNumbers.txt", "r");
 
   int[][] matrix = inFile.byLine.map!(line => line.idup.split(" ").map!(numstr => numstr.parse!(int)).array).array;
-  //int[][] matrix = array(map!(line => array(map!(numstr => parse!(int)(numstr))(split(line.idup, " "))))(inFile.byLine));
 
   foreach (j; 0..matrix.length) {
     foreach (i; 0..matrix[0].length) {

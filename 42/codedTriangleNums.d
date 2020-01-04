@@ -9,49 +9,38 @@ import std.functional;
 import std.datetime.stopwatch;
 import std.typecons;
 import std.traits;
+import std.utf;
 
-//alias isTriangularFast = memoize!(isTriangular);
 typeof(isTriangularInit()) isTriangular;
-alias TriGen = (a, n) => a[n - 1] + n;
-//alias Triangulars = typeof(recurrence!(TriGen)(0));
-//alias Triangulars = ReturnType!(recurrence!(TriGen, int));
 
 static this() {
-  //writeln(typeof(recurrence!((a, n) => a[n-1] + n)(0)).stringof);
-  //writeln(Triangulars.stringof);
   isTriangular = isTriangularInit();
 }
 
 void main() {
   StopWatch timer;
-  string rawData;
-  string[] words;
 
   timer.start();
-  Writeln("Coded triangle numbers");
+  writeln("Coded triangle numbers");
 
-  //wordsFile = File("p042_words.txt");
-  //wordsFile.rawRead(rawData);
-
-  rawData = cast(string)read("p042_words.txt");
-  words = rawData.split(',').map!(a => a.strip('"')).array();
-  
-  //"SKY".map!(a => a - 64).sum.writeln();
-
-  ulong count = words.map!(a => a.map!(a => a - 64).sum())
+  auto count = readText("p042_words.txt")
+    .split(',')
+    .map!(a => a.strip('"'))
+    .array
+    .map!(a => a.map!(a => a - 64).sum())
     .filter!isTriangular
     .tee!(a => write(a, " "))
     .count();
-  writeln();
 
+  writeln();
   timer.stop();
+
   writefln!"There are %s triangular words in the file."(count);
-  writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
+  writefln!"Finished in %s milliseconds."(timer.peek.total!"msecs"());
 }
 
 auto isTriangularInit() {
-  //auto triangulars = new Triangulars([0]);
-  auto temp = recurrence!(TriGen)(0);
+  auto temp = recurrence!((a, n) => a[n - 1] + n)(0);
   auto temp2 = new typeof(temp);
   *temp2 = temp;
   auto triangulars = refRange(temp2);

@@ -21,6 +21,7 @@ void main() {
     if (prodFive.nextProduct() > product)
       product = prodFive.getProduct;
   }
+
   timer.stop();
   writeln(product);
   writeln("finished in ", timer.peek.total!"msecs"(), " milliseconds");

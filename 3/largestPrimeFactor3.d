@@ -18,7 +18,6 @@ void main () {
 
   timer.start();
 
-  // The ever-so-simple solution:
   writeln(num.primeFactors.reduce!(max));
 
   timer.stop();

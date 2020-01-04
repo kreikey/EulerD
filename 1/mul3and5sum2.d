@@ -7,8 +7,6 @@ import std.functional;
 import std.conv;
 import unionmultiples;
 
-alias partial!(std.algorithm.reduce!((a, b) => a + b), 0UL) addn;
-
 void main(string[] args) {
   StopWatch timer;
   auto um = new UnionMultiples(3, 5);
@@ -20,8 +18,7 @@ void main(string[] args) {
 
   timer.start();
 
-  result = um.until!((a, b) => a >= b)(limit).addn();
-  //result = std.algorithm.sum(um.until!((a, b) => a >= b)(limit));
+  result = um.until!((a, b) => a >= b)(limit).sum();
 
   timer.stop();
   writeln("The sum multiples of 3 and 5 below ", limit, " is: ", result);

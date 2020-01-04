@@ -7,9 +7,6 @@ import std.range;
 import std.functional;
 import std.conv;
 
-// partial used to be called curry. This alias is no longer necessary, as sum works.
-//alias partial!(std.algorithm.reduce!((a, b) => a + b), 0UL) addn;
-
 void main(string[] args) {
   StopWatch timer;
   ulong limit = 1000;

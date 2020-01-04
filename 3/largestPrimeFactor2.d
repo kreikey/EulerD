@@ -6,9 +6,6 @@ import std.range;
 import std.array;
 import kreikey.primes;
 
-// Another option would be something like:
-// num.factors.filter!(isPrime).reduce!(max);
-
 void main () {
   StopWatch timer;
   auto p = new Primes!ulong();

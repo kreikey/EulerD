@@ -74,10 +74,10 @@ public:
       return primes[ndx];
     }
 
-    ndx = primes.length;
+    ndx = primes.length - 1;
 
     do popFront();
-    while (ndx <= i);
+    while (ndx < i);
 
     return primes[ndx];
   }
