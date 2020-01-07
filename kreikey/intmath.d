@@ -221,38 +221,24 @@ Factor maxMultiplicity(Factor a, Factor b) {
   return a.multiplicity > b.multiplicity ? a : b;
 }
 
-//auto isPrimeInit(T = ulong)()
-//if (isIntegral!T) {
-  //Primes!T primes = new Primes!T();
-
-  //bool isPrime(T number) {
-    //auto primesCopy = primes.save;
-
-    //if (number <= primesCopy.topPrime)
-      //return number in primesCopy.cache ? true : false;
-
-    //auto root = std.math.sqrt(real(number)).to!T();
-    //auto found = primesCopy.find!(p => number % p == 0 || p > root)().front;
-    //return found > root;
-  //}
-
-  //return &isPrime;
-//}
-
 auto isPrimeInit(T = ulong)()
 if (isIntegral!T) {
   Primes!T primes = new Primes!T();
 
   bool isPrime(T number) {
-    if (number > primes.topPrime)
-      primes.find!(a => a >= number)();
+    auto primesCopy = primes.save;
 
-    return number in primes.cache ? true : false;
+    if (number <= primesCopy.topPrime)
+      return number in primesCopy.cache ? true : false;
+
+    auto root = std.math.sqrt(real(number)).to!T();
+    auto found = primesCopy.find!(p => number % p == 0 || p > root)().front;
+
+    return found > root;
   }
 
   return &isPrime;
 }
-
 
 uint[] toDigits(alias base = 10)(ulong source)
 if (isIntegral!(typeof(base))) {
