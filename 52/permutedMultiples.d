@@ -22,7 +22,7 @@ void main() {
         .slide(2)
         .all!(b => isPermutation(b[0], b[1])))
     .front[0]
-    .toNumber();
+    .toNumber() / 2;
 
   timer.stop();
 
