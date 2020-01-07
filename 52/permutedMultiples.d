@@ -16,13 +16,12 @@ void main() {
   writeln("Permuted multiples");
 
   auto result = InfiniteIota(1uL)
-    .map!(a => iota(2uL, 7)
+    .map!(a => a, a => iota(2uL, 7)
         .map!(b => toDigits(a * b)))
-    .find!(a => a
+    .find!(a => a[1]
         .slide(2)
         .all!(b => isPermutation(b[0], b[1])))
-    .front[0]
-    .toNumber() / 2;
+    .front[0];
 
   timer.stop();
 
