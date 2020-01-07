@@ -29,10 +29,10 @@ void main(string[] args) {
 
   values = names.map!(value).array;
 
-  foreach (int i, val; values)
-    scores ~= val * (i + 1);
+  foreach (i, val; values)
+    scores ~= val * (cast(int)i + 1);
 
-  total = scores.reduce!((a, b) => a + b);
+  total = scores.sum();
 
   timer.stop();
   writefln("The total of the scores is: %s", total);

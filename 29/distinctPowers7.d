@@ -23,15 +23,21 @@ void main(string[] args) {
 
   timer.start();
 
-  iota(2, n+ 1)
-    .map!(base => iota(2, n+1)
-      .map!(exponent => base.primeFactors.cycleN(exponent).asort())
-      .array
-      .asort())
-    .array()
-    .multiwayUnion
-    .count
-    .writeln();
+  ulong[][][] powersMatrix;
+  ulong[][] row;
+  ulong[] res;
+
+  foreach(base; 2 .. n + 1) {
+    row = [];
+    foreach(exponent; 2 .. n + 1) {
+      res = base.primeFactors.cycleN(exponent).sort.array();
+      row ~= res;
+    }
+    sort(row);
+    powersMatrix ~= row;
+  }
+
+  powersMatrix.multiwayMerge.uniq.count.writeln();
 
   timer.stop();
 

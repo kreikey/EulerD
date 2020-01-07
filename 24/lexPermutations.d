@@ -13,7 +13,6 @@ void main(string[] args) {
   StopWatch timer;
   int[] digits;
   ulong permCount = 1000000;
-  //ulong permCount = 3628800;
 
   if (args.length > 1) {
     permCount = args[1].parse!ulong();

@@ -10,7 +10,6 @@ import kreikey.intmath;
 import kreikey.combinatorics;
 
 alias nextPermutation = kreikey.combinatorics.nextPermutation;
-//alias nextPermutation = std.algorithm.nextPermutation;
 
 void main() {
   StopWatch timer;

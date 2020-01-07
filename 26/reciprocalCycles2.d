@@ -23,11 +23,6 @@ void main(string[] args) {
   writefln("The number between %s and %s whose reciprocal has the longest reptend is:", start, end + 1);
   writefln("denominator: %s\nreptend length: %s", resTup[0], resTup[1]);
 
-  //auto res = iota(2, 1000).reduce!((a, b) => a.reptendLength() > b.reptendLength() ? a : b);
-  //writeln(res, ":", res.reptendLength());
-
-  //iota(2, 1000).reduce!((a, b) => a.reptendLength() > b.reptendLength() ? a : b).writeln();
-
   writeln("finished in ", timer.peek.total!"msecs"(), " milliseconds");
 }
 

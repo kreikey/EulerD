@@ -33,13 +33,6 @@ ulong countLatticePaths(int width, int height) {
   pathCount += takePath(DOWN, width, height, 0, 0);
   pathCount += rightPathTask.yieldForce();
 
-  //if (width == height) {
-    //pathCount += 2 * takePath(RIGHT, width, height, 0, 0);
-  //} else {
-    //pathCount += takePath(RIGHT, width, height, 0, 0);
-    //pathCount += takePath(DOWN, width, height, 0, 0);
-  //}
-
   return pathCount;
 }
 

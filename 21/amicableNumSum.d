@@ -41,7 +41,7 @@ long isAmicable(long number) {
 
   if (sumFactorsSumFactors == number && sumFactors != number) {
     isAmicable = sumFactors;
-    amicableCache[isAmicable] = number;   // put it in the associative array
+    amicableCache[isAmicable] = number;
   }
 
   return isAmicable;

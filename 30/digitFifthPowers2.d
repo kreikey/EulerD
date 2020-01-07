@@ -18,11 +18,6 @@ void main() {
   writeln("digit fifth powers");
   timer.start();
 
-  //foreach (x; 2 .. topNumber) {
-    //if (x == x.toDigits.map!(a => a ^^ exponent).sum())
-      //sums ~= x;
-  //}
-
   sums = iota(2, topNumber)
     .filter!(x => x.toDigits.fold!((a, b) => a + b ^^ exponent)(0uL) == x)
     .array();

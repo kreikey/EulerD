@@ -4,12 +4,8 @@ import std.datetime.stopwatch;
 import std.conv;
 import std.functional;
 import std.string;
-import std.experimental.checkedint;
-
-struct NK {
-  ulong n;
-  ulong k;
-}
+import std.typecons;
+import kreikey.combinatorics;
 
 void main(string[] args) {
   ulong width = 20, height = 20, pathCount;
@@ -25,7 +21,7 @@ void main(string[] args) {
   try {
     pathCount = nChooseK((width + height), height);
     timer.stop();
-    writefln("The number of lattice paths in a %sx%s grid from top left to bottom right are:\n%s",
+    writefln("The number of lattice paths in a %sx%s grid from top left to bottom right is:\n%s",
       width, height, pathCount);
     writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
   } catch (Exception e) {
@@ -33,27 +29,3 @@ void main(string[] args) {
   }
 }
 
-ulong nChooseK(ulong n, ulong k) {
-  assert(k <= n);
-
-  if (k == 0 || k == n)
-    return 1;
-
-  NK left = NK(k, k);
-  NK right = NK(n - k, 0);
-  auto sum = checked!Throw(0uL);
-  ulong leftSum;
-  ulong rightSum;
-  ulong product;
-
-  do {
-    leftSum = nChooseK(left.n, left.k);
-    rightSum = nChooseK(right.n, right.k);
-    product = (checked!Throw(leftSum) * rightSum).get;
-    sum += product;
-    left.k--;
-    right.k++;
-  } while (left.k < ulong.max && right.k <= right.n);
-
-  return sum.get;
-}

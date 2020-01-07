@@ -83,3 +83,35 @@ T[] nthPermutation(T)(ref T[] digits, ulong n) {
 
   return digits;
 }
+
+bool isPermutation(T)(T[] left, T[] right) {
+  import kreikey.intmath : asort;
+  return left.dup.asort() == right.dup.asort();
+}
+
+ulong nChooseK(ulong n, ulong k) {
+  import std.experimental.checkedint;
+  alias NK = Tuple!(ulong, "N", ulong, "K");
+  assert(k <= n);
+
+  if (k == 0 || k == n)
+    return 1;
+
+  NK left = tuple(k, k);
+  NK right = tuple(n - k, 0);
+  auto sum = checked!Throw(0uL);
+  ulong leftSum;
+  ulong rightSum;
+  ulong product;
+
+  do {
+    leftSum = nChooseK(left.N, left.K);
+    rightSum = nChooseK(right.N, right.K);
+    product = (checked!Throw(leftSum) * rightSum).get;
+    sum += product;
+    left.K--;
+    right.K++;
+  } while (left.K < ulong.max && right.K <= right.N);
+
+  return sum.get;
+}

@@ -18,20 +18,16 @@ void main(string[] args) {
 
   timer.start();
 
-  //BigInt last = 0;
   bool delegate(BigInt) unique = notEqualToPreviousInit(BigInt(0));
 
   int count = 0;
 
-  // Implemented the solution using more primitive constructs, because it's good to know how to use them.
   iota(2, n + 1)
     .map!(a => iota(2, n + 1)
         .map!(b => BigInt(a) ^^ b)
         .array())
     .array
     .multiwayMerge
-    //.filter!(unique)
-    //.fold!((int a, BigInt b) => a + 1)(0)
     .array
     .slide(2, 1)
     .fold!((a, b) => b[0] == b[1] ? a : a + 1)(1)
