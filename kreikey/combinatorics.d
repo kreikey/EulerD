@@ -91,7 +91,7 @@ bool isPermutation(T)(T[] left, T[] right) {
 
 ulong nChooseK(ulong n, ulong k) {
   import std.experimental.checkedint;
-  alias NK = Tuple!(ulong, "N", ulong, "K");
+  alias NK = Tuple!(ulong, "n", ulong, "k");
   assert(k <= n);
 
   if (k == 0 || k == n)
@@ -105,13 +105,13 @@ ulong nChooseK(ulong n, ulong k) {
   ulong product;
 
   do {
-    leftSum = nChooseK(left.N, left.K);
-    rightSum = nChooseK(right.N, right.K);
+    leftSum = nChooseK(left.n, left.k);
+    rightSum = nChooseK(right.n, right.k);
     product = (checked!Throw(leftSum) * rightSum).get;
     sum += product;
-    left.K--;
-    right.K++;
-  } while (left.K < ulong.max && right.K <= right.N);
+    left.k--;
+    right.k++;
+  } while (left.k < ulong.max && right.k <= right.n);
 
   return sum.get;
 }

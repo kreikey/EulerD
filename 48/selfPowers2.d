@@ -6,6 +6,7 @@ import std.range;
 import std.algorithm;
 import std.functional;
 import std.conv;
+import std.array;
 import kreikey.bigint;
 import kreikey.intmath;
 import kreikey.bytemath;
@@ -24,7 +25,10 @@ void main() {
   writeln("Please wait about fifteen seconds.");
 
   foreach (n; 1..1001) {
-    factors = n == 1 ? [1U] : primeFactors(n).cycleN(n);
+    if (n % 10 == 0)
+      continue;
+
+    factors = n == 1 ? [1U] : primeFactors(n).replicate(n);
 
     foreach (factor; factors) {
       digits = factor.rbytes();
@@ -34,7 +38,7 @@ void main() {
         product.length = 10;
     }
 
-    sum = add(sum, product);
+    accumulate(sum, product);
 
     if (sum.length > 10)
       sum.length = 10;
@@ -47,8 +51,3 @@ void main() {
   //9110846700
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }
-
-T[] cycleN(T)(T[] array, uint copies) {
-  return array.cycle.take(array.length * copies).array();
-}
-

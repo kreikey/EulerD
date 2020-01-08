@@ -28,8 +28,12 @@ ubyte[] add(const(ubyte)[] left, const(ubyte)[] right) {
 ubyte[] accumulate(ref ubyte[] left, const(ubyte)[] right) {
   ubyte carry = 0;
 
-  if (left.length < right.length)
-    throw new Exception("left is shorter than right");
+  if (left.length < right.length) {
+    //throw new Exception("left is shorter than right");
+    size_t oldLen = left.length;
+    left.length = right.length;
+    left[oldLen .. $] = 0;
+  }
 
   for (ulong i = 0; i < left.length; i++) {
     left[i] += (right.length > i ? right[i] : 0) + carry;
