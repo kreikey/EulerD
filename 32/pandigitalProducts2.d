@@ -7,6 +7,7 @@ import std.algorithm;
 import std.conv;
 import std.typecons;
 import kreikey.intmath;
+import kreikey.bytemath;
 
 void main() {
   StopWatch timer;

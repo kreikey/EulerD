@@ -8,6 +8,8 @@ import std.range;
 import std.traits;
 import std.typecons;
 
+enum MulThreshold = 70;
+
 mixin template RvalueRef() {
   alias T = typeof(this);
   static assert (is(T == struct));
@@ -281,10 +283,12 @@ private:
     ulong m;
 
     // Take care of base case where one or both operands are of length 1
-    if (lhs.length == 1)
-      return mulSingleDigit(rhs, lhs[0]);
-    else if (rhs.length == 1)
-      return mulSingleDigit(lhs, rhs[0]);
+    //if (lhs.length == 1)
+      //return mulSingleDigit(rhs, lhs[0]);
+    //else if (rhs.length == 1)
+      //return mulSingleDigit(lhs, rhs[0]);
+    if (lhs.length < MulThreshold && rhs.length < MulThreshold)
+      return mulSmall(lhs, rhs);
 
     m = lhs.length > rhs.length ? lhs.length / 2 : rhs.length / 2;
 
@@ -312,6 +316,28 @@ private:
     addAbsInPlace(z2, z1);
     addAbsInPlace(z2, z0);
     return z2;
+  }
+
+  static byte[] mulSmall(const(byte)[] left, const(byte)[] right) {
+    byte carry;
+    byte d;
+    byte[] result;
+    byte[] part;
+
+    result.reserve(left.length + right.length + 1);
+
+    if (left.length < right.length)
+      swap(left, right);
+
+    for (size_t i = 0; i < right.length; i++) {
+      part = mulSingleDigit(left, right[i]);
+      shiftBigInPlace(part, i);
+      addAbsInPlace(result, part);
+      carry = 0;
+      part = [];
+    }
+
+    return result;
   }
 
   static void shiftBigInPlace(ref byte[] lhs, ulong n) {
@@ -430,9 +456,8 @@ private:
     if (carry)
       pro ~= carry;
 
-    // In case we've multiplied by a zero, set length to one.
-    if (pro[$ - 1] == 0)
-      pro.length = 1;
+    while (pro.length > 1 && pro[$ - 1] == 0)
+      pro.length--;
 
     return pro;
   }
@@ -780,7 +805,11 @@ private:
 
   BigInt mul(ref const BigInt rhs) const {
     BigInt pro;
-    pro.mant = karatsuba(this.mant, rhs.mant);
+
+    //if (this.mant.length < MulThreshold && rhs.mant.length < MulThreshold)
+      //pro.mant = mulSmall(this.mant, rhs.mant);
+    //else
+      pro.mant = karatsuba(this.mant, rhs.mant);
 
     if (pro.mant[$ - 1] == 0)
       pro.sign = false;
@@ -949,6 +978,16 @@ public:
   static Tuple!(byte[], byte[]) lastDivModResult;
   static Tuple!(ulong, ulong) lastDivModArgHashes;
 
+  size_t length() @property {
+    return mant.length;
+  }
+
+  void length(size_t length) @property {
+    mant.length = length;
+    while (mant[$-1] == 0 && mant.length > 1)
+      mant.length--;
+  }
+
   this(string source) nothrow {
     bool allZeros = true;
     bool valid = true;
@@ -957,6 +996,13 @@ public:
       this.sign = true;
       source = source[1 .. $];
     }
+
+    int startNdx = 0;
+
+    //while (source[startNdx] == '0' && startNdx < source.length - 1)
+      //startNdx++;
+
+    //source = source[startNdx..$];
 
     for (ulong i; i < source.length; i++) {
       if (source[i] < '0' || source[i] > '9')
@@ -1045,9 +1091,12 @@ public:
     //writeln("this(long) unittest passed");
   }
 
-  private this(const(byte)[] source, bool sign) nothrow {
+  this(const(byte)[] source, bool sign) nothrow {
     this.mant = source.dup;
     this.sign = sign;
+
+    while (this.mant.length > 1 && this.mant[$-1] == 0)
+      this.mant.length--;
   }
   unittest {
     //writeln("this(byte[]) unittest");
@@ -1063,9 +1112,12 @@ public:
     //writeln("this(byte[]) unittest passed");
   }
 
-  private this(const(byte)[] source) nothrow {
+  this(const(byte)[] source) nothrow {
     this.mant = source.dup;
     this.sign = false;
+
+    while (this.mant.length > 1 && this.mant[$-1] == 0)
+      this.mant.length--;
   }
   unittest {
     //writeln("this(byte[]) unittest");
@@ -1084,7 +1136,6 @@ public:
     assert(c.sign != d.sign);
     //writeln("this(byte[]) unittest passed");
   }
-
 
   this(this) nothrow {
     mant = mant.dup;
@@ -1265,12 +1316,12 @@ public:
   }
 
   void opAssign(T)(T rhs)
-  if (isIntegral!T) {
+  if (isIntegral!T || isSomeString!T) {
     this = BigInt(rhs);
   }
 
   void opOpAssign(string op, T)(T rhs)
-  if (isIntegral!T) {
+  if (isIntegral!T || isSomeString!T) {
     BigInt value = BigInt(rhs);
     opOpAssign!op(value);
   }
@@ -1306,6 +1357,14 @@ public:
 
       return result;
     }
+  }
+
+  typeof(this) opSlice(size_t i, size_t j) {
+    return BigInt(this.mant[i..j], this.sign);
+  }
+
+  size_t opDollar() {
+    return this.mant.length;
   }
 
   string toString() const {
@@ -1344,10 +1403,6 @@ public:
     //digits[] += '0';
     std.algorithm.reverse(digitBytes);
     return digitBytes;
-  }
-
-  ulong toHash() {
-    return typeid(typeof(this)).getHash(&this);
   }
 
   mixin RvalueRef;

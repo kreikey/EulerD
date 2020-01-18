@@ -5,6 +5,7 @@ import std.algorithm;
 import std.range;
 import std.datetime.stopwatch;
 import kreikey.intmath;
+import kreikey.bytemath;
 import std.typecons;
 import champernowne;
 

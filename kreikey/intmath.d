@@ -10,10 +10,8 @@ import std.math;
 import std.conv;
 import std.typecons;
 import std.functional;
+import kreikey.bytemath;
 
-alias asort = (a) {a.sort(); return a;};
-alias asortDescending = (a) {a.sort!((b, c) => c < b)(); return a;};
-alias toString = digits => digits.map!(a => cast(immutable(char))(a + '0')).array();
 alias InfiniteIota = recurrence!((a, n) => a[n-1]+1, ulong);
 
 //ReturnType!(primeFactorsInit) PrimeFactors;
@@ -240,60 +238,6 @@ if (isIntegral!T) {
   return &isPrime;
 }
 
-uint[] toDigits(alias base = 10)(ulong source)
-if (isIntegral!(typeof(base))) {
-  ulong maxPowB = 1;
-  uint[] result;
-
-  while (maxPowB <= source)
-    maxPowB *= base;
-
-  if (source != 0)
-    maxPowB /= base;
-
-  while (maxPowB > 0) {
-    result ~= cast(uint)source / maxPowB;
-    source %= maxPowB;
-    maxPowB /= base;
-  }
-
-  return result;
-}
-
-//uint[] toDigits(alias base = 10)(ulong source)
-//if (isIntegral!(typeof(base))) {
-  //if (source == 0)
-    //return [];
-
-  //return toDigits!base(source / base) ~ cast(uint)(source % base);
-//}
-
-ulong toNumber(alias base = 10)(uint[] digits) 
-if (isIntegral!(typeof(base))) {
-  ulong result;
-
-  for (size_t i = 0; i < digits.length; i++) {
-    result += digits[i] * base ^^ (digits.length - i - 1);
-  }
-
-  return result;
-}
-
-//ulong toNumber(alias base = 10)(uint[] digits) 
-//if (isIntegral!(typeof(base))) {
-  //if (digits.length == 0)
-    //return 0;
-
-  //return digits[0] * base ^^ (digits.length - 1) + toNumber!base(digits[1..$]);
-//}
-
-//alias factorial = memoize!factorialImpl;
-//ulong factorialImpl(ulong number) {
-  //if (number == 0 || number == 1)
-    //return 1;
-  //return number * memoize!factorialImpl(number - 1);
-//}
-
 ulong factorial(ulong number) {
   ulong result = 1;
 
@@ -304,38 +248,6 @@ ulong factorial(ulong number) {
     result *= n;
 
   return result;
-}
-
-T[] dror(T)(T[] digits) {
-  T temp = digits[$-1];
-
-  for (size_t i = digits.length-1; i > 0; i--)
-    digits[i] = digits[i-1];
-
-  digits[0] = temp;
-
-  return digits;
-}
-
-ulong dror(T)(T source)
-if(isIntegral!T) {
-  return source.toDigits.dror.toNumber();
-}
-
-T[] drol(T)(T[] digits) {
-  T temp = digits[0];
-
-  for (size_t i = 0; i < digits.length-1; i++)
-    digits[i] = digits[i+1];
-
-  digits[$-1] = temp;
-
-  return digits;
-}
-
-ulong drol(T)(T source)
-if(isIntegral!T) {
-  return source.toDigits.drol.toNumber();
 }
 
 auto getTriplets(ulong perimeter) {

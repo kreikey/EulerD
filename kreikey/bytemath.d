@@ -3,16 +3,17 @@ module kreikey.bytemath;
 import std.range;
 import std.algorithm;
 import std.stdio;
-import std.array;
 import std.traits;
+import kreikey.util;
 
-alias rstr = (const ubyte[] value) => value.retro.map!(a => cast(immutable(char))(a + '0')).array();
 alias isNotEqualTo = (const(ubyte)[] left, const(ubyte)[] right) => left.compare(right) != 0;
 alias isEqualTo = (const(ubyte)[] left, const(ubyte)[] right) => left.compare(right) == 0;
 alias isGreaterThan = (const(ubyte)[] left, const(ubyte)[] right) => left.compare(right) > 0;
 alias isLessThan = (const(ubyte)[] left, const(ubyte)[] right) => left.compare(right) < 0;
 alias isGreaterThanOrEqualTo = (const(ubyte)[] left, const(ubyte)[] right) => left.compare(right) >= 0;
 alias isLessThanOrEqualTo = (const(ubyte)[] left, const(ubyte)[] right) => left.compare(right) <= 0;
+
+enum MulThreshold = 70;
 
 ubyte[] add(const(ubyte)[] left, const(ubyte)[] right) {
 
@@ -29,10 +30,7 @@ ubyte[] accumulate(ref ubyte[] left, const(ubyte)[] right) {
   ubyte carry = 0;
 
   if (left.length < right.length) {
-    //throw new Exception("left is shorter than right");
-    size_t oldLen = left.length;
     left.length = right.length;
-    left[oldLen .. $] = 0;
   }
 
   for (ulong i = 0; i < left.length; i++) {
@@ -108,6 +106,31 @@ int compare(const(ubyte)[] left, const(ubyte)[] right) {
   return 0;
 }
 
+ubyte[] mulSmall(const(ubyte)[] left, const(ubyte)[] right) {
+  ubyte carry;
+  ubyte d;
+  ubyte[] result;
+  ubyte[] part;
+
+  result.reserve(left.length + right.length + 1);
+
+  if (left.length < right.length)
+    swap(left, right);
+
+  for (size_t i = 0; i < right.length; i++) {
+    part = mulSingleDigit(left, right[i]);
+    part.shiftBigInPlace(i);
+    result.accumulate(part);
+    carry = 0;
+    part = [];
+  }
+
+  while (result[$-1] == 0 && result.length > 1)
+    result.length--;
+
+  return result;
+}
+
 ubyte[] mul(const(ubyte)[] left, const(ubyte)[] right) {
   ubyte[] z0;
   ubyte[] z1;
@@ -115,10 +138,8 @@ ubyte[] mul(const(ubyte)[] left, const(ubyte)[] right) {
   ulong m;
 
   // Take care of base case where one or both operands are of length 1
-  if (left.length == 1)
-    return mulSingleDigit(right, left[0]);
-  else if (right.length == 1)
-    return mulSingleDigit(left, right[0]);
+  if (left.length < MulThreshold && right.length < MulThreshold)
+    return mulSmall(left, right);
 
   m = left.length > right.length ? left.length / 2 : right.length / 2;
 
@@ -148,7 +169,7 @@ ubyte[] mul(const(ubyte)[] left, const(ubyte)[] right) {
 }
 
 ubyte[] mulSingleDigit(const(ubyte)[] left, ubyte digit) {
-  ubyte[] result = left.dup;
+  auto result = left.dup;
   ubyte carry = 0;
 
   for (ulong i = 0; i < result.length; i++) {
@@ -163,54 +184,51 @@ ubyte[] mulSingleDigit(const(ubyte)[] left, ubyte digit) {
 
   while (result.length > 1 && result[$-1] == 0)
     result.length--;
- 
+
   return result;
-}
-
-void mulSingleDigitInPlace(ref ubyte[] left, ubyte digit) {
-  ubyte carry = 0;
-
-  for (ubyte i = 0; i < left.length; i++) {
-    left[i] *= digit;
-    left[i] += carry;
-    carry = left[i] / 10;
-    left[i] %= 10;
-  }
-
-  if (carry)
-    left ~= carry;
-
-  while (left.length > 1 && left[$-1] == 0)
-    left.length--;
 }
 
 ubyte[] shiftBig(const(ubyte)[] digits, ulong amount) {
-  ubyte[] result = new ubyte[digits.length + amount];
+  auto temp = digits.dup;
+  return shiftBigInPlace(temp, amount);
+}
 
-  result[0 .. amount] = 0;
-  result[amount .. $] = digits[];
+ref ubyte[] shiftBigInPlace(ref ubyte[] digits, ulong amount) {
+  if (amount == 0)
+    return digits;
+  if (digits.length == 1 && digits[$-1] == 0)
+    return digits;
 
-  while (result.length > 1 && result[$-1] == 0)
-    result.length--;
+  digits.length = digits.length + amount;
 
-  return result;
+  for (size_t i = digits.length - 1; i >= amount; i--) {
+    digits[i] = digits[i - amount];
+    digits[i - amount] = 0;
+  }
+
+  return digits;
 }
 
 uint[] toDigits(alias base = 10)(ulong source)
 if (isIntegral!(typeof(base))) {
-  ulong maxPowB = 1;
   uint[] result;
 
-  while (maxPowB <= source)
-    maxPowB *= base;
+  while (source != 0) {
+    result ~= cast(uint)(source % base);
+    source /= base;
+  }
 
-  if (source != 0)
-    maxPowB /= base;
+  reverse(result);
 
-  while (maxPowB > 0) {
-    result ~= cast(uint)source / maxPowB;
-    source %= maxPowB;
-    maxPowB /= base;
+  return result;
+}
+
+ulong toNumber(alias base = 10)(uint[] digits) 
+if (isIntegral!(typeof(base))) {
+  ulong result;
+
+  for (size_t i = 0; i < digits.length; i++) {
+    result += digits[i] * base ^^ (digits.length - i - 1);
   }
 
   return result;
@@ -223,3 +241,43 @@ ubyte[] rbytes(const char[] value) {
 ubyte[] rbytes(ulong value) {
   return value.toDigits.retro.map!(a => cast(ubyte)(a)).array();
 }
+
+string rstr(const ubyte[] value) {
+  return value.retro.map!(a => cast(immutable(char))(a + '0')).array();
+}
+
+T[] dror(T)(T[] digits) {
+  T temp = digits[$-1];
+
+  for (size_t i = digits.length-1; i > 0; i--)
+    digits[i] = digits[i-1];
+
+  digits[0] = temp;
+
+  return digits;
+}
+
+ulong dror(T)(T source)
+if(isIntegral!T) {
+  return source.toDigits.dror.toNumber();
+}
+
+T[] drol(T)(T[] digits) {
+  T temp = digits[0];
+
+  for (size_t i = 0; i < digits.length-1; i++)
+    digits[i] = digits[i+1];
+
+  digits[$-1] = temp;
+
+  return digits;
+}
+
+ulong drol(T)(T source)
+if(isIntegral!T) {
+  return source.toDigits.drol.toNumber();
+}
+alias asort = (a) {a.sort(); return a;};
+alias asortDescending = (a) {a.sort!((b, c) => c < b)(); return a;};
+alias toString = digits => digits.map!(a => cast(immutable(char))(a + '0')).array();
+

@@ -15,7 +15,7 @@ void main(string[] args) {
   longNumbers = inFile.byLine.map!(rbytes).array();
   accumulator = longNumbers[0].dup;
 
-  foreach (i, line; longNumbers[1 .. $]) {
+  foreach (line; longNumbers[1 .. $]) {
     accumulate(accumulator, line);
   }
 

@@ -6,6 +6,8 @@ import std.range;
 import std.algorithm;
 import kreikey.combinatorics;
 import kreikey.intmath;
+import kreikey.bytemath;
+import kreikey.util;
 
 alias isPermutation = kreikey.combinatorics.isPermutation;
 

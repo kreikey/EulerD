@@ -1,10 +1,14 @@
 module kreikey.combinatorics;
 
 import kreikey.stack;
-//import std.stdio;
+import std.stdio;
 import std.typecons;
 import std.algorithm;
 import std.range;
+import std.functional;
+import kreikey.bigint;
+import std.traits;
+import std.experimental.checkedint;
 
 auto permutations(T)(T[] digits) {
   return Permutations!T(digits);
@@ -85,33 +89,47 @@ T[] nthPermutation(T)(ref T[] digits, ulong n) {
 }
 
 bool isPermutation(T)(T[] left, T[] right) {
-  import kreikey.intmath : asort;
+  import kreikey.util : asort;
   return left.dup.asort() == right.dup.asort();
 }
 
-ulong nChooseK(ulong n, ulong k) {
-  import std.experimental.checkedint;
-  alias NK = Tuple!(ulong, "n", ulong, "k");
+T nChooseK(T)(T n, T k)
+if (isIntegral!T || is(T == BigInt)) {
+  alias NK = Tuple!(T, "n", T, "k");
+  static if (is(T == BigInt) || isSigned!T)
+    alias keepSumming = (NK left, NK right) => (left.k >= 0 && right.k <= right.n);
+  else
+    alias keepSumming = (NK left, NK right) => (left.k < T.max && right.k <= right.n);
+
   assert(k <= n);
 
   if (k == 0 || k == n)
-    return 1;
+    return T(1);
 
   NK left = tuple(k, k);
   NK right = tuple(n - k, 0);
-  auto sum = checked!Throw(0uL);
-  ulong leftSum;
-  ulong rightSum;
-  ulong product;
+  static if (is(T == BigInt))
+    T sum = 0;
+  else
+    auto sum = checked!Throw(0uL);
+  T leftSum;
+  T rightSum;
+  T product;
 
   do {
-    leftSum = nChooseK(left.n, left.k);
-    rightSum = nChooseK(right.n, right.k);
-    product = (checked!Throw(leftSum) * rightSum).get;
+    leftSum = memoize!(nChooseK!T)(left.n, left.k);
+    rightSum = memoize!(nChooseK!T)(right.n, right.k);
+    static if (is(T == BigInt))
+      product = leftSum * rightSum;
+    else
+      product = (checked!Throw(leftSum) * rightSum).get;
     sum += product;
     left.k--;
     right.k++;
-  } while (left.k < ulong.max && right.k <= right.n);
+  } while (keepSumming(left, right));
 
-  return sum.get;
+  static if (is(T == BigInt))
+    return sum;
+  else
+    return sum.get;
 }

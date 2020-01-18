@@ -6,9 +6,11 @@ import std.functional;
 import std.string;
 import std.typecons;
 import kreikey.combinatorics;
+import std.experimental.checkedint;
+import kreikey.bigint;
 
 void main(string[] args) {
-  ulong width = 20, height = 20, pathCount;
+  ulong width = 20L, height = 20L, pathCount;
   StopWatch timer;
 
   if (args.length > 2) {

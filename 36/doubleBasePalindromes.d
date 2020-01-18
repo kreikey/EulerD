@@ -8,6 +8,7 @@ import std.format;
 import std.array;
 import std.range;
 import kreikey.intmath;
+import kreikey.bytemath;
 
 alias isPalindrome = digits => digits == digits.dup.reverse();
 

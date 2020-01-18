@@ -30,16 +30,10 @@ void main() {
 
     foreach (k; 0..n) {
       product = mul(product, temp);
-
-      if (product.length > 10)
-        product.length = 10;
     }
 
     accumulate(sum, product);
-
-    if (sum.length > 10)
-      sum.length = 10;
-
+    //writeln(product.rstr());
     product = [1];
   }
 

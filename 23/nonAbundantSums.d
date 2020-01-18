@@ -19,7 +19,7 @@ void main(string[] args) {
 }
 
 bool isAbundant(long num) {
-  if (reduce!((a, b) => a + b)(num.getFactors()) > num)
+  if (reduce!((a, b) => a + b)(num.properDivisors()) > num)
     return true;
   else
     return false;

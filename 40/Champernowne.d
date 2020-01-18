@@ -1,5 +1,6 @@
 module champernowne;
 import kreikey.intmath;
+import kreikey.bytemath;
 
 struct Champernowne {
   private:

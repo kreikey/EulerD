@@ -6,6 +6,7 @@ import std.range;
 import std.algorithm;
 import kreikey.primes;
 import kreikey.intmath;
+import kreikey.bytemath;
 import kreikey.combinatorics;
 
 alias permutations = kreikey.combinatorics.permutations;

@@ -7,6 +7,7 @@ import std.datetime.stopwatch;
 import std.functional;
 import kreikey.primes;
 import kreikey.intmath;
+import kreikey.bytemath;
 
 bool delegate(ulong) isPrime;
 

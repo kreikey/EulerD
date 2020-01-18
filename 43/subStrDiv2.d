@@ -12,6 +12,12 @@ import std.functional;
 
 alias permutations = kreikey.combinatorics.permutations;
 
+typeof(areSubstringsDivisibleInit()) areSubstringsDivisible;
+
+static this() {
+  areSubstringsDivisible = areSubstringsDivisibleInit();
+}
+
 void main() {
   StopWatch timer;
 
@@ -25,8 +31,7 @@ void main() {
   auto perms = permutations(pandigital);
 
   auto sum = perms
-    .filter!(a => !zip(a[1..$].slide(3), somePrimes)
-        .any!(b => b[0].toNumber() % b[1] != 0)())
+    .filter!areSubstringsDivisible
     .map!toNumber
     .tee!writeln
     .sum();
@@ -43,4 +48,19 @@ void main() {
   writeln("Digits [8,9,10] is divisible by 17 is:");
   writeln(sum);
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
+}
+
+auto areSubstringsDivisibleInit() {
+  auto primes = new Primes!(uint)();
+  auto somePrimes = primes.save.take(7).array();
+
+  bool areSubstringsDivisible(uint[] digits) {
+    foreach (i, p; lockstep(iota(1u, 8), somePrimes))
+      if (digits[i..i+3].toNumber() % p != 0)
+        return false;
+
+    return true;
+  }
+
+  return &areSubstringsDivisible;
 }

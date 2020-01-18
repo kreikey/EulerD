@@ -7,6 +7,7 @@ import std.range;
 import std.algorithm;
 import kreikey.bigint;
 import kreikey.intmath;
+import kreikey.bytemath;
 
 alias asortDescending = (a) {a.sort!((b, c) => c < b)(); return a;};
 

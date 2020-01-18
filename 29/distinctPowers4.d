@@ -2,6 +2,7 @@
 
 import std.stdio;
 import std.range;
+import std.array;
 import std.algorithm;
 import std.conv;
 import std.datetime.stopwatch;
@@ -25,7 +26,7 @@ void main(string[] args) {
 
   iota(2, n+ 1)
     .map!(base => iota(2, n+1)
-      .map!(exponent => base.primeFactors.cycleN(exponent).asort())
+      .map!(exponent => base.primeFactors.replicate(exponent).asort())
       .array
       .asort())
     .array()
@@ -36,9 +37,5 @@ void main(string[] args) {
   timer.stop();
 
   writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
-}
-
-ulong[] cycleN(ulong[] array, ulong copies) {
-  return array.cycle.take(array.length * copies).array();
 }
 
