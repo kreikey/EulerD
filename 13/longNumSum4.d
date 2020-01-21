@@ -3,6 +3,7 @@ import std.stdio;
 import std.datetime.stopwatch;
 import std.array;
 import std.algorithm;
+import std.conv;
 import kreikey.bytemath;
 import kreikey.bigint;
 
@@ -20,20 +21,11 @@ void main(string[] args) {
   ulong height = longNumbers.length;
   ulong part = 0;
   ulong sum = 0;
-  ulong colmax = 9 * height / 10;
-  ulong addmax = 0;
-  ulong digsmin = 0;
-  ulong digsrem = 0;
-  uint[] sumdigs;
-
-  do {
-    addmax += colmax;
-    digsmin++;
-    colmax /= 10;
-  } while (colmax > 0);
+  uint[] sumdigs = [];
+  auto maxParts = getMaxParts(height);
+  ulong index = 0;
 
   foreach (i; 0..width) {
-    digsrem = height - 1 - i;
     part = 0;
 
     foreach (j; 0..height)
@@ -42,12 +34,8 @@ void main(string[] args) {
     sum += part;
     sumdigs = sum.toDigits();
 
-    foreach (j; digsrem..digsmin)
-      addmax /= 10;
-    foreach (j; digsrem..digsmin)
-      addmax *= 10;
-
-    if (sumdigs.length > 9 && sumdigs[0..10] == (sum+addmax).toDigits()[0..10])
+    index = (width - i) > maxParts.length ? 0 : maxParts.length - (width - i);
+    if (sumdigs.length > 9 && sumdigs[0..10] == (sum + maxParts[index]).toDigits()[0..10])
       break;
 
     if (i != width-1)
@@ -58,4 +46,22 @@ void main(string[] args) {
   //5537376230
   timer.stop();
   writeln("finished in ", timer.peek.total!"msecs"(), " milliseconds");
+}
+
+ulong[] getMaxParts(ulong height) {
+  double[] maxcols;
+  double colmax = 9 * height;
+  ulong[] result;
+
+  do {
+    colmax /= 10;
+    maxcols ~= colmax;
+  } while (colmax.to!ulong() > 0);
+
+  foreach (i, r; maxcols)
+    result ~= maxcols[0..$-i].sum.to!ulong();
+
+  result ~= 0;
+
+  return result;
 }

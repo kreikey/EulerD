@@ -234,6 +234,10 @@ if (isIntegral!(typeof(base))) {
   return result;
 }
 
+string toString(uint[] digits) {
+  return digits.map!(a => cast(immutable(char))(a + '0')).array();
+}
+
 ubyte[] rbytes(const char[] value) {
   return value.retro.map!(a => cast(ubyte)(a - '0')).array();
 }
@@ -279,5 +283,4 @@ if(isIntegral!T) {
 }
 alias asort = (a) {a.sort(); return a;};
 alias asortDescending = (a) {a.sort!((b, c) => c < b)(); return a;};
-alias toString = digits => digits.map!(a => cast(immutable(char))(a + '0')).array();
 
