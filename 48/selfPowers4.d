@@ -11,13 +11,11 @@ import kreikey.bigint;
 import kreikey.intmath;
 import kreikey.bytemath;
 
-alias primeFactors = memoize!(primeFactors2!uint);
-
 void main() {
   StopWatch timer;
-  ubyte[] sum = [0];
-  ubyte[] temp;
-  ubyte[] product = [1];
+  ulong sum = 0;
+  ulong temp = 0;
+  ulong product = 1;
 
   timer.start();
   writeln("Self powers");
@@ -26,19 +24,21 @@ void main() {
     if (n % 10 == 0)
       continue;
 
-    temp = n.rbytes();
+    temp = n;
 
     foreach (k; 0..n) {
-      product = mul(product, temp);
+      product *= temp;
+      product %= 10000000000;
     }
 
-    accumulate(sum, product);
+    sum += product;
+    sum %= 10000000000;
     //writeln(product.rstr());
-    product = [1];
+    product = 1;
   }
 
   timer.stop();
-  writefln("The last 10 digits of the sum of self-powers n^n from 1 through 1000 are:\n%s", sum.rstr());
+  writefln("The last 10 digits of the sum of self-powers n^n from 1 through 1000 are:\n%s", sum);
   //9110846700
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }

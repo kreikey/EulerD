@@ -11,8 +11,6 @@ import kreikey.bigint;
 import kreikey.intmath;
 import kreikey.bytemath;
 
-alias primeFactors = memoize!(primeFactors2!uint);
-
 void main() {
   StopWatch timer;
   ubyte[] sum = [0];
