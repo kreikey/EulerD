@@ -14,7 +14,6 @@ import kreikey.bytemath;
 void main() {
   StopWatch timer;
   ulong sum = 0;
-  ulong temp = 0;
   ulong product = 1;
 
   timer.start();
@@ -24,10 +23,8 @@ void main() {
     if (n % 10 == 0)
       continue;
 
-    temp = n;
-
     foreach (k; 0..n) {
-      product *= temp;
+      product *= n;
       product %= 10000000000;
     }
 
