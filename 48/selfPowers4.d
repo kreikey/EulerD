@@ -33,7 +33,6 @@ void main() {
 
     sum += product;
     sum %= 10000000000;
-    //writeln(product.rstr());
     product = 1;
   }
 
