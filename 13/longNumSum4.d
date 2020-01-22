@@ -14,7 +14,7 @@ void main(string[] args) {
 
   auto longNumbers = File("longNumbers.txt", "r")
     .byLine
-    .map!(l => l.map!(d => d - '0').array())
+    .map!toDigits
     .array();
   
   ulong width = longNumbers[0].length;

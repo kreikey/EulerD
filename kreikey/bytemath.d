@@ -223,6 +223,10 @@ if (isIntegral!(typeof(base))) {
   return result;
 }
 
+uint[] toDigits(const char[] source) {
+  return source.map!(a => a - '0').array();
+}
+
 ulong toNumber(alias base = 10)(uint[] digits) 
 if (isIntegral!(typeof(base))) {
   ulong result;
