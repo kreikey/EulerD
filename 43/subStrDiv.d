@@ -25,8 +25,8 @@ void main() {
   auto perms = permutations(pandigital);
 
   auto sum = perms
-    .filter!(a => !zip(a[1..$].slide(3), somePrimes)
-        .any!(b => b[0].toNumber() % b[1] != 0)())
+    .filter!(a => zip(a[1..$].slide(3), somePrimes)
+        .not!(any!(b => b[0].toNumber() % b[1] != 0)))
     .map!toNumber
     .tee!writeln
     .sum();
