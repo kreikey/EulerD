@@ -1397,7 +1397,7 @@ public:
     return cast(immutable(char)[])digits;
   }
 
-  const(byte)[] digitBytes() const {
+  byte[] digitBytes() const {
     //return this.mant.retro.map!(d => cast(immutable(char))(d + '0')).array();
     byte[] digitBytes = this.mant.dup;
     //digits[] += '0';
