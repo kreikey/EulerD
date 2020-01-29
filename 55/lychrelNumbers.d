@@ -21,12 +21,8 @@ void main() {
 }
 
 bool isLychrel(BigInt number) {
-  //writeln("testing ", number);
-  //BigInt rnum = number.digitBytes.reverse.BigInt();
-  //writeln("reverse: ", rnum);
   foreach (i; 0..50) {
     number += number.digitBytes.reverse.BigInt();
-    //writeln("sum: ", number);
     if (number.isPalindrome())
       return false;
   }
