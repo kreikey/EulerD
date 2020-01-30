@@ -1405,6 +1405,16 @@ public:
     return digitBytes;
   }
 
+  uint[] toDigits() const {
+    return this.mant.retro.map!(a => cast(uint)a).array();
+  }
+
+  typeof(this) reverse() {
+    byte[] resmant = this.mant.dup;
+    std.algorithm.reverse(resmant);
+    return BigInt(resmant);
+  }
+
   mixin RvalueRef;
 }
 

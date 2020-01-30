@@ -48,7 +48,7 @@ struct Hand {
   int opCmp(typeof(this) rhs) {
     if (this.rank < rhs.rank)
       return -1;
-    else if (this.rank < rhs.rank)
+    else if (this.rank > rhs.rank)
       return 1;
     else {
       auto leftGroup = this.cards
@@ -72,31 +72,15 @@ struct Hand {
   }
 
   int getRank() {
-    int result;
-
-    if (isRoyalFlush()) {
-      result = 10;
-    } else if (isStraightFlush()) {
-      result = 9;
-    } else if (isFourOfAKind()) {
-      result = 8;
-    } else if (isFullHouse()) {
-      result = 7;
-    } else if (isFlush()) {
-      result = 6;
-    } else if (isStraight()) {
-      result = 5;
-    } else if (isThreeOfAKind()) {
-      result = 4;
-    } else if (isTwoPair()) {
-      result = 3;
-    } else if (isOnePair()) {
-      result = 2;
-    } else {
-      result = 1;
-    }
-
-    return result;
+    return isRoyalFlush() ? 10 :
+    isStraightFlush() ? 9 :
+    isFourOfAKind() ? 8 :
+    isFullHouse() ? 7 :
+    isFlush() ? 6 :
+    isStraight() ? 5 :
+    isThreeOfAKind() ? 4 :
+    isTwoPair() ? 3 :
+    isOnePair() ? 2 : 1;
   }
 
   bool isRoyalFlush() {

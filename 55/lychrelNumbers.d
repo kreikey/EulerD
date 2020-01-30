@@ -6,7 +6,8 @@ import std.conv;
 import std.algorithm;
 import std.range;
 import std.array;
-import kreikey.bytemath;
+import std.traits;
+import kreikey.digits;
 import kreikey.bigint;
 
 void main() {
@@ -21,19 +22,26 @@ void main() {
 }
 
 bool isLychrel(BigInt number) {
+  static bool[BigInt] cache;
+  bool* result = number in cache;
+
+  if (result != null)
+    return *result;
+
+  BigInt copy = number;
+  BigInt rnum = number.reverse();
+  
   foreach (i; 0..50) {
-    number += number.digitBytes.reverse.BigInt();
-    if (number.isPalindrome())
+    number += number.reverse();
+    if (number.isPalindrome()) {
+      cache[copy] = false;
+      cache[rnum] = false;
       return false;
+    }
   }
+
+  cache[copy] = true;
+  cache[rnum] = true;
   return true;
 }
 
-bool isPalindrome(BigInt num) {
-  byte[] digits = num.digitBytes();
-
-  if (digits == digits.dup.reverse())
-    return true;
-  else
-    return false;
-}
