@@ -105,21 +105,13 @@ struct Hand {
   }
 
   bool isFlush() {
-    foreach (p; cards.slide(2)) {
-      if (p[0].suit != p[1].suit)
-        return false;
-    }
-    
-    return true;
+    return cards.slide(2)
+      .all!(a => a[0].suit == a[1].suit)();
   }
 
   bool isStraight() {
-    foreach (p; cards.slide(2)) {
-      if (p[0].value != p[1].value + 1)
-        return false;
-    }
-
-    return true;
+    return cards.slide(2)
+      .all!(a => a[0].value == a[1].value + 1)();
   }
 
   bool isThreeOfAKind() {
