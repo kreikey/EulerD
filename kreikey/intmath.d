@@ -13,11 +13,7 @@ import std.functional;
 import kreikey.bytemath;
 
 alias InfiniteIota = recurrence!((a, n) => a[n-1]+1, ulong);
-
-//ReturnType!(primeFactorsInit) PrimeFactors;
-//static this() {
-  //PrimeFactors primeFactors = primeFactorsInit();
-//}
+alias primeFactors = memoize!primeFactors2;
 
 long[] properDivisors(long number) {
   static long[][long] factorsCache;
@@ -136,10 +132,9 @@ string recipDigits(int divisor, int length) {
   return cast(string)digits;
 }
 
-T[] primeFactors2(T)(T num)
-if (isIntegral!T) {
-  T[] factors;
-  T n = 2;
+ulong[] primeFactors2(ulong num) {
+  ulong[] factors;
+  ulong n = 2;
 
   if (num == 1)
     return [];
@@ -150,13 +145,12 @@ if (isIntegral!T) {
   if (num % n == 0)
     factors ~= n;
 
-  return factors ~ memoize!(primeFactors2!T)(num / n);
+  return factors ~ memoize!(primeFactors2)(num / n);
 }
 
-T[] primeFactors1(T)(T num) 
-if (isIntegral!T) {
-  T[] factors;
-  T n = 2;
+ulong[] primeFactors1(ulong num) {
+  ulong[] factors;
+  ulong n = 2;
 
   while (num > 1) {
     while (num % n == 0) {
@@ -169,10 +163,9 @@ if (isIntegral!T) {
   return factors;
 }
 
-T[] distinctPrimeFactors2(T)(T num)
-if (isIntegral!T) {
-  T[] factors;
-  T n = 2;
+ulong[] distinctPrimeFactors2(ulong num) {
+  ulong[] factors;
+  ulong n = 2;
 
   if (num == 1)
     return [];
@@ -187,13 +180,12 @@ if (isIntegral!T) {
     num /= n;
   }
 
-  return n ~ memoize!(distinctPrimeFactors2!T)(num);
+  return n ~ memoize!(distinctPrimeFactors2)(num);
 }
 
-T[] distinctPrimeFactors1(T)(T num)
-if (isIntegral!T) {
-  T[] factors;
-  T n = 2;
+ulong[] distinctPrimeFactors1(ulong num) {
+  ulong[] factors;
+  ulong n = 2;
 
   while (num > 1) {
     while (num % n != 0) {
@@ -219,17 +211,16 @@ Factor maxMultiplicity(Factor a, Factor b) {
   return a.multiplicity > b.multiplicity ? a : b;
 }
 
-auto isPrimeInit(T = ulong)()
-if (isIntegral!T) {
-  Primes!T primes = new Primes!T();
+auto isPrimeInit() {
+  Primes!ulong primes = new Primes!ulong();
 
-  bool isPrime(T number) {
+  bool isPrime(ulong number) {
     auto primesCopy = primes.save;
 
     if (number <= primesCopy.topPrime)
       return number in primesCopy.cache ? true : false;
 
-    auto root = std.math.sqrt(real(number)).to!T();
+    auto root = std.math.sqrt(real(number)).to!ulong();
     auto found = primesCopy.find!(p => number % p == 0 || p > root)().front;
 
     return found > root;
@@ -275,3 +266,30 @@ auto getTriplets(ulong perimeter) {
   return triplets;
 }
 
+auto maximizePower(Tuple!(ulong, ulong) source) {
+  Tuple!(ulong, ulong) result;
+  auto perfectPower = classifyPerfectPower(source[0]);
+  result = tuple(perfectPower[0], perfectPower[1] * source[1]);
+  return result;
+}
+
+auto classifyPerfectPower(ulong source) {
+  static Tuple!(ulong, ulong)[ulong] cache;
+  Tuple!(ulong, ulong)* saved = source in cache;
+
+  if (saved != null)
+    return *saved;
+
+  Tuple!(ulong, ulong) result;
+  auto primeFactorGroups = source.primeFactors.group.array();
+  auto divisor = primeFactorGroups.map!(a => a[1]).fold!gcd();
+  primeFactorGroups.each!((ref g) => g[1] /= divisor)();
+  result[0] = primeFactorGroups
+    .map!(a => a[0] ^^ a[1])
+    .fold!((a, b) => a * b)();
+  result[1] = divisor;
+
+  cache[source] = result;
+
+  return result;
+}

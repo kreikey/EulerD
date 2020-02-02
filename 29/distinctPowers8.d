@@ -1,14 +1,13 @@
 #!/usr/bin/env rdmd -i -I..
 
 import std.stdio;
+import std.datetime.stopwatch;
 import std.range;
-import std.array;
 import std.algorithm;
 import std.conv;
-import std.datetime.stopwatch;
-import std.functional;
+import std.typecons;
+//import kreikey.bigint;
 import kreikey.intmath;
-import kreikey.util;
 
 void main(string[] args) {
   StopWatch timer;
@@ -21,15 +20,17 @@ void main(string[] args) {
 
   timer.start();
 
-  iota(2, n+ 1)
-    .map!(base => iota(2, n+1)
-      .map!(exponent => base.primeFactors.replicate(exponent).asort())
-      .array
-      .asort())
-    .array()
+  iota(2, n + 1)
+    .map!classifyPerfectPower
+    .map!(a => iota(2, n + 1)
+        .map!(b => tuple(a[0], a[1] * b))
+        .array())
+    .array
     .multiwayUnion
     .count
     .writeln();
+
+  //writeln(count(multiwayUnion(array(map!(a => array(map!(b => tuple(a[0], a[1] * b))(iota(2, n + 1))))(map!classifyPerfectPower(iota(2, n + 1)))))));
 
   timer.stop();
 
