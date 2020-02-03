@@ -2,8 +2,6 @@ module poker;
 
 import std.algorithm;
 import std.range;
-import std.regex;
-import std.stdio;
 
 struct Card {
   int value;
