@@ -12,12 +12,17 @@ import kreikey.bigint;
 
 void main() {
   StopWatch timer;
-  writeln("Lychrel Numbers");
+
+  writeln("Lychrel numbers");
+
   timer.start();
-  iota(BigInt(1), 10000)
-    .count!isLychrel
-    .writeln();
+  
+  auto count = iota(BigInt(1), 10000)
+    .count!isLychrel();
+
   timer.stop();
+
+  writefln("The number of possible Lychrel numbers below 10,000, using 50 iterations, is:\n%s", count);
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }
 

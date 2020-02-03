@@ -274,12 +274,6 @@ auto maximizePower(Tuple!(ulong, ulong) source) {
 }
 
 auto classifyPerfectPower(ulong source) {
-  static Tuple!(ulong, ulong)[ulong] cache;
-  Tuple!(ulong, ulong)* saved = source in cache;
-
-  if (saved != null)
-    return *saved;
-
   Tuple!(ulong, ulong) result;
   auto primeFactorGroups = source.primeFactors.group.array();
   auto divisor = primeFactorGroups.map!(a => a[1]).fold!gcd();
@@ -288,8 +282,6 @@ auto classifyPerfectPower(ulong source) {
     .map!(a => a[0] ^^ a[1])
     .fold!((a, b) => a * b)();
   result[1] = divisor;
-
-  cache[source] = result;
 
   return result;
 }
