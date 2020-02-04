@@ -9,6 +9,8 @@ import std.functional;
 import kreikey.bigint;
 import kreikey.intmath;
 
+alias powerDigitSum = memoize!powerDigitSum1;
+
 void main() {
   StopWatch timer;
   
@@ -22,9 +24,9 @@ void main() {
         .map!(b => tuple(a[0], b * a[1]))
         .array())
     .join
-    .fold!((a, b) => memoize!powerDigitSum(a[0], a[1]) > memoize!powerDigitSum(b[0], b[1]) ? a : b)();
+    .fold!((a, b) => powerDigitSum(a[0], a[1]) > powerDigitSum(b[0], b[1]) ? a : b)();
 
-  auto maxDigSum = memoize!powerDigitSum(maxPow[0], maxPow[1]);
+  auto maxDigSum = powerDigitSum(maxPow[0], maxPow[1]);
 
   timer.stop();
 
@@ -33,6 +35,6 @@ void main() {
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }
 
-ulong powerDigitSum(ulong a, ulong b) {
+ulong powerDigitSum1(ulong a, ulong b) {
   return (BigInt(a) ^^ b).toDigits.sum();
 }
