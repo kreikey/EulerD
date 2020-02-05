@@ -1415,6 +1415,10 @@ public:
     return BigInt(resmant);
   }
 
+  @property ulong digitsLength() const {
+    return this.mant.length;
+  }
+
   mixin RvalueRef;
 }
 
