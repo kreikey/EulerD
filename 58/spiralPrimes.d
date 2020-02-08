@@ -23,10 +23,9 @@ void main() {
   auto count = recurrence!((a, n) => a[n-4] + 2)(1, 2, 2, 2, 2)
     .cumulativeFold!((a, b) => a + b)
     .cumulativeFold!((a, b) => a + 1, (a, b) => a + (b.isPrime() ? 1 : 0))(tuple(0, 0))
-    .map!(a => a, a => float(a[1])/a[0])
-    .dropOne
-    .countUntil!(a => a[1] < 0.1)()
-    + 1;
+    .until!(a => a[1] > 0 && float(a[1])/a[0] < 0.1)
+    .tail(1)
+    .front[0];
 
   auto width = widthByDiagonalCount(count);
 
