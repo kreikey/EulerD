@@ -21,16 +21,17 @@ void main() {
     .filter!(a => a % 10 != 0)
     .map!classifyPerfectPower
     .map!(a => iota(2, 100)
-        .map!(b => tuple(a[0], b * a[1]))
+        .map!(b => a[0], b => b * a[1])
         .array())
     .join
-    .fold!((a, b) => powerDigitSum(a[0], a[1]) > powerDigitSum(b[0], b[1]) ? a : b)();
+    .map!(a => powerDigitSum(a.expand), a => a)
+    .fold!max();
 
-  auto maxDigSum = powerDigitSum(maxPow[0], maxPow[1]);
+  auto maxDigSum = powerDigitSum(maxPow[1].expand);
 
   timer.stop();
 
-  writefln("Power with max digit sum: %(%s^%s%)", maxPow);
+  writefln("Power with max digit sum: %(%s^%s%)", maxPow[1]);
   writefln("Max digit sum: %s", maxDigSum);
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }
