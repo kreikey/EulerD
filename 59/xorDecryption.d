@@ -40,22 +40,18 @@ void main() {
     .join();
 
   foreach (key; keys) {
-    foreach (c, k; lockstep(ciphertext, key.cycle())) {
+    foreach (c, k; lockstep(ciphertext, key.cycle()))
       plaintext ~= c ^ k;
-    }
-    words = plaintext.split(' ');
-    foreach (word; words) {
-      if (word in commonWords)
-        num++;
-    }
+
+    num = plaintext.split(' ').fold!((a, b) => a + (b in commonWords ? 1 : 0))(0);
+
     if (num > maxcount) {
       bestkey = key;
       maxcount = num;
       bestplaintext = plaintext;
     }
-    num = 0;
+
     plaintext = [];
-    words = [];
   }
 
   sum = bestplaintext.sum();
