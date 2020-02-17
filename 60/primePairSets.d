@@ -9,6 +9,7 @@ import std.conv;
 import std.traits;
 import std.functional;
 import std.math;
+import std.file;
 import kreikey.primes;
 import kreikey.intmath;
 import kreikey.digits;
@@ -30,7 +31,9 @@ void main() {
   bool stopAppending = false;
   ulong[] sums = [];
   ulong total = 0;
-  ulong topSum = 0;
+  ulong topSum = ulong.max;
+
+  //auto outfile = File("output.txt", "w");
 
   writeln("Prime pair sets");
   timer.start();
@@ -40,7 +43,7 @@ void main() {
   
   do {
     foreach (ref row; primesMatrix) {
-      if ((topSum == 0 || (row.sum + selectedPrimes.front) < topSum) && row.all!(a => a.catsPrimeWith(selectedPrimes.front))()) {
+      if (row.all!(a => a.catsPrimeWith(selectedPrimes.front))()) {
         row ~= selectedPrimes.front;
         if (row.length == 5) {
           longestRows ~= row;
@@ -50,9 +53,7 @@ void main() {
         writeln(row);
       }
     }
-    if (!finished) {
-      primesMatrix ~= [selectedPrimes.front];
-    }
+    primesMatrix ~= [selectedPrimes.front];
     selectedPrimes.popFront();
   } while (!finished);
 
@@ -62,13 +63,17 @@ void main() {
   writeln(limit);
   writeln();
 
-  auto lastIdx = primesMatrix.countUntil!(a => a[0] >= limit)();
-  primesMatrix = primesMatrix[0 .. lastIdx];
+  auto lastIdx = primesMatrix.countUntil!(a => a[0] > limit)();
+  primesMatrix = primesMatrix[0 .. lastIdx + 1];
 
   do {
     finished = true;
-    writeln("looping");
+    writefln("Prime: %s", selectedPrimes.front);
     foreach (ref row; primesMatrix) {
+      if (row.length == 5)
+        continue;
+      else if ((row.sum() + selectedPrimes.front) < topSum)
+        finished = false;
       if (row.all!(a => a.catsPrimeWith(selectedPrimes.front))()) {
         row ~= selectedPrimes.front;
         if (row.length == 5) {
@@ -76,8 +81,6 @@ void main() {
         }
         writeln(row);
       }
-      if ((row.sum() + selectedPrimes.front) < topSum)
-        finished = false;
     }
     selectedPrimes.popFront();
   } while (!finished);
@@ -86,7 +89,7 @@ void main() {
   sums = longestRows.map!sum.array();
   total = sums.fold!max();
 
-  primesMatrix.each!writeln();
+  //primesMatrix.each!(a => outfile.writeln(a))();
   writeln("Longest rows:");
   writeln(longestRows);
 
