@@ -31,7 +31,7 @@ if (isIntegral!(typeof(base))) {
   ulong result;
 
   for (size_t i = 0; i < digits.length; i++) {
-    result += digits[i] * base ^^ (digits.length - i - 1);
+    result += ulong(digits[i]) * ulong(base) ^^ ulong(digits.length - i - 1);
   }
 
   return result;
