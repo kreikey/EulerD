@@ -43,7 +43,6 @@ auto primePairSets(ulong length, ulong biggestSum) {
   PrimesRange primesCopy;
 
   void inner(ulong[] cattables, PrimesRange primes, ulong depth) {
-    PrimesRange primesCopy;
     ulong catsum = cattables.sum();
     if (depth == length) {
       if (catsum < biggestSum)
@@ -52,9 +51,7 @@ auto primePairSets(ulong length, ulong biggestSum) {
       return;
     }
 
-    foreach (p; primes) {
-      if (catsum + p > biggestSum)
-        break;
+    foreach (p; primes.until!(a => catsum + a * (length - depth) > biggestSum)) {
       if (cattables.all!(a => a.catsPrimeWith(p))()) {
         primesCopy = primes.save;
         primesCopy.popFront();
@@ -63,7 +60,7 @@ auto primePairSets(ulong length, ulong biggestSum) {
     }
   }
 
-  foreach (p; primes.until!(a => a >= biggestSum)()) {
+  foreach (p; primes.until!(a => a >= biggestSum / length)()) {
     primesCopy = primes.save;
     primesCopy.popFront();
     inner([p], primesCopy, 1);
