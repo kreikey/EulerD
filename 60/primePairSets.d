@@ -81,3 +81,30 @@ bool catsPrimeWith1(ulong left, ulong right) {
 
   return true;
 }
+
+ulong getUpperBound() {
+  ulong[][] primesMatrix = [][];
+  ulong[] longestRow;
+  auto primes = new Primes!ulong();
+  bool finished = false;
+
+  auto selectedPrimes = primes.filter!(a => a != 2 && a != 5)();
+  primesMatrix ~= [selectedPrimes.front];
+  selectedPrimes.popFront();
+  
+  do {
+    foreach (ref row; primesMatrix) {
+      if (row.all!(a => a.catsPrimeWith(selectedPrimes.front))()) {
+        row ~= selectedPrimes.front;
+        if (row.length == 5) {
+          longestRow ~= row;
+          finished = true;
+          break;
+        }
+      }
+    }
+    primesMatrix ~= [selectedPrimes.front];
+    selectedPrimes.popFront();
+  } while (!finished);
+  return longestRow.sum();
+}
