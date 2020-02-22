@@ -6,33 +6,40 @@ import std.range;
 import std.algorithm;
 import std.array;
 import std.conv;
-import std.traits;
-import std.functional;
 import std.math;
 import std.file;
 import kreikey.primes;
-import kreikey.intmath;
-import kreikey.digits;
+import common;
 
-alias catsPrimeWith = memoize!catsPrimeWith1;
-//alias catsPrimeWith = catsPrimeWith1;
-ReturnType!isPrimeInit isPrime;
-
-static this() {
-  isPrime = isPrimeInit();
-}
-
-void main() {
+void main(string[] args) {
   StopWatch timer;
-  timer.start();
-  writefln("Prime pair sets");
   ulong biggestSum = 107623;
+
+  if (args.length > 1) {
+    biggestSum = args[1].to!ulong();
+  }
+
+  timer.start();
+
+  writefln("Prime pair sets");
+  writefln("Using %s as an upper bound.", biggestSum);
+
   auto result = primePairSets(5, biggestSum);
-  result.each!writeln();
-  ulong smallestSum = result.map!sum.fold!min();
+
   timer.stop();
-  writeln("The lowest sum for a set of five primes for which any two primes concatenate to produce another prime is:");
-  writeln(smallestSum);
+
+  ulong smallestSum = 0;
+
+  if (result.length == 0) {
+    writeln("No results found. Try a higher upper bound.");
+  } else {
+    writeln("results:");
+    result.each!writeln();
+    smallestSum = result.back.sum;
+    writeln("The lowest sum for a set of five primes for which any two primes concatenate to produce another prime is:");
+    writeln(smallestSum);
+  }
+
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }
 
@@ -66,45 +73,4 @@ auto primePairSets(ulong length, ulong biggestSum) {
     inner([p], primesCopy, 1);
   }
   return result;
-}
-
-bool catsPrimeWith1(ulong left, ulong right) {
-  ulong cat1 = toNumber(left.toDigits ~ right.toDigits);
-
-  if (!cat1.isPrime())
-    return false;
-
-  ulong cat2 = toNumber(right.toDigits() ~ left.toDigits);
-
-  if (!cat2.isPrime())
-    return false;
-
-  return true;
-}
-
-ulong getUpperBound() {
-  ulong[][] primesMatrix = [][];
-  ulong[] longestRow;
-  auto primes = new Primes!ulong();
-  bool finished = false;
-
-  auto selectedPrimes = primes.filter!(a => a != 2 && a != 5)();
-  primesMatrix ~= [selectedPrimes.front];
-  selectedPrimes.popFront();
-  
-  do {
-    foreach (ref row; primesMatrix) {
-      if (row.all!(a => a.catsPrimeWith(selectedPrimes.front))()) {
-        row ~= selectedPrimes.front;
-        if (row.length == 5) {
-          longestRow ~= row;
-          finished = true;
-          break;
-        }
-      }
-    }
-    primesMatrix ~= [selectedPrimes.front];
-    selectedPrimes.popFront();
-  } while (!finished);
-  return longestRow.sum();
 }
