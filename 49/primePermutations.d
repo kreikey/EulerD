@@ -40,7 +40,7 @@ void main() {
     .array
     .sort
     .uniq
-    .filterBidirectional!(a => a.canFind!(b => a.canFind(b + 3330) && a.canFind(b + 3330 * 2)))
+    .filterBidirectional!(a => a.any!(b => a.canFind(b + 3330) && a.canFind(b + 3330 * 2))())
     .map!(a => a.find!(b => a.canFind(b + 3330) && a.canFind(b + 3330 * 2))
         .front
         .recurrence!((a, n) => a[n-1] + 3330)

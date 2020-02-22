@@ -72,5 +72,6 @@ auto primePairSets(ulong length, ulong biggestSum) {
     primesCopy.popFront();
     inner([p], primesCopy, 1);
   }
+
   return result;
 }
