@@ -7,6 +7,8 @@ import std.range;
 import std.algorithm;
 import kreikey.intmath;
 
+enum Figurate {Triangular, Square, Pentagonal, Hexagonal, Heptagonal, Octagonal}
+
 void main() {
   StopWatch timer;
 
@@ -16,6 +18,10 @@ void main() {
   result.each!writeln();
   writeln("results length: ", result.length);
   writeln("sum of last: ", result.back.sum());
+  writeln("all sums:");
+
+  result.map!sum.each!writeln();
+
   timer.stop();
 
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
@@ -27,18 +33,56 @@ bool mayCycle(ulong number) {
 
 auto allFiguratesRepresentedInit(ref bool[ulong] isTriangular, ref bool[ulong] isSquare, ref bool[ulong] isPentagonal, ref bool[ulong] isHexagonal, ref bool[ulong] isHeptagonal, ref bool[ulong] isOctagonal) {
   auto allFiguratesRepresented(ulong[] numbers) {
-    if (numbers.all!(n => isTriangular[n] == false)())
+    Figurate[] singularFiguratesFound;
+    Figurate[] multiFiguratesFound;
+    Figurate[] figuratesPerNumber;
+    Figurate[] totalFiguratesFound;
+    Figurate[] uniqueFiguratesFound;
+
+    foreach (number; numbers) {
+      if (isTriangular[number]) {
+        figuratesPerNumber ~= Figurate.Triangular;
+      }
+      if (isSquare[number]) {
+        figuratesPerNumber ~= Figurate.Square;
+      }
+      if (isPentagonal[number]) {
+        figuratesPerNumber ~= Figurate.Pentagonal;
+      }
+      if (isHexagonal[number]) {
+        figuratesPerNumber ~= Figurate.Hexagonal;
+      }
+      if (isHeptagonal[number]) {
+        figuratesPerNumber ~= Figurate.Heptagonal;
+      }
+      if (isOctagonal[number]) {
+        figuratesPerNumber ~= Figurate.Octagonal;
+      }
+
+      if (figuratesPerNumber.length > 1) {
+        multiFiguratesFound ~= figuratesPerNumber;
+      } else {
+        singularFiguratesFound ~= figuratesPerNumber;
+      }
+
+      figuratesPerNumber = [];
+    }
+
+    totalFiguratesFound = multiFiguratesFound ~ singularFiguratesFound;
+    sort(totalFiguratesFound);
+    uniqueFiguratesFound = totalFiguratesFound.uniq.array();
+
+    if (uniqueFiguratesFound.length < 6)
       return false;
-    if (numbers.all!(n => isSquare[n] == false)())
+
+    sort(singularFiguratesFound);
+
+    if (singularFiguratesFound.group.canFind!(a => a[1] > 1)())
       return false;
-    if (numbers.all!(n => isPentagonal[n] == false)())
-      return false;
-    if (numbers.all!(n => isHexagonal[n] == false)())
-      return false;
-    if (numbers.all!(n => isHeptagonal[n] == false)())
-      return false;
+
     return true;
   }
+
   return &allFiguratesRepresented;
 }
 
@@ -65,6 +109,8 @@ ulong[][] findSixCyclableFigurates() {
   auto cyclable4DFigurates = merge(fourDigitTriangulars, fourDigitSquares, fourDigitPentagonals, fourDigitHexagonals, fourDigitHeptagonals, fourDigitOctagonals).uniq.filter!mayCycle.array();
   auto allFiguratesRepresented = allFiguratesRepresentedInit(isTriangular, isSquare, isPentagonal, isHexagonal, isHeptagonal, isOctagonal);
   ulong count = 0;
+  
+  //allFiguratesRepresented([8128, 2882, 8281]).writeln();
 
   auto cyclables = cyclable4DFigurates
     .group!((a, b) => a / 100 == b / 100)
@@ -96,6 +142,7 @@ ulong[][] findSixCyclableFigurates() {
       //break;
   }
 
+  result.map!allFiguratesRepresented.each!writeln();
   writeln("iteration count: ", count);
   return result;
 }
