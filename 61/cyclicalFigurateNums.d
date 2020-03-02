@@ -13,14 +13,11 @@ void main() {
   StopWatch timer;
 
   timer.start();
+  writefln("Cyclical figurate numbers");
 
   auto result = findSixCyclableFigurates();
-  result.each!writeln();
-  writeln("results length: ", result.length);
-  writeln("sum of last: ", result.back.sum());
-  writeln("all sums:");
-
-  result.map!sum.each!writeln();
+  writefln("result: %s", result);
+  writefln("sum: %s", result.sum());
 
   timer.stop();
 
@@ -40,44 +37,33 @@ auto allFiguratesRepresentedInit(ref bool[ulong] isTriangular, ref bool[ulong] i
     Figurate[] uniqueFiguratesFound;
 
     foreach (number; numbers) {
-      if (isTriangular[number]) {
+      if (isTriangular[number])
         figuratesPerNumber ~= Figurate.Triangular;
-      }
-      if (isSquare[number]) {
+      if (isSquare[number])
         figuratesPerNumber ~= Figurate.Square;
-      }
-      if (isPentagonal[number]) {
+      if (isPentagonal[number])
         figuratesPerNumber ~= Figurate.Pentagonal;
-      }
-      if (isHexagonal[number]) {
+      if (isHexagonal[number])
         figuratesPerNumber ~= Figurate.Hexagonal;
-      }
-      if (isHeptagonal[number]) {
+      if (isHeptagonal[number])
         figuratesPerNumber ~= Figurate.Heptagonal;
-      }
-      if (isOctagonal[number]) {
+      if (isOctagonal[number])
         figuratesPerNumber ~= Figurate.Octagonal;
-      }
 
-      if (figuratesPerNumber.length > 1) {
+      if (figuratesPerNumber.length > 1)
         multiFiguratesFound ~= figuratesPerNumber;
-      } else {
+      else
         singularFiguratesFound ~= figuratesPerNumber;
-      }
 
       figuratesPerNumber = [];
     }
 
     totalFiguratesFound = multiFiguratesFound ~ singularFiguratesFound;
-    sort(totalFiguratesFound);
-    uniqueFiguratesFound = totalFiguratesFound.uniq.array();
 
-    if (uniqueFiguratesFound.length < 6)
+    if (totalFiguratesFound.sort.uniq.count() < 6)
       return false;
 
-    sort(singularFiguratesFound);
-
-    if (singularFiguratesFound.group.canFind!(a => a[1] > 1)())
+    if (singularFiguratesFound.sort.group.canFind!(a => a[1] > 1)())
       return false;
 
     return true;
@@ -86,8 +72,8 @@ auto allFiguratesRepresentedInit(ref bool[ulong] isTriangular, ref bool[ulong] i
   return &allFiguratesRepresented;
 }
 
-ulong[][] findSixCyclableFigurates() {
-  ulong[][] result; 
+ulong[] findSixCyclableFigurates() {
+  ulong[] result; 
   auto triangulars = recurrence!((a, n) => a[n-1] + n + 1)(1);
   auto squares = recurrence!((a, n) => a[n-1] + 2*n + 1)(1);
   auto pentagonals = recurrence!((a, n) => a[n-1] + 3*n + 1)(1);
@@ -108,10 +94,7 @@ ulong[][] findSixCyclableFigurates() {
   auto fourDigitOctagonals = octagonals.tee!(a => isOctagonal[a] = true).find!(a => a > 999).until!(a => a >= 10000).array();
   auto cyclable4DFigurates = merge(fourDigitTriangulars, fourDigitSquares, fourDigitPentagonals, fourDigitHexagonals, fourDigitHeptagonals, fourDigitOctagonals).uniq.filter!mayCycle.array();
   auto allFiguratesRepresented = allFiguratesRepresentedInit(isTriangular, isSquare, isPentagonal, isHexagonal, isHeptagonal, isOctagonal);
-  ulong count = 0;
   
-  //allFiguratesRepresented([8128, 2882, 8281]).writeln();
-
   auto cyclables = cyclable4DFigurates
     .group!((a, b) => a / 100 == b / 100)
     .map!(a => a[0] / 100)
@@ -122,27 +105,24 @@ ulong[][] findSixCyclableFigurates() {
 
   void inner(ulong[] cyclingFigurates, ulong depth) {
     if (depth == 6) {
-      count++;
       if (allFiguratesRepresented(cyclingFigurates) && cyclingFigurates[$-1]%100 == cyclingFigurates[0]/100) {
-        result ~= cyclingFigurates;
+        result = cyclingFigurates;
       }
       return;
     }
 
     foreach (figurate; cyclables[cyclingFigurates[$-1] % 100]) {
       inner(cyclingFigurates ~ figurate, depth + 1);
-      //if (result.length != 0)
-        //break;
+      if (result.length != 0)
+        break;
     }
   }
 
   foreach (figurate; cyclable4DFigurates) {
     inner([figurate], 1);
-    //if (result.length != 0)
-      //break;
+    if (result.length != 0)
+      break;
   }
 
-  result.map!allFiguratesRepresented.each!writeln();
-  writeln("iteration count: ", count);
   return result;
 }
