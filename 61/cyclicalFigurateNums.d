@@ -17,20 +17,20 @@ alias Hexagonals = recurrence!((a, n) => a[n-1] + 4*n + 1, ulong);
 alias Heptagonals = recurrence!((a, n) => a[n-1] + 5*n + 1, ulong);
 alias Octagonals = recurrence!((a, n) => a[n-1] + 6*n + 1, ulong);
 
-ReturnType!isTriangularInit isTriangular;
-ReturnType!isSquareInit isSquare;
-ReturnType!isPentagonalInit isPentagonal;
-ReturnType!isHexagonalInit isHexagonal;
-ReturnType!isHeptagonalInit isHeptagonal;
-ReturnType!isOctagonalInit isOctagonal;
+ReturnType!(isFigurateInit!Triangulars) isTriangular;
+ReturnType!(isFigurateInit!Squares) isSquare;
+ReturnType!(isFigurateInit!Pentagonals) isPentagonal;
+ReturnType!(isFigurateInit!Hexagonals) isHexagonal;
+ReturnType!(isFigurateInit!Heptagonals) isHeptagonal;
+ReturnType!(isFigurateInit!Octagonals) isOctagonal;
 
 static this() {
-  isTriangular = isTriangularInit();
-  isSquare = isSquareInit();
-  isPentagonal = isPentagonalInit();
-  isHexagonal = isHexagonalInit();
-  isHeptagonal = isHeptagonalInit();
-  isOctagonal = isOctagonalInit();
+  isTriangular = isFigurateInit!Triangulars();
+  isSquare = isFigurateInit!Squares();
+  isPentagonal = isFigurateInit!Pentagonals();
+  isHexagonal = isFigurateInit!Hexagonals;
+  isHeptagonal = isFigurateInit!Heptagonals();
+  isOctagonal = isFigurateInit!Octagonals();
 }
 
 void main() {
@@ -137,111 +137,20 @@ ulong[][ulong] getCyclablesByDigits(ulong[] fourDigitNumbers) {
     .assocArray();
 }
 
-auto isTriangularInit() {
-  auto temp = recurrence!((a, n) => a[n - 1] + n + 1, ulong)(1);
+auto isFigurateInit(alias generator)() {
+  auto temp = generator(1);
   auto temp2 = new typeof(temp);
   *temp2 = temp;
-  auto triangulars = refRange(temp2);
+  auto figurates = refRange(temp2);
   bool[ulong] cache = null;
 
-  bool isTriangular(ulong num) {
-    if (triangulars.front <= num)
-      triangulars.until!(a => a > num)
+  bool isFigurate(ulong num) {
+    if (figurates.front <= num)
+      figurates.until!(a => a > num)
         .each!(a => cache[a] = true)();
 
     return num in cache ? true : false;
   }
 
-  return &isTriangular;
+  return &isFigurate;
 }
-
-auto isSquareInit() {
-  auto temp = recurrence!((a, n) => a[n-1] + 2*n + 1)(1);
-  auto temp2 = new typeof(temp);
-  *temp2 = temp;
-  auto squares = refRange(temp2);
-  bool[ulong] cache = null;
-
-  bool isSquare(ulong num) {
-    if (squares.front <= num)
-      squares.until!(a => a > num)
-        .each!(a => cache[a] = true)();
-
-    return num in cache ? true : false;
-  }
-
-  return &isSquare;
-}
-
-auto isPentagonalInit() {
-  auto temp = recurrence!((a, n) => a[n-1] + 3*n + 1)(1);
-  auto temp2 = new typeof(temp);
-  *temp2 = temp;
-  auto pentagonals = refRange(temp2);
-  bool[ulong] cache = null;
-
-  bool isPentagonal(ulong num) {
-    if (pentagonals.front <= num)
-      pentagonals.until!(a => a > num)
-        .each!(a => cache[a] = true)();
-
-    return num in cache ? true : false;
-  }
-
-  return &isPentagonal;
-}
-
-auto isHexagonalInit() {
-  auto temp = recurrence!((a, n) => a[n-1] + 4*n + 1)(1);
-  auto temp2 = new typeof(temp);
-  *temp2 = temp;
-  auto hexagonals = refRange(temp2);
-  bool[ulong] cache = null;
-
-  bool isHexagonal(ulong num) {
-    if (hexagonals.front <= num)
-      hexagonals.until!(a => a > num)
-        .each!(a => cache[a] = true)();
-
-    return num in cache ? true : false;
-  }
-
-  return &isHexagonal;
-}
-
-auto isHeptagonalInit() {
-  auto temp = recurrence!((a, n) => a[n-1] + 5*n + 1)(1);
-  auto temp2 = new typeof(temp);
-  *temp2 = temp;
-  auto heptagonals = refRange(temp2);
-  bool[ulong] cache = null;
-
-  bool isHeptagonal(ulong num) {
-    if (heptagonals.front <= num)
-      heptagonals.until!(a => a > num)
-        .each!(a => cache[a] = true)();
-
-    return num in cache ? true : false;
-  }
-
-  return &isHeptagonal;
-}
-
-auto isOctagonalInit() {
-  auto temp = recurrence!((a, n) => a[n-1] + 6*n + 1)(1);
-  auto temp2 = new typeof(temp);
-  *temp2 = temp;
-  auto octagonals = refRange(temp2);
-  bool[ulong] cache = null;
-
-  bool isOctagonal(ulong num) {
-    if (octagonals.front <= num)
-      octagonals.until!(a => a > num)
-        .each!(a => cache[a] = true)();
-
-    return num in cache ? true : false;
-  }
-
-  return &isOctagonal;
-}
-
