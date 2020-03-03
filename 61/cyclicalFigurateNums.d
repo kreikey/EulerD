@@ -86,7 +86,7 @@ auto allFiguratesRepresented(ulong[] numbers) {
   if (totalFiguratesFound.sort.uniq.count() < 6)
     return false;
 
-  return (singularFiguratesFound.sort.group.all!(a => a[1] == 1)());
+  return singularFiguratesFound.sort.group.all!(a => a[1] == 1)();
 }
 
 ulong[] findSixCyclableFigurates() {
