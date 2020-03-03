@@ -6,7 +6,6 @@ import std.conv;
 import std.range;
 import std.algorithm;
 import std.traits;
-import std.functional;
 import kreikey.intmath;
 
 enum Figurate {Triangular, Square, Pentagonal, Hexagonal, Heptagonal, Octagonal}
@@ -53,42 +52,42 @@ bool mayCycle(ulong number) {
   return (number % 100) > 9;
 }
 
-  auto allFiguratesRepresented(ulong[] numbers) {
-    Figurate[] singularFiguratesFound;
-    Figurate[] multiFiguratesFound;
-    Figurate[] figuratesPerNumber;
+auto allFiguratesRepresented(ulong[] numbers) {
+  Figurate[] singularFiguratesFound;
+  Figurate[] multiFiguratesFound;
+  Figurate[] figuratesPerNumber;
 
-    foreach (number; numbers) {
-      if (isTriangular(number))
-        figuratesPerNumber ~= Figurate.Triangular;
-      if (isSquare(number))
-        figuratesPerNumber ~= Figurate.Triangular;
-      if (isSquare(number))
-        figuratesPerNumber ~= Figurate.Square;
-      if (isPentagonal(number))
-        figuratesPerNumber ~= Figurate.Pentagonal;
-      if (isHexagonal(number))
-        figuratesPerNumber ~= Figurate.Hexagonal;
-      if (isHeptagonal(number))
-        figuratesPerNumber ~= Figurate.Heptagonal;
-      if (isOctagonal(number))
-        figuratesPerNumber ~= Figurate.Octagonal;
+  foreach (number; numbers) {
+    if (isTriangular(number))
+      figuratesPerNumber ~= Figurate.Triangular;
+    if (isSquare(number))
+      figuratesPerNumber ~= Figurate.Triangular;
+    if (isSquare(number))
+      figuratesPerNumber ~= Figurate.Square;
+    if (isPentagonal(number))
+      figuratesPerNumber ~= Figurate.Pentagonal;
+    if (isHexagonal(number))
+      figuratesPerNumber ~= Figurate.Hexagonal;
+    if (isHeptagonal(number))
+      figuratesPerNumber ~= Figurate.Heptagonal;
+    if (isOctagonal(number))
+      figuratesPerNumber ~= Figurate.Octagonal;
 
-      if (figuratesPerNumber.length > 1)
-        multiFiguratesFound ~= figuratesPerNumber;
-      else
-        singularFiguratesFound ~= figuratesPerNumber;
+    if (figuratesPerNumber.length > 1)
+      multiFiguratesFound ~= figuratesPerNumber;
+    else
+      singularFiguratesFound ~= figuratesPerNumber;
 
-      figuratesPerNumber = [];
-    }
-
-    auto totalFiguratesFound = multiFiguratesFound ~ singularFiguratesFound;
-
-    if (totalFiguratesFound.sort.uniq.count() < 6)
-      return false;
-
-    return (singularFiguratesFound.sort.group.all!(a => a[1] == 1)());
+    figuratesPerNumber = [];
   }
+
+  auto totalFiguratesFound = multiFiguratesFound ~ singularFiguratesFound;
+
+  if (totalFiguratesFound.sort.uniq.count() < 6)
+    return false;
+
+  return (singularFiguratesFound.sort.group.all!(a => a[1] == 1)());
+}
 
 ulong[] findSixCyclableFigurates() {
   ulong[] result; 
