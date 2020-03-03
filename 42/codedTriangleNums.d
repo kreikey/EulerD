@@ -48,8 +48,8 @@ auto isTriangularInit() {
 
   bool isTriangular(ulong num) {
     if (triangulars.front <= num)
-      triangulars.tee!(a => cache[a] = true)
-        .find!(a => a > num)();
+      triangulars.until!(a => a > num)
+        .each!(a => cache[a] = true)();
 
     return num in cache ? true : false;
   }
