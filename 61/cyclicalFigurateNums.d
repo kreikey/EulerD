@@ -10,12 +10,6 @@ import std.meta;
 import std.functional;
 import kreikey.intmath;
 
-template staticIota(size_t N) {
-    import std.range: iota;
-    import std.meta: aliasSeqOf;
-    alias staticIota = aliasSeqOf!(N.iota);
-}
-
 template staticIota(size_t S, size_t E) {
     import std.range: iota;
     import std.meta: aliasSeqOf;
@@ -24,23 +18,14 @@ template staticIota(size_t S, size_t E) {
 
 unittest {
     size_t count = 0;
-    foreach (i; staticIota!10) {
+    foreach (i; staticIota!(1, 11) {
         mixin("++count;");
     }
     assert(count == 10);
 }
 
 enum Figurate {Triangular, Square, Pentagonal, Hexagonal, Heptagonal, Octagonal}
-
 bool delegate(ulong num)[] figurateCheckers;
-
-//template genFigurateLambda(int mul) {
-  //const char[] genFigurateLambda = "(a, n) => a[n-1] + " ~ mul.to!string() ~ " * n + 1";
-//}
-
-string genFiguratePredicate(int mul) {
-  return "a[n-1] + " ~ mul.to!string() ~ " * n + 1";
-}
 
 static this() {
   foreach (n; staticIota!(1, 7))
@@ -60,6 +45,10 @@ void main() {
   timer.stop();
 
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
+}
+
+string genFiguratePredicate(int mul) {
+  return "a[n-1] + " ~ mul.to!string() ~ " * n + 1";
 }
 
 bool mayCycle(ulong number) {
@@ -124,11 +113,8 @@ ulong[] findSixCyclableFigurates() {
 ulong[] getCyclable4DFigurates() {
   ulong[][] fourDigitFiguratesGrid;
 
-  //auto bleh = mixin(genFigurateLambda!(1));
-
-  foreach (n; staticIota!(1, 7)) {
+  foreach (n; staticIota!(1, 7))
     fourDigitFiguratesGrid ~= recurrence!(genFiguratePredicate(n), ulong)(1).find!(a => a > 999).until!(a => a >= 10000).array();
-  }
 
   return fourDigitFiguratesGrid.multiwayUnion.filter!mayCycle.array();
 }
