@@ -6,9 +6,6 @@ import std.conv;
 import std.range;
 import std.algorithm;
 import std.traits;
-import std.meta;
-import std.functional;
-import kreikey.intmath;
 
 template staticIota(size_t S, size_t E) {
     import std.range: iota;
