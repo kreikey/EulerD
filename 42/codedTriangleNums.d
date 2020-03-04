@@ -41,12 +41,10 @@ void main() {
 
 auto isTriangularInit() {
   auto temp = recurrence!((a, n) => a[n - 1] + n)(0);
-  auto temp2 = new typeof(temp);
-  *temp2 = temp;
-  auto triangulars = refRange(temp2);
   bool[ulong] cache = null;
 
   bool isTriangular(ulong num) {
+    auto triangulars = refRange(&temp);
     if (triangulars.front <= num)
       triangulars.until!(a => a > num)
         .each!(a => cache[a] = true)();

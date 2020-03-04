@@ -6,31 +6,45 @@ import std.conv;
 import std.range;
 import std.algorithm;
 import std.traits;
+import std.meta;
+import std.functional;
 import kreikey.intmath;
+
+template staticIota(size_t N) {
+    import std.range: iota;
+    import std.meta: aliasSeqOf;
+    alias staticIota = aliasSeqOf!(N.iota);
+}
+
+template staticIota(size_t S, size_t E) {
+    import std.range: iota;
+    import std.meta: aliasSeqOf;
+    alias staticIota = aliasSeqOf!(iota(S, E));
+}
+
+unittest {
+    size_t count = 0;
+    foreach (i; staticIota!10) {
+        mixin("++count;");
+    }
+    assert(count == 10);
+}
 
 enum Figurate {Triangular, Square, Pentagonal, Hexagonal, Heptagonal, Octagonal}
 
-alias Triangulars = recurrence!((a, n) => a[n-1] + n + 1, ulong);
-alias Squares = recurrence!((a, n) => a[n-1] + 2*n + 1, ulong);
-alias Pentagonals = recurrence!((a, n) => a[n-1] + 3*n + 1, ulong);
-alias Hexagonals = recurrence!((a, n) => a[n-1] + 4*n + 1, ulong);
-alias Heptagonals = recurrence!((a, n) => a[n-1] + 5*n + 1, ulong);
-alias Octagonals = recurrence!((a, n) => a[n-1] + 6*n + 1, ulong);
+bool delegate(ulong num)[] figurateCheckers;
 
-ReturnType!(isFigurateInit!Triangulars) isTriangular;
-ReturnType!(isFigurateInit!Squares) isSquare;
-ReturnType!(isFigurateInit!Pentagonals) isPentagonal;
-ReturnType!(isFigurateInit!Hexagonals) isHexagonal;
-ReturnType!(isFigurateInit!Heptagonals) isHeptagonal;
-ReturnType!(isFigurateInit!Octagonals) isOctagonal;
+//template genFigurateLambda(int mul) {
+  //const char[] genFigurateLambda = "(a, n) => a[n-1] + " ~ mul.to!string() ~ " * n + 1";
+//}
+
+string genFiguratePredicate(int mul) {
+  return "a[n-1] + " ~ mul.to!string() ~ " * n + 1";
+}
 
 static this() {
-  isTriangular = isFigurateInit!Triangulars();
-  isSquare = isFigurateInit!Squares();
-  isPentagonal = isFigurateInit!Pentagonals();
-  isHexagonal = isFigurateInit!Hexagonals;
-  isHeptagonal = isFigurateInit!Heptagonals();
-  isOctagonal = isFigurateInit!Octagonals();
+  foreach (n; staticIota!(1, 7))
+    figurateCheckers ~= isFigurateInit!(recurrence!(genFiguratePredicate(n), ulong))();
 }
 
 void main() {
@@ -58,20 +72,10 @@ auto allFiguratesRepresented(ulong[] numbers) {
   Figurate[] figuratesPerNumber;
 
   foreach (number; numbers) {
-    if (isTriangular(number))
-      figuratesPerNumber ~= Figurate.Triangular;
-    if (isSquare(number))
-      figuratesPerNumber ~= Figurate.Triangular;
-    if (isSquare(number))
-      figuratesPerNumber ~= Figurate.Square;
-    if (isPentagonal(number))
-      figuratesPerNumber ~= Figurate.Pentagonal;
-    if (isHexagonal(number))
-      figuratesPerNumber ~= Figurate.Hexagonal;
-    if (isHeptagonal(number))
-      figuratesPerNumber ~= Figurate.Heptagonal;
-    if (isOctagonal(number))
-      figuratesPerNumber ~= Figurate.Octagonal;
+    foreach (isFigurate, FigurateType; lockstep(figurateCheckers, [EnumMembers!Figurate])) {
+      if (isFigurate(number))
+        figuratesPerNumber ~= FigurateType;
+    }
 
     if (figuratesPerNumber.length > 1)
       multiFiguratesFound ~= figuratesPerNumber;
@@ -120,12 +124,11 @@ ulong[] findSixCyclableFigurates() {
 ulong[] getCyclable4DFigurates() {
   ulong[][] fourDigitFiguratesGrid;
 
-  fourDigitFiguratesGrid ~= Triangulars(1).find!(a => a > 999).until!(a => a >= 10000).array();
-  fourDigitFiguratesGrid ~= Squares(1).find!(a => a > 999).until!(a => a >= 10000).array();
-  fourDigitFiguratesGrid ~= Pentagonals(1).find!(a => a > 999).until!(a => a >= 10000).array();
-  fourDigitFiguratesGrid ~= Hexagonals(1).find!(a => a > 999).until!(a => a >= 10000).array();
-  fourDigitFiguratesGrid ~= Heptagonals(1).find!(a => a > 999).until!(a => a >= 10000).array();
-  fourDigitFiguratesGrid ~= Octagonals(1).find!(a => a > 999).until!(a => a >= 10000).array();
+  //auto bleh = mixin(genFigurateLambda!(1));
+
+  foreach (n; staticIota!(1, 7)) {
+    fourDigitFiguratesGrid ~= recurrence!(genFiguratePredicate(n), ulong)(1).find!(a => a > 999).until!(a => a >= 10000).array();
+  }
 
   return fourDigitFiguratesGrid.multiwayUnion.filter!mayCycle.array();
 }
@@ -139,12 +142,10 @@ ulong[][ulong] getCyclablesByDigits(ulong[] fourDigitNumbers) {
 
 auto isFigurateInit(alias generator)() {
   auto temp = generator(1);
-  auto temp2 = new typeof(temp);
-  *temp2 = temp;
-  auto figurates = refRange(temp2);
   bool[ulong] cache = null;
 
   bool isFigurate(ulong num) {
+    auto figurates = refRange(&temp);
     if (figurates.front <= num)
       figurates.until!(a => a > num)
         .each!(a => cache[a] = true)();
