@@ -5,28 +5,19 @@ import std.datetime.stopwatch;
 import std.conv;
 import std.range;
 import std.algorithm;
+import std.functional;
 import std.traits;
 
-template staticIota(size_t S, size_t E) {
-    import std.range: iota;
-    import std.meta: aliasSeqOf;
-    alias staticIota = aliasSeqOf!(iota(S, E));
-}
-
-unittest {
-    size_t count = 0;
-    foreach (i; staticIota!(1, 11) {
-        mixin("++count;");
-    }
-    assert(count == 10);
-}
-
-enum Figurate {Triangular, Square, Pentagonal, Hexagonal, Heptagonal, Octagonal}
+enum Figurate {triangular = 1, square, pentagonal, hexagonal, heptagonal, octagonal}
 bool delegate(ulong num)[] figurateCheckers;
+alias FigGen = ReturnType!(generate!(ReturnType!genFigurateInit));
+FigGen[] figurateGenerators;
 
 static this() {
-  foreach (n; staticIota!(1, 7))
-    figurateCheckers ~= isFigurateInit!(recurrence!(genFiguratePredicate(n), ulong))();
+  foreach (f; [EnumMembers!Figurate]) {
+    figurateGenerators ~= genFigurateInit(f).generate();
+    figurateCheckers ~= isFigurateInit(genFigurateInit(f).generate());
+  }
 }
 
 void main() {
@@ -34,7 +25,6 @@ void main() {
 
   timer.start();
   writefln("Cyclical figurate numbers");
-
   auto result = findSixCyclableFigurates();
   writefln("result: %s", result);
   writefln("sum: %s", result.sum());
@@ -44,12 +34,23 @@ void main() {
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }
 
-string genFiguratePredicate(int mul) {
-  return "a[n-1] + " ~ mul.to!string() ~ " * n + 1";
-}
-
 bool mayCycle(ulong number) {
   return (number % 100) > 9;
+}
+
+bool cyclesWith(ulong a, ulong b) {
+  return a % 100 == b / 100;
+}
+
+auto genFigurateInit(Figurate mul) {
+  ulong last = 0;
+  ulong n = 0;
+
+  return delegate ulong() {
+    last = last + mul * n + 1;
+    n++;
+    return last;
+  };
 }
 
 auto allFiguratesRepresented(ulong[] numbers) {
@@ -85,13 +86,16 @@ ulong[] findSixCyclableFigurates() {
   auto cyclables = getCyclablesByDigits(cyclable4DFigurates);
 
   void inner(ulong[] cyclingFigurates, ulong depth) {
+    ulong last = cyclingFigurates[$-1];
+    ulong first = cyclingFigurates[0];
+
     if (depth == 6) {
-      if (cyclingFigurates[$-1]%100 == cyclingFigurates[0]/100 && allFiguratesRepresented(cyclingFigurates))
+      if (last.cyclesWith(first) && allFiguratesRepresented(cyclingFigurates))
         result = cyclingFigurates;
       return;
     }
 
-    foreach (figurate; cyclables[cyclingFigurates[$-1] % 100]) {
+    foreach (figurate; cyclables[last % 100]) {
       inner(cyclingFigurates ~ figurate, depth + 1);
       if (result.length != 0)
         break;
@@ -110,8 +114,8 @@ ulong[] findSixCyclableFigurates() {
 ulong[] getCyclable4DFigurates() {
   ulong[][] fourDigitFiguratesGrid;
 
-  foreach (n; staticIota!(1, 7))
-    fourDigitFiguratesGrid ~= recurrence!(genFiguratePredicate(n), ulong)(1).find!(a => a > 999).until!(a => a >= 10000).array();
+  foreach (f; figurateGenerators)
+    fourDigitFiguratesGrid ~= f.find!(a => a > 999).until!(a => a >= 10000).array();
 
   return fourDigitFiguratesGrid.multiwayUnion.filter!mayCycle.array();
 }
@@ -123,12 +127,11 @@ ulong[][ulong] getCyclablesByDigits(ulong[] fourDigitNumbers) {
     .assocArray();
 }
 
-auto isFigurateInit(alias generator)() {
-  auto temp = generator(1);
+auto isFigurateInit(FigGen generator) {
   bool[ulong] cache = null;
 
   bool isFigurate(ulong num) {
-    auto figurates = refRange(&temp);
+    auto figurates = refRange(&generator);
     if (figurates.front <= num)
       figurates.until!(a => a > num)
         .each!(a => cache[a] = true)();

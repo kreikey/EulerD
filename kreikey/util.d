@@ -10,3 +10,17 @@ T[] asort(alias less = (a, b) => a < b, T)(T[] source) {
 
 alias asortDescending = (a) {a.sort!((b, c) => c < b)(); return a;};
 
+template staticIota(size_t S, size_t E) {
+    import std.range: iota;
+    import std.meta: aliasSeqOf;
+    alias staticIota = aliasSeqOf!(iota(S, E));
+}
+
+unittest {
+    size_t count = 0;
+    foreach (i; staticIota!(1, 11) {
+        mixin("++count;");
+    }
+    assert(count == 10);
+}
+
