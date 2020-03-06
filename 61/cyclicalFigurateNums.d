@@ -7,6 +7,7 @@ import std.range;
 import std.algorithm;
 import std.functional;
 import std.traits;
+import std.format;
 
 enum Figurate {triangular = 1, square, pentagonal, hexagonal, heptagonal, octagonal}
 bool delegate(ulong num)[] figurateCheckers;
@@ -36,7 +37,7 @@ void main() {
 }
 
 string genFigurateLambda(int mul) {
-  return "(s, n) => s[n-1] + " ~ mul.to!string() ~ " * n + 1";
+  return q{(s, n) => s[n-1] + %s * n + 1}.format(mul);
 }
 
 bool mayCycle(ulong number) {
