@@ -47,7 +47,7 @@ bool cyclesWith(ulong a, ulong b) {
   return a % 100 == b / 100;
 }
 
-auto allFiguratesRepresented(ulong[] numbers) {
+auto allUniqFigurates(ulong[] numbers) {
   Figurate[] singularFiguratesFound;
   Figurate[] multiFiguratesFound;
   Figurate[] figuratesPerNumber;
@@ -71,7 +71,10 @@ auto allFiguratesRepresented(ulong[] numbers) {
   if (totalFiguratesFound.sort.uniq.count() < 6)
     return false;
 
-  return singularFiguratesFound.sort.group.all!(a => a[1] == 1)();
+  return singularFiguratesFound
+    .sort
+    .group
+    .all!(a => a[1] == 1)();
 }
 
 ulong[] findSixCyclableFigurates() {
@@ -84,7 +87,7 @@ ulong[] findSixCyclableFigurates() {
     ulong first = cyclingFigurates[0];
 
     if (depth == 6) {
-      if (last.cyclesWith(first) && allFiguratesRepresented(cyclingFigurates))
+      if (last.cyclesWith(first) && cyclingFigurates.allUniqFigurates())
         result = cyclingFigurates;
       return;
     }
@@ -106,18 +109,24 @@ ulong[] findSixCyclableFigurates() {
 }
 
 ulong[] getCyclable4DFigurates() {
-  ulong[][] fourDigitFiguratesGrid;
+  ulong[][] fourDigFigurates;
 
   foreach (f; EnumMembers!Figurate)
-    fourDigitFiguratesGrid ~= FigGen!f.find!(a => a > 999).until!(a => a >= 10000).array();
+    fourDigFigurates ~= FigGen!f
+      .find!(a => a > 999)
+      .until!(a => a >= 10000)
+      .array();
 
-  return fourDigitFiguratesGrid.multiwayUnion.filter!mayCycle.array();
+  return fourDigFigurates
+    .multiwayUnion
+    .filter!mayCycle
+    .array();
 }
 
 ulong[][ulong] getCyclablesByDigits(ulong[] fourDigitNumbers) {
   return fourDigitNumbers
     .chunkBy!((a, b) => a / 100 == b / 100)
-    .map!(a => a.front / 100, a => a.array())
+    .map!(a => a.front / 100, array)
     .assocArray();
 }
 
@@ -125,14 +134,12 @@ auto isFigurateInit(alias generator)() {
   auto temp = generator();
   bool[ulong] cache = null;
 
-  bool isFigurate(ulong num) {
+  return delegate(ulong num) {
     auto figurates = refRange(&temp);
     if (figurates.front <= num)
       figurates.until!(a => a > num)
         .each!(a => cache[a] = true)();
 
     return num in cache ? true : false;
-  }
-
-  return &isFigurate;
+  };
 }
