@@ -10,20 +10,21 @@ import std.traits;
 
 enum Figurate {triangular = 1, square, pentagonal, hexagonal, heptagonal, octagonal}
 bool delegate(ulong num)[] figurateCheckers;
-alias FigGen = ReturnType!(generate!(ReturnType!genFigurateInit));
-FigGen[] figurateGenerators;
+
+template FigGen(Figurate mul) {
+  alias FigGen = partial!(recurrence!(mixin(genFigurateLambda(mul)), ulong), 1uL);
+}
 
 static this() {
-  foreach (f; [EnumMembers!Figurate]) {
-    figurateGenerators ~= genFigurateInit(f).generate();
-    figurateCheckers ~= isFigurateInit(genFigurateInit(f).generate());
-  }
+  foreach (f; EnumMembers!Figurate)
+    figurateCheckers ~= isFigurateInit!(FigGen!f)();
 }
 
 void main() {
   StopWatch timer;
 
   timer.start();
+
   writefln("Cyclical figurate numbers");
   auto result = findSixCyclableFigurates();
   writefln("result: %s", result);
@@ -34,6 +35,10 @@ void main() {
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }
 
+string genFigurateLambda(int mul) {
+  return "(s, n) => s[n-1] + " ~ mul.to!string() ~ " * n + 1";
+}
+
 bool mayCycle(ulong number) {
   return (number % 100) > 9;
 }
@@ -42,26 +47,15 @@ bool cyclesWith(ulong a, ulong b) {
   return a % 100 == b / 100;
 }
 
-auto genFigurateInit(Figurate mul) {
-  ulong last = 0;
-  ulong n = 0;
-
-  return delegate ulong() {
-    last = last + mul * n + 1;
-    n++;
-    return last;
-  };
-}
-
 auto allFiguratesRepresented(ulong[] numbers) {
   Figurate[] singularFiguratesFound;
   Figurate[] multiFiguratesFound;
   Figurate[] figuratesPerNumber;
 
   foreach (number; numbers) {
-    foreach (isFigurate, FigurateType; lockstep(figurateCheckers, [EnumMembers!Figurate])) {
+    foreach (isFigurate, f; lockstep(figurateCheckers, [EnumMembers!Figurate])) {
       if (isFigurate(number))
-        figuratesPerNumber ~= FigurateType;
+        figuratesPerNumber ~= f;
     }
 
     if (figuratesPerNumber.length > 1)
@@ -114,8 +108,8 @@ ulong[] findSixCyclableFigurates() {
 ulong[] getCyclable4DFigurates() {
   ulong[][] fourDigitFiguratesGrid;
 
-  foreach (f; figurateGenerators)
-    fourDigitFiguratesGrid ~= f.find!(a => a > 999).until!(a => a >= 10000).array();
+  foreach (f; EnumMembers!Figurate)
+    fourDigitFiguratesGrid ~= FigGen!f.find!(a => a > 999).until!(a => a >= 10000).array();
 
   return fourDigitFiguratesGrid.multiwayUnion.filter!mayCycle.array();
 }
@@ -127,11 +121,12 @@ ulong[][ulong] getCyclablesByDigits(ulong[] fourDigitNumbers) {
     .assocArray();
 }
 
-auto isFigurateInit(FigGen generator) {
+auto isFigurateInit(alias generator)() {
+  auto temp = generator();
   bool[ulong] cache = null;
 
   bool isFigurate(ulong num) {
-    auto figurates = refRange(&generator);
+    auto figurates = refRange(&temp);
     if (figurates.front <= num)
       figurates.until!(a => a > num)
         .each!(a => cache[a] = true)();
