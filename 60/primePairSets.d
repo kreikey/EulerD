@@ -14,6 +14,7 @@ import common;
 void main(string[] args) {
   StopWatch timer;
   ulong biggestSum = 107623;
+  //ulong biggestSum = ulong.max;
 
   if (args.length > 1) {
     biggestSum = args[1].to!ulong();
@@ -54,6 +55,7 @@ auto primePairSets(ulong length, ulong biggestSum) {
     if (depth == length) {
       if (catsum < biggestSum)
         biggestSum = catsum;
+      writeln(cattables);
       result ~= cattables;
       return;
     }

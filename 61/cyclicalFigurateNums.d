@@ -41,7 +41,7 @@ string genFigurateLambda(int mul) {
 }
 
 bool mayCycle(ulong number) {
-  return (number % 100) > 9;
+  return number % 100 > 9;
 }
 
 bool cyclesWith(ulong a, ulong b) {

@@ -23,7 +23,7 @@ void main() {
   long pj = 0;
   long pk = 0;
 
-  writeln("Please wait for about a minute...");
+  writeln("Please wait for a few seconds...");
   auto found = findSpecialPentagonals();
 
   pj = found[0];
@@ -50,25 +50,20 @@ auto isPentagonalInit() {
 }
 
 Tuple!(long, long) findSpecialPentagonals() {
-  auto pentagonals = Pentagonals().dropOne();
-  auto diffDiffGen = recurrence!((a, n) => (n - 2)%3==0 ? 0 : a[n-1]+1)(0, 0, 0, 2, 2);
-  auto diffGen = diffDiffGen.cumulativeFold!((a, b) => a + b)(0);
-  auto distGen = diffGen.cumulativeFold!((a,b) => a + b)(1);
-  long pj = 0;
-  long pk = 0;
+  auto pentagonals = sequence!PentagonalGenerator().dropOne();
+  long sum;
+  ulong j=0;
 
-
-  foreach (i, d; distGen.enumerate()) {
-    foreach (j; iota(i+1, i+d+1)) {
-      pj = pentagonals[i];
-      pk = pentagonals[j];
-      if (isPentagonal(pj + pk) && isPentagonal(pk - pj)) {
+  for (ulong i = 0; i < short.max; i++) {
+    j = i+1;
+    do  {
+      sum = pentagonals[i] + pentagonals[j];
+      if (isPentagonal(sum) && isPentagonal(pentagonals[j] - pentagonals[i])) {
         writeln("Pentagonal sum and difference found!");
-        return tuple(pj, pk);
+        return tuple!(long, long)(pentagonals[i], pentagonals[j]);
       }
-    }
-    if (i == short.max)
-      break;
+      j++;
+    } while (sum >= pentagonals[j+1]);
   }
   return tuple(-1L, -1L);
 }
