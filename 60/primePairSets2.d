@@ -18,8 +18,11 @@ void main() {
   timer.start();
 
   writefln("Prime pair sets");
+  writeln("Please wait about 1.5 minutes");
 
   auto result = smallestPrimePairSet(5);
+  writeln("The lowest sum for a set of five primes for which any two primes concatenate to produce another prime is:");
+  writeln(result.sum());
 
   timer.stop();
 
@@ -75,7 +78,7 @@ auto smallestPrimePairSet(ulong length) {
 
     primesList ~= primes.front;
     topPrime = primes.front;
-    writeln(topPrime);
+    //writeln(topPrime);
     primes.popFront();
 
     foreach (p; primesList[0..$-1]) {
