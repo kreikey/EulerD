@@ -4,10 +4,7 @@ import std.stdio;
 import std.datetime.stopwatch;
 import std.range;
 import std.algorithm;
-import std.array;
-import std.conv;
-import std.math;
-import std.file;
+import std.functional;
 import kreikey.primes;
 import common;
 
@@ -18,9 +15,10 @@ void main() {
   timer.start();
 
   writefln("Prime pair sets");
-  writeln("Please wait about 1.5 minutes");
+  writeln("Please wait about 4 seconds");
 
   auto result = smallestPrimePairSet(5);
+  writeln(result);
   writeln("The lowest sum for a set of five primes for which any two primes concatenate to produce another prime is:");
   writeln(result.sum());
 
@@ -32,61 +30,45 @@ void main() {
 }
 
 auto smallestPrimePairSet(ulong length) {
-  ulong[] result;
   auto primes = new Primes!()();
   auto primesList = primes.take(5).array();
-  ulong biggestSum = ulong.max;
   ulong[][ulong] cattablesTable;
-  ulong topPrime = primesList[$-1];
   ulong[] cattables;
+  bool done = false;
 
   ulong[] getCattables(ulong key) {
     ulong[]* result = key in cattablesTable;
-    if (result != null)
-      return *result;
-    
-    return [];
+    return result ? *result : [];
   }
 
-  void inner(ulong[] cattablesFound, ulong[] localPrimes, ulong depth) {
-    ulong catsum;
-    if (depth == length) {
-      writeln(cattablesFound);
-      catsum = cattablesFound.sum();
-      if (catsum < biggestSum) {
-        biggestSum = catsum;
-      }
-      result = cattablesFound;
-      return;
-    }
+  ulong[] findMoreCattables(ulong[] cattablesFound, ulong[] localPrimes) {
+    ulong[] localResult = cattablesFound;
+    done = localResult.length == length;
 
-    foreach (p; localPrimes) {
-      if (cattablesFound.map!(a => getCattables(a)).join.count(p) == depth) {
-        inner(cattablesFound ~ p, getCattables(p), depth + 1);
-      }
-      if (catsum + p * (length - depth) > biggestSum)
-        break;
-    }
+    if (done)
+      return localResult;
+
+    foreach (p; localPrimes.until!(a => done))
+      if (cattablesFound[0..$-1].map!(a => getCattables(a)).join.count(p) == cattablesFound.length - 1)
+        localResult = memoize!findMoreCattables(cattablesFound ~ p, getCattables(p));
+
+    return localResult;
   }
 
   do {
-    foreach (p; primesList) {
-      inner([p], getCattables(p), 1);
-      if (p >= biggestSum / length)
-        break;
-    }
+    foreach (p; primesList.until!(a => done))
+      cattables = memoize!findMoreCattables([p], getCattables(p));
+
+    if (done)
+      continue;
 
     primesList ~= primes.front;
-    topPrime = primes.front;
-    //writeln(topPrime);
     primes.popFront();
 
-    foreach (p; primesList[0..$-1]) {
-      if (p.catsPrimeWith(topPrime)) {
-        cattablesTable[p] ~= topPrime;
-      }
-    }
-  } while (result.length == 0);
+    foreach (p; primesList[0..$-1])
+      if (p.catsPrimeWith(primesList[$-1]))
+        cattablesTable[p] ~= primesList[$-1];
+  } while (!done);
 
-  return result;
+  return cattables;
 }
