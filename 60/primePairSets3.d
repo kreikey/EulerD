@@ -27,15 +27,9 @@ void main() {
 
 auto smallestPrimePairSet(ulong length) {
   auto primes = new Primes!()();
-  auto primesList = primes.take(2).array();
-  ulong[][ulong] cattablesTable;
+  auto primesList = primes.take(length).array();
   ulong[] cattables;
   bool done = false;
-
-  ulong[] getCattables(ulong key) {
-    ulong[]* result = key in cattablesTable;
-    return result ? *result : [];
-  }
 
   ulong[] findMoreCattables(ulong[] cattablesFound, ulong[] localPrimes) {
     ulong[] localResult = cattablesFound;
@@ -44,24 +38,15 @@ auto smallestPrimePairSet(ulong length) {
     if (done)
       return localResult;
 
-    foreach (p; localPrimes.until!(a => done))
-      if (cattablesFound[0..$-1].map!(a => getCattables(a)).join.count(p) == cattablesFound.length - 1)
-        localResult = memoize!findMoreCattables(cattablesFound ~ p, getCattables(p));
+    foreach (i, p; localPrimes.enumerate.retro.until!(a => done))
+      if (cattablesFound.all!(a => a.catsPrimeWith(p)))
+        localResult = findMoreCattables(cattablesFound ~ p, localPrimes[0..i]);
 
     return localResult;
   }
 
   do {
-    foreach (p; primesList[0..$-1])
-      if (p.catsPrimeWith(primesList[$-1]))
-        cattablesTable[p] ~= primesList[$-1];
-
-    foreach (p; primesList.until!(a => done))
-      cattables = memoize!findMoreCattables([p], getCattables(p));
-
-    if (done)
-      continue;
-
+    cattables = findMoreCattables(primesList[$-1..$], primesList[0..$-1]);
     primesList ~= primes.front;
     primes.popFront();
   } while (!done);
