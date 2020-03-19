@@ -493,8 +493,9 @@ private:
   }
 
   Tuple!(byte[], byte[]) divMod(const(byte)[] lhs, const(byte)[] rhs) const {
-    if (lhs.toHash() == BigInt.lastDivModArgHashes[0] && rhs.toHash() == BigInt.lastDivModArgHashes[1])
+    if (lhs.toHash() == BigInt.lastDivModArgHashes[0] && rhs.toHash() == BigInt.lastDivModArgHashes[1]) {
       return BigInt.lastDivModResult;
+    }
     BigInt.lastDivModArgHashes[0] = lhs.toHash();
     BigInt.lastDivModArgHashes[1] = rhs.toHash();
 
@@ -512,8 +513,11 @@ private:
 
     if (rhs == [0])
       throw new Exception("Divide by zero error.");
-    if (cmpAbs(lhs, rhs) < 0)
+    if (cmpAbs(lhs, rhs) < 0) {
+      BigInt.lastDivModResult[0] = quo;
+      BigInt.lastDivModResult[1] = rem;
       return Tuple!(byte[], byte[])(quo, rem);
+    }
 
     quo.length = 0;
     quo.reserve(lhs.length - rhs.length + 1);
@@ -1407,6 +1411,10 @@ public:
 
   uint[] toDigits() const {
     return this.mant.retro.map!(a => cast(uint)a).array();
+  }
+
+  ulong countDigits() const {
+    return this.mant.length;
   }
 
   typeof(this) reverse() {

@@ -41,11 +41,6 @@ void main() {
   writeln("finished in ", timer.peek.total!"msecs"(), " milliseconds.");
 }
 
-Tuple!(ulong, ulong) reduceFrac(ulong numerator, ulong denominator) {
-  ulong divisor = gcd(numerator, denominator);
-  return tuple(numerator/divisor, denominator/divisor);
-}
-
 bool hasCommonDigits(uint[] numerator, uint[] denominator) {
   foreach (d; numerator)
     foreach (e; denominator)

@@ -12,7 +12,6 @@ import std.typecons;
 import std.functional;
 import kreikey.bytemath;
 
-alias InfiniteIota = recurrence!((a, n) => a[n-1]+1, ulong);
 alias primeFactors = memoize!primeFactors2;
 
 long[] properDivisors(long number) {
@@ -285,3 +284,9 @@ auto classifyPerfectPower(ulong source) {
 
   return result;
 }
+
+Tuple!(ulong, ulong) reduceFrac(ulong numerator, ulong denominator) {
+  ulong divisor = gcd(numerator, denominator);
+  return tuple(numerator/divisor, denominator/divisor);
+}
+

@@ -1,6 +1,9 @@
 module kreikey.util;
 
 import std.algorithm;
+import std.range;
+
+alias InfiniteIota = recurrence!((a, n) => a[n-1]+1, ulong);
 
 //alias asort = (a) {a.sort(); return a;};
 T[] asort(alias less = (a, b) => a < b, T)(T[] source) {

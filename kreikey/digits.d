@@ -8,8 +8,18 @@ import kreikey.util;
 import kreikey.bigint;
 import std.traits;
 
-uint[] toDigits(alias base = 10)(ulong source)
-if (isIntegral!(typeof(base))) {
+ulong countDigits(uint base = 10)(ulong source) {
+  ulong count = 0;
+
+  while (source != 0) {
+    source /= base;
+    count++;
+  }
+
+  return count;
+}
+
+uint[] toDigits(uint base = 10)(ulong source) {
   uint[] result;
 
   while (source != 0) {
@@ -26,7 +36,7 @@ uint[] toDigits(const char[] source) {
   return source.map!(a => a - '0').array();
 }
 
-ulong toNumber(alias base = 10)(uint[] digits) 
+ulong toNumber(ulong base = 10)(uint[] digits) 
 if (isIntegral!(typeof(base))) {
   ulong result;
 
