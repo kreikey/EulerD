@@ -16,9 +16,7 @@ void main() {
 
   auto oddPeriods = iota(2, 10001uL)
     .map!squareRootSequence
-    .map!(a => a[1].length)
-    .filter!(a => a % 2 == 1)
-    .count();
+    .count!(a => a[1].length % 2 == 1)();
 
   writeln("The number of odd period square roots <= 10,000 is:");
   writeln(oddPeriods);
