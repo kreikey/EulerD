@@ -290,3 +290,29 @@ Tuple!(ulong, ulong) reduceFrac(ulong numerator, ulong denominator) {
   return tuple(numerator/divisor, denominator/divisor);
 }
 
+ulong sqrtInt(ulong number) {
+  ulong start = 1;
+  ulong end = number;
+  ulong delta;
+  ulong halfDelta;
+  ulong candidate;
+  ulong candidateSq;
+
+  if (number == 0)
+    return 0;
+
+  do {
+    delta = end - start;
+    halfDelta = delta / 2;
+    candidate = start + halfDelta;
+    candidateSq = candidate ^^ 2;
+    if (candidateSq > number) {
+      end = candidate;
+    } else {
+      start = candidate;
+    }
+  } while (delta > 1);
+
+  return candidate;
+}
+

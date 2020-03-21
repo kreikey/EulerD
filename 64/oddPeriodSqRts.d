@@ -24,84 +24,28 @@ void main() {
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }
 
-void squareRoots(int number) {
-  writefln("%.62s", sqrt(real(number)));
-  writeln(sqrtInt(number));
-}
-
-ulong sqrtInt(ulong number) {
-  ulong start = 1;
-  ulong end = number;
-  ulong delta;
-  ulong halfDelta;
-  ulong candidate;
-  ulong candidateSq;
-
-  if (number == 0)
-    return 0;
-
-  do {
-    delta = end - start;
-    halfDelta = delta / 2;
-    candidate = start + halfDelta;
-    candidateSq = candidate ^^ 2;
-    if (candidateSq > number) {
-      end = candidate;
-    } else {
-      start = candidate;
-    }
-  } while (delta > 1);
-
-  return candidate;
-}
-
-/*
-   root(13)
-   3 + root(13) - 3
-   3 + 1 / (1 / (root(13) - 3))
-   3 + 1/(root(13) + 3) / 4)
-   3 + 1/(1 + (root(13) - 1) / 4)
-   3;(1, )
-
-
-*/
-
-
 Tuple!(long, long[]) squareRootSequence(long number) {
   Tuple!(long, long[]) result;
-  long a = sqrtInt(number);
-  long offset;
-  long denom = 1;
-  long num = 1;
-  long offsetNext;
-  long factor = 0;
-  Tuple!(long, long) fraction = tuple(1, 1);
+  long a0 = sqrt(float(number)).lrint();
+  long a;
+  long b;
+  long d = 1;
+  long n = 1;
+  long t;
 
-  result[0] = a;
-  offset = -a;
+  b = a0;
 
   do {
-    denom = number + offset * -offset;
-    if (denom == 0)
+    d = number - b^^2;
+    if (d == 0)
       break;
-    fraction = reduceFrac(num, denom);
-    num = fraction[0];
-    denom = fraction[1];
-    offsetNext = -offset;
-
-    do {
-      offsetNext -= denom;
-      factor++;
-    } while (!(offsetNext < -result[0]));
-
-    offsetNext += denom;
-    factor--;
-    offset = offsetNext;
-    num = denom;
-    a = factor;
-    factor = 0;
+    d /= n;
+    t = a0 + b;
+    a = t / d;
     result[1] ~= a;
-  } while (denom != 1);
+    n = d;
+    b = a0 - (t % d);
+  } while (d != 1);
 
   return result;
 }
