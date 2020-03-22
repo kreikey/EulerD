@@ -27,8 +27,7 @@ void main() {
     .map!(base => iota(1, maxExponent + 1uL)
         .map!(exponent => base ^^ exponent, e => base, e => e))
     .join
-    .filter!(n => n[0].countDigits() == n[2])
-    .count();
+    .count!(n => n[0].countDigits() == n[2]);
 
   writeln("Then number of n-digit positive integers which are also an nth power is:");
   writeln(matchCount);
