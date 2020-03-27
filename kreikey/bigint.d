@@ -1037,6 +1037,10 @@ public:
     //writeln("this(string) unittest passed");
   }
 
+  this(real source) nothrow {
+    this(cast(long)source);
+  }
+
   this(long source) nothrow {
     byte digit;
 
@@ -1360,6 +1364,8 @@ public:
         result = -result;
 
       return result;
+    } else static if (isFloatingPoint!T) {
+      return (T(cast(long)this));
     }
   }
 

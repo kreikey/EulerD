@@ -11,6 +11,7 @@ import std.conv;
 import std.typecons;
 import std.functional;
 import kreikey.bytemath;
+import kreikey.stack;
 
 alias primeFactors = memoize!primeFactors2;
 
@@ -316,3 +317,74 @@ ulong sqrtInt(ulong number) {
   return candidate;
 }
 
+auto squareRootSequence(T)(T number)
+if (isIntegral!T || is(T == BigInt)) {
+  T a0 = cast(T)sqrt(cast(real)number);
+  T[] result;
+  T a;
+  T b = a0;
+  T d = 1;
+  T n = 1;
+  T t;
+
+  result ~= a0;
+
+  do {
+    d = number - b^^2;
+    if (d == 0)
+      break;
+    d /= n;
+    t = a0 + b;
+    a = t / d;
+    result ~= a;
+    n = d;
+    b = a0 - (t % d);
+  } while (d != 1);
+
+  return result;
+}
+
+struct ContinuedFraction(R, T = ElementType!R)
+if (isInputRange!(Unqual!R) && isIntegral!(ElementType!R) || is(ElementType!R == BigInt)) {
+  alias E = ElementType!R;
+  E first;
+  R range;
+  size_t j = 0;
+  enum bool empty = false;
+
+  this(R _terms) {
+    first = _terms.front;
+    range = _terms.dropOne();
+  }
+
+  auto front() @property {
+    return this[j];
+  }
+
+  auto popFront() {
+    j++;
+  }
+
+  Tuple!(T, T) opIndex(size_t i) {
+    Stack!(E) termStack;
+    Tuple!(T, T) result;
+    E current;
+    result[1] = 1;
+
+    static if (hasLength!R)
+      only(first).chain(range.cycle()).take(i+1).each!(a => termStack.push(a))();
+    else
+      only(first).chain(range).take(i+1).each!(a => termStack.push(a))();
+
+    current = termStack.pop();
+    result[0] = T(current);
+
+    while (!termStack.empty) {
+      swap(result[0], result[1]);
+      current = termStack.pop();
+      result[0] = T(current) * result[1] + result[0];
+    }
+
+    return result;
+  }
+}

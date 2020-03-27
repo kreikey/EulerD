@@ -2,27 +2,31 @@
 
 import std.stdio;
 import std.datetime.stopwatch;
-import std.conv;
+import std.typecons;
 import std.algorithm;
 import std.range;
 import std.math;
-import std.typecons;
+import std.concurrency;
 import std.traits;
-import kreikey.intmath;
+import std.conv;
 import kreikey.bigint;
+import kreikey.intmath;
 
 void main() {
   StopWatch timer;
+
+  writeln("Square root convergents");
+
   timer.start();
-  writeln("Odd period square roots");
-
-  auto oddPeriods = iota(2, 10001)
-    .map!squareRootSequence
-    .count!(a => (a.length - 1) % 2 == 1)();
-
-  writeln("The number of odd period square roots <= 10,000 is:");
-  writeln(oddPeriods);
+  auto sqrt2seq = squareRootSequence(2);
+  auto approximations = ContinuedFraction!(int[], BigInt)(sqrt2seq);
+  auto count = approximations
+    .take(1000)
+    .count!(a => a[0].digitsLength > a[1].digitsLength)();
   timer.stop();
+
+  writeln("The number of fractions containing a numerator with more digits than the denominator is:");
+  writeln(count);
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }
 
