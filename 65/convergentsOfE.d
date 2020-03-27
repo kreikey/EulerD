@@ -15,26 +15,15 @@ void main() {
   writeln("Convergents of e");
   alias Eterms = Generator!ulong;
   auto convergents = ContinuedFraction!(Eterms, BigInt)(new Eterms(&contFracE));
-  auto convergents2 = ContinuedFraction!(Eterms, BigInt)(new Eterms(&contFracE));
 
-  writefln("%(%s/%s%)", convergents2[9]);
-  //foreach (i; 0..10) {
-    //writefln("%(%s/%s%)", convergents2[i]);
-  //}
-  
-  //foreach (c; convergents.take(10)) {
-    //writefln("%(%s/%s%)", c);
-  //}
-
-  //auto digSum = convergents[99][0]
-    //.digitBytes
-    //.sum();
+  auto digSum = convergents[99][0]
+    .digitBytes
+    .sum();
 
   auto r = new Eterms(&contFracE);
 
-  r.take(10).writeln();
   writeln("The sum of the digits of the numerator of the 100th convergent of the continued fraction of e is:");
-  //writeln(digSum);
+  writeln(digSum);
   timer.stop();
   writefln("Finished in %s milliseconds", timer.peek.total!"msecs"());
 }
