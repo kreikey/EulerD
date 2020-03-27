@@ -366,25 +366,40 @@ if (isInputRange!(Unqual!R) && isIntegral!(ElementType!R) || is(ElementType!R ==
   }
 
   Tuple!(T, T) opIndex(size_t i) {
-    Stack!(E) termStack;
-    Tuple!(T, T) result;
+    Tuple!(T, T) result = tuple(T(0), T(1));
     E current;
-    result[1] = 1;
 
     static if (hasLength!R)
-      only(first).chain(range.cycle()).take(i+1).each!(a => termStack.push(a))();
+      auto terms = only(first).chain(range.cycle());
     else
-      only(first).chain(range).take(i+1).each!(a => termStack.push(a))();
+      auto terms = only(first).chain(range);
 
-    current = termStack.pop();
-    result[0] = T(current);
+    Tuple!(T, T) inner(E term, size_t j) {
+      Tuple!(T, T) local;
 
-    while (!termStack.empty) {
-      swap(result[0], result[1]);
-      current = termStack.pop();
-      result[0] = T(current) * result[1] + result[0];
+      if (j == i) {
+        local[0] = T(1);
+        local[1] = T(term);
+        return local;
+      }
+
+      terms.popFront();
+      local = inner(terms.front, j + 1);
+      local[0] = T(term) * local[1] + local[0];
+      swap(local[0], local[1]);
+
+      return local;
     }
+
+    current = terms.front;
+    terms.popFront();
+
+    if (i > 0)
+      result = inner(terms.front, 1);
+
+    result[0] = T(current) * result[1] + result[0];
 
     return result;
   }
+
 }
