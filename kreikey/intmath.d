@@ -349,12 +349,22 @@ if (isInputRange!(Unqual!R) && isIntegral!(ElementType!R) || is(ElementType!R ==
   alias E = ElementType!R;
   E first;
   R range;
+  static if (hasLength!R)
+    alias Terms = typeof(only(first).chain(range.cycle()));
+  else
+    alias Terms = typeof(only(first).chain(range));
+  Terms terms;
   size_t j = 0;
   enum bool empty = false;
+  E[] cache;
 
   this(R _terms) {
     first = _terms.front;
     range = _terms.dropOne();
+    static if (hasLength!R)
+      terms = only(first).chain(range.cycle());
+    else
+      terms = only(first).chain(range);
   }
 
   auto front() @property {
@@ -369,37 +379,34 @@ if (isInputRange!(Unqual!R) && isIntegral!(ElementType!R) || is(ElementType!R ==
     Tuple!(T, T) result = tuple(T(0), T(1));
     E current;
 
-    static if (hasLength!R)
-      auto terms = only(first).chain(range.cycle());
-    else
-      auto terms = only(first).chain(range);
-
-    Tuple!(T, T) inner(E term, size_t j) {
+    Tuple!(T, T) inner(size_t j) {
       Tuple!(T, T) local;
 
       if (j == i) {
         local[0] = T(1);
-        local[1] = T(term);
+        local[1] = T(cache[j]);
         return local;
       }
 
-      terms.popFront();
-      local = inner(terms.front, j + 1);
-      local[0] = T(term) * local[1] + local[0];
+      local = inner(j+1);
+      local[0] = T(cache[j]) * local[1] + local[0];
       swap(local[0], local[1]);
 
       return local;
     }
 
-    current = terms.front;
-    terms.popFront();
+    while (i >= cache.length) {
+      cache ~= terms.front;
+      terms.popFront();
+    }
+
+    current = cache[0];
 
     if (i > 0)
-      result = inner(terms.front, 1);
+      result = inner(1);
 
     result[0] = T(current) * result[1] + result[0];
 
     return result;
   }
-
 }

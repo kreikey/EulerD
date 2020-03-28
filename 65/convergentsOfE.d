@@ -26,6 +26,9 @@ void main() {
   writeln(digSum);
   timer.stop();
   writefln("Finished in %s milliseconds", timer.peek.total!"msecs"());
+  // 6963524437876961749120273824619538346438023188214475670667
+  //6 + 9 + 6 + 3 + 5 + 2 + 4 + 4 + 3 + 7 + 8 + 7 + 6 + 9 + 6 + 1 + 7 + 4 + 9 + 1 + 2 + 0 + 2 + 7 + 3 + 8 + 2 + 4 + 6 + 1 + 9 + 5 + 3 + 8 + 3 + 4 + 6 + 4 + 3 + 8 + 0 + 2 + 3 + 1 + 8 + 8 + 2 + 1 + 4 + 4 + 7 + 5 + 6 + 7 + 0 + 6 + 6 + 7
+  //= 272
 }
 
 void contFracE() {
@@ -42,49 +45,69 @@ void contFracE() {
   }
 }
 
-/*
- *struct ContinuedFraction(R, T = ElementType!R)
- *if (isInputRange!(Unqual!R) && isIntegral!(ElementType!R) || is(ElementType!R == BigInt)) {
- *  alias E = ElementType!R;
- *  E first;
- *  R range;
- *  size_t j = 0;
- *  enum bool empty = false;
- *
- *  this(R _terms) {
- *    first = _terms.front;
- *    range = _terms.dropOne();
- *  }
- *
- *  auto front() @property {
- *    return this[j];
- *  }
- *
- *  auto popFront() {
- *    j++;
- *  }
- *
- *  Tuple!(T, T) opIndex(size_t i) {
- *    Stack!(E) termStack;
- *    Tuple!(T, T) result;
- *    E current;
- *    result[1] = 1;
- *
- *    static if (hasLength!R)
- *      only(first).chain(range.cycle()).take(i+1).each!(a => termStack.push(a))();
- *    else
- *      only(first).chain(range).take(i+1).each!(a => termStack.push(a))();
- *
- *    current = termStack.pop();
- *    result[0] = T(current);
- *
- *    while (!termStack.empty) {
- *      swap(result[0], result[1]);
- *      current = termStack.pop();
- *      result[0] = T(current) * result[1] + result[0];
- *    }
- *
- *    return result;
- *  }
- *}
- */
+//struct ContinuedFraction(R, T = ElementType!R)
+//if (isInputRange!(Unqual!R) && isIntegral!(ElementType!R) || is(ElementType!R == BigInt)) {
+  //alias E = ElementType!R;
+  //E first;
+  //R range;
+  //static if (hasLength!R)
+    //alias Terms = typeof(only(first).chain(range.cycle()));
+  //else
+    //alias Terms = typeof(only(first).chain(range));
+  //Terms terms;
+  //size_t j = 0;
+  //enum bool empty = false;
+  //E[] cache;
+
+  //this(R _terms) {
+    //first = _terms.front;
+    //range = _terms.dropOne();
+    //static if (hasLength!R)
+      //terms = only(first).chain(range.cycle());
+    //else
+      //terms = only(first).chain(range);
+  //}
+
+  //auto front() @property {
+    //return this[j];
+  //}
+
+  //auto popFront() {
+    //j++;
+  //}
+
+  //Tuple!(T, T) opIndex(size_t i) {
+    //Tuple!(T, T) result = tuple(T(0), T(1));
+    //E current;
+
+    //Tuple!(T, T) inner(size_t j) {
+      //Tuple!(T, T) local;
+
+      //if (j == i) {
+        //local[0] = T(1);
+        //local[1] = T(cache[j]);
+        //return local;
+      //}
+
+      //local = inner(j+1);
+      //local[0] = T(cache[j]) * local[1] + local[0];
+      //swap(local[0], local[1]);
+
+      //return local;
+    //}
+
+    //while (i >= cache.length) {
+      //cache ~= terms.front;
+      //terms.popFront();
+    //}
+
+    //current = cache[0];
+
+    //if (i > 0)
+      //result = inner(1);
+
+    //result[0] = T(current) * result[1] + result[0];
+
+    //return result;
+  //}
+//}
