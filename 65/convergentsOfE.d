@@ -79,7 +79,6 @@ void contFracE() {
  *
  *  Tuple!(T, T) opIndex(size_t i) {
  *    Tuple!(T, T) result = tuple(T(0), T(1));
- *    E current;
  *
  *    Tuple!(T, T) inner(size_t j) {
  *      Tuple!(T, T) local;
@@ -102,12 +101,10 @@ void contFracE() {
  *      terms.popFront();
  *    }
  *
- *    current = cache[0];
- *
  *    if (i > 0)
  *      result = inner(1);
  *
- *    result[0] = T(current) * result[1] + result[0];
+ *    result[0] = T(cache[0]) * result[1] + result[0];
  *
  *    return result;
  *  }
