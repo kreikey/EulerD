@@ -80,31 +80,17 @@ void contFracE() {
  *  Tuple!(T, T) opIndex(size_t i) {
  *    Tuple!(T, T) result = tuple(T(0), T(1));
  *
- *    Tuple!(T, T) inner(size_t j) {
- *      Tuple!(T, T) local;
- *
- *      if (j == i) {
- *        local[0] = T(1);
- *        local[1] = T(cache[j]);
- *        return local;
- *      }
- *
- *      local = inner(j+1);
- *      local[0] = T(cache[j]) * local[1] + local[0];
- *      swap(local[0], local[1]);
- *
- *      return local;
- *    }
- *
  *    while (i >= cache.length) {
  *      cache ~= terms.front;
  *      terms.popFront();
  *    }
  *
- *    if (i > 0)
- *      result = inner(1);
+ *    for (size_t j = i; j < ulong.max; j--) {
+ *      result[0] = T(cache[j]) * result[1] + result[0];
+ *      swap(result[0], result[1]);
+ *    }
  *
- *    result[0] = T(cache[0]) * result[1] + result[0];
+ *    swap(result[0], result[1]);
  *
  *    return result;
  *  }
