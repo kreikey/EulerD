@@ -85,8 +85,8 @@ void contFracE() {
  *      terms.popFront();
  *    }
  *
- *    for (size_t j = i; j < ulong.max; j--) {
- *      result[0] = T(cache[j]) * result[1] + result[0];
+ *    foreach (item; cache.retro()) {
+ *      result[0] = T(item) * result[1] + result[0];
  *      swap(result[0], result[1]);
  *    }
  *

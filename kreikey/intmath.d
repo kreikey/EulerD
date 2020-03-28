@@ -307,11 +307,10 @@ ulong sqrtInt(ulong number) {
     halfDelta = delta / 2;
     candidate = start + halfDelta;
     candidateSq = candidate ^^ 2;
-    if (candidateSq > number) {
+    if (candidateSq > number)
       end = candidate;
-    } else {
+    else
       start = candidate;
-    }
   } while (delta > 1);
 
   return candidate;
@@ -383,8 +382,8 @@ if (isInputRange!(Unqual!R) && isIntegral!(ElementType!R) || is(ElementType!R ==
       terms.popFront();
     }
 
-    for (size_t j = i; j < ulong.max; j--) {
-      result[0] = T(cache[j]) * result[1] + result[0];
+    foreach (item; cache.retro()) {
+      result[0] = T(item) * result[1] + result[0];
       swap(result[0], result[1]);
     }
 
