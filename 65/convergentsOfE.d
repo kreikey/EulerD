@@ -35,14 +35,8 @@ void contFracE() {
   ulong k = 1uL;
   yield(2uL);
 
-  for (int n = 2;; n++) {
-    if (n == 3) {
-      yield(2uL * k++);
-      n = 0;
-    } else {
-      yield(1uL);
-    }
-  }
+  foreach (n; iota(1, 4).cycle.drop(1))
+    yield(n % 3 ? 1uL : 2uL * k++);
 }
 
 /*
