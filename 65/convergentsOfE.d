@@ -20,8 +20,6 @@ void main() {
     .digitBytes
     .sum();
 
-  auto r = new Eterms(&contFracE);
-
   writeln("The sum of the digits of the numerator of the 100th convergent of the continued fraction of e is:");
   writeln(digSum);
   timer.stop();
