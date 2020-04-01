@@ -21,16 +21,16 @@ void main() {
     .map!(a => a^^2)();
   auto numbers = InfiniteIota(2);
   auto noSquares = setDifference(numbers, squares);
-  //auto num = noSquares
-    //.map!(a => a, a => diophantineMinX(long(a)))
-    //.cache
-    //.enumerate
-    //.map!(a => a[0], a => a[1][0], a => a[1][1])
-    //.until!(a => a[1] > 1000)
-    //.tee!(a => writefln("i: %s, d: %s, x: %s", a.expand))
-    //.count!(a => a[2] == -1)();
-  //writeln(num);
-  writeln(diophantineMinX(61));
+  auto num = noSquares
+    .enumerate
+    .map!(a => a[0], a => a[1], a => diophantineMinX(long(a[1])))
+    .cache
+    .until!(a => a[1] > 1000)
+    //.filter!(a => a[2] == -1)
+    .tee!(a => writefln("i: %s, d: %s, x: %s", a.expand))
+    .count!(a => a[2] == -1)();
+  writeln(num);
+  //writeln(diophantineMinX(61));
   //real rem;
   //int quo;
   //writeln(remquo(5.0, 2.0, quo));
@@ -65,6 +65,8 @@ auto diophantineMinX(long d) {
 
     y = sqrt(real(temp)/d);
     frac = modf(y, intpart);
+    if (x > 1000000)
+      return (-1);
   } while (frac.feqrel(0.0) <= 16);
 
   return x;
