@@ -5,7 +5,9 @@ import std.datetime.stopwatch;
 import std.algorithm;
 import std.range;
 import std.experimental.checkedint;
+import std.math;
 import kreikey.intmath;
+import kreikey.digits;
 import kreikey.util;
 import kreikey.bigint;
 
@@ -13,48 +15,57 @@ void main() {
   StopWatch timer;
 
   timer.start();
+  writeln("long.max: ", long.max);
+  writeln("long.max digit count: ", countDigits(long.max));
   auto squares = InfiniteIota(2)
     .map!(a => a^^2)();
   auto numbers = InfiniteIota(2);
   auto noSquares = setDifference(numbers, squares);
-  //noSquares.take(100).writeln();
-  //noSquares.enumerate(1).until!(a => a[1] == 61).each!writeln();
-  auto num = noSquares
-    .map!(a => diophantineMinX(long(a)))
-    .enumerate
-    .take(1000)
-    .tee!(a => writefln("i: %s x: %s", a[0], a[1]))
-    .count!(a => a[1] == -1)();
-  writeln(num);
-  //auto n = noSquares.take(54).tail(1).front;
-  //writeln(n);
-  //writeln(diophantineMinX(BigInt(73)));
+  //auto num = noSquares
+    //.map!(a => a, a => diophantineMinX(long(a)))
+    //.cache
+    //.enumerate
+    //.map!(a => a[0], a => a[1][0], a => a[1][1])
+    //.until!(a => a[1] > 1000)
+    //.tee!(a => writefln("i: %s, d: %s, x: %s", a.expand))
+    //.count!(a => a[2] == -1)();
+  //writeln(num);
+  writeln(diophantineMinX(61));
+  //real rem;
+  //int quo;
+  //writeln(remquo(5.0, 2.0, quo));
+  //writeln(quo);
+  /* solution for 109 is:
+     25910770249
+ */
+  //auto x = 25910770249L;
+  //auto y2 = (x ^^ 2 - 1) / 109;
+  //long y = cast(long)sqrt(real(y2));
+  //writefln("%.10f", sqrt(real(y2)));
+  //writeln(y);
+  //writefln("%s^2 - 109 * %s^2 = %s", x, y, x ^^ 2 - 109 * y ^^ 2);
+  ////Finished in 1760281 milliseconds.
   timer.stop();
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }
 
 auto diophantineMinX(long d) {
   long x = 1;
-  long y = 1;
-  long a = 0;
-  long b = 0;
-  long diff1 = 0;
-  long diff2 = 0;
-  long diff3 = 0;
-  long diffdiff = 0;
-  ulong iterations = 0;
-  //writeln("D: -------------------------------------------------------------------------- ", d);
+  real y = 1.5;
+  long temp;
+  real frac;
+  real intpart;
+
   do {
-    a = x^^2;
-    b = d*y^^2;
-    while (a - b < 1)
-      a = (++x) ^^ 2;
-    while (a - b > 1)
-      b = d * (++y) ^^ 2;
-    iterations++;
-    if (iterations == 5000000)
-      return long(-1);
-  } while (a - b != 1);
+    x++;
+    temp = x * x - 1;
+
+    if (temp % d != 0)
+      continue;
+
+    y = sqrt(real(temp)/d);
+    frac = modf(y, intpart);
+  } while (frac.feqrel(0.0) <= 16);
 
   return x;
 }
