@@ -291,16 +291,17 @@ Tuple!(ulong, ulong) reduceFrac(ulong numerator, ulong denominator) {
   return tuple(numerator/divisor, denominator/divisor);
 }
 
-ulong sqrtInt(ulong number) {
-  ulong start = 1;
-  ulong end = number;
-  ulong delta;
-  ulong halfDelta;
-  ulong candidate;
-  ulong candidateSq;
+T sqrtInt(T)(T number)
+if (isIntegral!T || is(T == BigInt)) {
+  T start = 1;
+  T end = number;
+  T delta;
+  T halfDelta;
+  T candidate;
+  T candidateSq;
 
   if (number == 0)
-    return 0;
+    return T(0);
 
   do {
     delta = end - start;

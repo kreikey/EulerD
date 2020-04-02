@@ -2,7 +2,7 @@ module kreikey.bigint;
 
 import std.algorithm;
 import std.conv;
-//import std.stdio;
+import std.stdio;
 import std.math;
 import std.range;
 import std.traits;
@@ -1041,6 +1041,10 @@ public:
     this(cast(long)source);
   }
 
+  this(int source) nothrow {
+    this(long(source));
+  }
+
   this(long source) nothrow {
     byte digit;
 
@@ -1097,6 +1101,47 @@ public:
     assert(b.mant == [0]);
     assert(b.sign == false);
     //writeln("this(long) unittest passed");
+  }
+
+  this(uint source) nothrow {
+    this(ulong(source));
+  }
+
+  this(ulong source) nothrow {
+    byte digit;
+
+    this.sign = source < 0;
+    this.mant.length = 0;
+
+    do {
+      digit = source % 10UL;
+      source = source / 10;
+      this.mant ~= digit;
+    } while (source != 0);
+  }
+  unittest {
+    //writeln("this(long) unittest");
+    BigInt q = BigInt(0uL);
+    assert(q.mant == [0]);
+
+    BigInt num = BigInt(100uL);
+    assert(num.mant == [0, 0, 1]);
+    assert(num.sign == false);
+
+    BigInt num2 = BigInt(321uL);
+    assert(num2.mant == [1, 2, 3]);
+    assert(num2.sign == false);
+
+    BigInt num3 = BigInt(0uL);
+    assert(num3.mant == [0]);
+    assert(num3.sign == false);
+
+    BigInt a = BigInt(947436711uL);
+    BigInt b = BigInt(3245879uL);
+    assert(a.mant == [1, 1, 7, 6, 3, 4, 7, 4, 9]);
+    assert(a.sign == false);
+    assert(b.mant == [9, 7, 8, 5, 4, 2, 3]);
+    assert(b.sign == false);
   }
 
   this(const(byte)[] source, bool sign) nothrow {
