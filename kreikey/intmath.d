@@ -312,6 +312,7 @@ if (isIntegral!T || is(T == BigInt)) {
       end = candidate;
     else
       start = candidate;
+    //writeln(delta);
   } while (delta > 1);
 
   return candidate;
