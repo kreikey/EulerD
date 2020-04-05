@@ -20,6 +20,18 @@ void main() {
 
   auto numbers = LinkedList!int([1, 2, 3, 4, 5]);
   printList(numbers);
+  writeln(*numbers.cur);
+  numbers.append(6);
+  numbers.prepend(0);
+  printList(numbers);
+  numbers.insertAfter(-1);
+  printList(numbers);
+  numbers.insertBefore(-2);
+  printList(numbers);
+  numbers.removePrev();
+  printList(numbers);
+  numbers.removeNext();
+  printList(numbers);
   //auto cur = new Node!int(0);
 
   //foreach (n; 1..101) {
