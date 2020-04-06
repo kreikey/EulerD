@@ -18,30 +18,12 @@ void main() {
 
   timer.start();
 
-  auto numbers = LinkedList!int([1, 2, 3, 4, 5]);
-  printList(numbers);
-  writeln(*numbers.cur);
-  numbers.append(6);
-  numbers.prepend(0);
-  printList(numbers);
-  numbers.insertAfter(-1);
-  printList(numbers);
-  numbers.insertBefore(-2);
-  printList(numbers);
-  numbers.removePrev();
-  printList(numbers);
-  numbers.removeNext();
-  printList(numbers);
-  //auto cur = new Node!int(0);
+  auto squares = InfiniteIota(1)
+    .map!(a => a^^2)();
+  auto numbers = InfiniteIota(1);
+  auto noSquares = setDifference(numbers, squares);
+  auto Ds = noSquares.until!(a => a > 1000).toLinkedList.byItem();
 
-  //foreach (n; 1..101) {
-    //numbers.insertAfter(n);
-  //}
-
-  //auto squares = InfiniteIota(1)
-    //.map!(a => a^^2)();
-  //auto numbers = InfiniteIota(1);
-  //auto noSquares = setDifference(numbers, squares);
   //auto num = noSquares
     //.enumerate
     //.map!(a => a[0], a => a[1], a => diophantineMinX(long(a[1])))
@@ -82,16 +64,6 @@ auto diophantineMinX(ulong d) {
   result = cast(ulong)x;
 
   return result;
-}
-
-void printList(T)(T list)
-if (isInstanceOf!(LinkedList, T)) {
-  auto cur = list.first;
-  while (cur != null) {
-    write(*cur);
-    write(cur == list.last ? "\n" : ", ");
-    cur = cur.next;
-  }
 }
 
 // xfrac.feqrel(0.0) <= 16

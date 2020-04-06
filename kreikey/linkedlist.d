@@ -3,143 +3,205 @@ module kreikey.linkedlist;
 import std.conv : to;
 import std.range;
 import std.stdio;
+import std.traits;
+import core.exception;
 
-struct LinkedList(T) {
-  Node!T* first = null;
-  Node!T* last = null;
-  Node!T* cur = null;
-
-  this(R)(R items)
+auto toLinkedList(R)(R items)
   if (isInputRange!R) {
-    foreach (item; items) {
-      append(item);
-    }
-    cur = first;
-  }
+  return LinkedList!(ElementType!R)(items);
+}
 
-  void insert(Node!T* item, Node!T* existing) {
-    if (existing == null) {
-      item.next = first;
-      item.prev = null;
-      if (first)
-        first.prev = item;
-      first = item;
-      if (!item.next)
-        last = item;
-    } else {
-      item.next = existing.next;
-      item.prev = existing;
-      existing.next = item;
+template LinkedList(T) {
+  struct LinkedList {
+    private Node* first = null;
+    private Node* last = null;
 
-      if (existing == last) {
-        last = item;
-      } else {
-        item.next.prev = item;
+    this(R)(R items)
+    if (isInputRange!R && is(ElementType!R == T)) {
+      foreach (item; items) {
+        append(item);
       }
     }
-  }
 
-  void insertBefore(T value) {
-    auto item = new Node!T(value);
+    private void insert(Node* item, Node* existing) {
+      if (existing == null) {
+        item.next = first;
+        item.prev = null;
+        if (first)
+          first.prev = item;
+        first = item;
+        if (!item.next)
+          last = item;
+      } else {
+        item.next = existing.next;
+        item.prev = existing;
+        existing.next = item;
 
-    if (cur != null)
-      cur = cur.prev;
-
-    insert(item, cur);
-    cur = item;
-  }
-
-  void insertAfter(T value) {
-    auto item = new Node!T(value);
-
-    insert(item, cur);
-    cur = item;
-  }
-
-  void append(T value) {
-    auto item = new Node!T(value);
-    
-    insert(item, last);
-    last = item;
-  }
-
-  void prepend(T value) {
-    auto item = new Node!T(value);
-
-    insert(item, null);
-    first = item;
-  }
-
-  // existing is never null
-  Node!T* remove(Node!T* existing) {
-    if (existing == first) {
-      first = first.next;
-      if (first)
-        first.prev = null;
-    } else {
-      existing.prev.next = existing.next;
+        if (existing == last) {
+          last = item;
+        } else {
+          item.next.prev = item;
+        }
+      }
     }
-    if (existing == last) {
-      last = last.prev;
-      if (last)
-        last.next = null;
-    } else {
-      existing.next.prev = existing.prev;
+
+    void append(T value) {
+      auto item = new Node(value);
+      
+      insert(item, last);
+      last = item;
     }
-    
-    existing.next = null;
-    existing.prev = null;
 
-    return existing;
+    void prepend(T value) {
+      auto item = new Node(value);
+
+      insert(item, null);
+      first = item;
+    }
+
+    // existing is never null
+    private Node* remove(Node* existing) {
+      if (existing == first) {
+        first = first.next;
+        if (first)
+          first.prev = null;
+      } else {
+        existing.prev.next = existing.next;
+      }
+      if (existing == last) {
+        last = last.prev;
+        if (last)
+          last.next = null;
+      } else {
+        existing.next.prev = existing.prev;
+      }
+      
+      existing.next = null;
+      existing.prev = null;
+
+      return existing;
+    }
+
+    auto byItem() @property {
+      return ByItemResult(&this);
+    }
   }
 
-  T removePrev() {
-    Node!T* result = null;
-    Node!T* temp = null;
+  private struct Node {
+    Node* next = null;
+    Node* prev = null;
+    T payload;
 
-    if (cur == null)
-      throw new Exception("Cannot remove from an empty list.");
+    this(T _payload) {
+      payload = _payload;
+    }
 
-    if (cur != first)
-      temp = cur.prev;
-    else
-      temp = cur.next;
-
-    result = remove(cur);
-    cur = temp;
-
-    return result.item;
+    string toString() {
+      return payload.to!string();
+    }
   }
 
-  T removeNext() {
-    Node!T* result = null;
-    Node!T* temp = null;
+  private struct ByItemResult {
+    LinkedList* myList;
+    Node* frontNode;
+    Node* backNode;
+    bool _empty;
 
-    if (cur == null)
-      throw new Exception("Cannot remove from an empty list.");
+    this(LinkedList* _myList) {
+      frontNode = _myList.first;
+      backNode = _myList.last;
+      _empty = frontNode == null && backNode == null;
+      myList = _myList;
+    }
 
-    if (cur.next != null)
-      temp = cur.next;
-    else
-      temp = cur.prev;
+    T front() @property {
+      if (_empty)
+        throw new Exception("Attempting to fetch the front of an empty LinkedList range of " ~ T.stringof);
 
-    result = remove(cur);
-    cur = temp;
+      return frontNode.payload;
+    }
 
-    return result.item;
+    void popFront() {
+      if (_empty)
+        return;
+
+      if (frontNode == backNode)
+        _empty = true;
+
+      frontNode = frontNode.next;
+    }
+
+    T back() @property {
+      if (_empty)
+        throw new Exception("Attempting to fetch the back of an empty LinkedList range of " ~ T.stringof);
+
+      return backNode.payload;
+    }
+
+    void popBack() {
+      if (_empty)
+        return;
+
+      if (frontNode == backNode)
+        _empty = true;
+
+      backNode = backNode.prev;
+    }
+
+    bool empty() @property {
+      return _empty;
+    }
+
+    auto save() @property {
+      auto copy = this;
+      return copy;
+    }
+
+    T removeFront() {
+      if (_empty)
+        throw new Exception("Attempting to removeFront() from an empty LinkedList range of " ~ T.stringof);
+
+      Node* temp = frontNode;
+      popFront();
+      Node* myNode = myList.remove(temp);
+
+      return myNode.payload;
+    }
+
+    T removeBack() {
+      if (_empty)
+        throw new Exception("Cannot removeBack() from an empty LinkedList range of " ~ T.stringof);
+
+      Node* temp = backNode;
+      popBack();
+      Node* myNode = myList.remove(temp);
+
+      return myNode.payload;
+    }
+
+    void insertFront(T value) {
+      Node* item = new Node(value);
+      Node* temp = frontNode.prev;
+      myList.insert(item, temp);
+      frontNode = item;
+    }
+
+    void insertBack(T value) {
+      Node* item = new Node(value);
+      myList.insert(item, backNode);
+      backNode = item;
+    }
   }
 }
 
-struct Node(T) {
-  Node!T* next = null;
-  Node!T* prev = null;
-  T item;
-
-  this(T _item) {
-    item = _item;
-  }
-
-  string toString() {
-    return item.to!string();
+void printList(T)(T list)
+if (isInstanceOf!(LinkedList, T)) {
+  auto cur = list.first;
+  write("[");
+  while (cur != null) {
+    write(*cur);
+    write(cur == list.last ? "]\n" : ", ");
+    cur = cur.next;
   }
 }
+
