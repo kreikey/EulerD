@@ -18,11 +18,34 @@ void main() {
 
   timer.start();
 
-  auto squares = InfiniteIota(1)
-    .map!(a => a^^2)();
-  auto numbers = InfiniteIota(1);
-  auto noSquares = setDifference(numbers, squares);
-  auto Ds = noSquares.until!(a => a > 1000).toLinkedList.byItem();
+  auto numbers = [1, 2, 3, 4, 5, 6, 7].toLinkedList();
+  auto numrange = numbers.byItem();
+  writeln(numrange);
+  numrange.drop(3).removeFront();
+  writeln(numrange);
+  numrange.popFront();
+  numrange.popBack();
+  writeln(numrange);
+  numbers.printList();
+  foreach (n; 0..2)
+    numrange.removeFront();
+  writeln(numrange);
+  numrange.removeBack();
+  writeln(numrange);
+  numrange.removeBack();
+  writeln(numrange);
+  numbers.printList();
+  numrange = numbers.byItem();
+  writeln(numrange);
+  numrange.removeFront();
+  numrange.removeFront();
+  writeln(numrange);
+  numbers.printList();
+  //auto squares = InfiniteIota(1)
+    //.map!(a => a^^2)();
+  //auto numbers = InfiniteIota(1);
+  //auto noSquares = setDifference(numbers, squares);
+  //auto Ds = noSquares.until!(a => a > 1000).toLinkedList.byItem();
 
   //auto num = noSquares
     //.enumerate

@@ -200,8 +200,10 @@ if (isInstanceOf!(LinkedList, T)) {
   write("[");
   while (cur != null) {
     write(*cur);
-    write(cur == list.last ? "]\n" : ", ");
+    if (cur != list.last)
+      write(", ");
     cur = cur.next;
   }
+  writeln("]");
 }
 
