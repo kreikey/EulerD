@@ -13,8 +13,10 @@ auto toLinkedList(R)(R items)
 
 template LinkedList(T) {
   struct LinkedList {
-    private Node* first = null;
-    private Node* last = null;
+    Node* first = null;
+    Node* last = null;
+    Node* cur = null;
+    ulong length = 0;
 
     this(R)(R items)
     if (isInputRange!R && is(ElementType!R == T)) {
@@ -43,6 +45,8 @@ template LinkedList(T) {
           item.next.prev = item;
         }
       }
+
+      length++;
     }
 
     void append(T value) {
@@ -61,6 +65,18 @@ template LinkedList(T) {
 
     // existing is never null
     private Node* remove(Node* existing) {
+      //writeln("existing: ", existing);
+      //writeln("existing.prev ", existing.prev);
+      //writeln("existing.next ", existing.next);
+      //if (existing == first)
+        //writeln("existing == first");
+      //else
+        //writeln("existing != first");
+      //if (existing == last)
+        //writeln("existing == last");        
+      //else
+        //writeln("existing != last");
+
       if (existing == first) {
         first = first.next;
         if (first)
@@ -76,10 +92,62 @@ template LinkedList(T) {
         existing.next.prev = existing.prev;
       }
       
-      existing.next = null;
-      existing.prev = null;
+      length--;
 
       return existing;
+    }
+
+    void insertBefore(T value) {
+      auto item = new Node(value);
+
+      if (cur != null)
+        cur = cur.prev;
+
+      insert(item, cur);
+      cur = item;
+    }
+
+    void insertAfter(T value) {
+      auto item = new Node(value);
+
+      insert(item, cur);
+      cur = item;
+    }
+
+    T removePrev() {
+      Node* result = null;
+      Node* temp = null;
+
+      if (cur == null)
+        throw new Exception("Cannot remove from an empty list.");
+
+      if (cur != first)
+        temp = cur.prev;
+      else
+        temp = cur.next;
+
+      result = remove(cur);
+      cur = temp;
+
+      return result.payload;
+    }
+
+    T removeNext() {
+      Node* result = null;
+      Node* temp = null;
+
+      if (cur == null)
+        throw new Exception("Cannot remove from an empty list.");
+
+      if (cur.next != null)
+        temp = cur.next;
+      else
+        temp = cur.prev;
+
+      result = remove(cur);
+      cur = temp;
+
+      return result.payload;
     }
 
     auto byItem() @property {
@@ -161,9 +229,7 @@ template LinkedList(T) {
       if (_empty)
         throw new Exception("Attempting to removeFront() from an empty LinkedList range of " ~ T.stringof);
 
-      Node* temp = frontNode;
-      popFront();
-      Node* myNode = myList.remove(temp);
+      Node* myNode = myList.remove(frontNode);
 
       return myNode.payload;
     }
@@ -172,9 +238,7 @@ template LinkedList(T) {
       if (_empty)
         throw new Exception("Cannot removeBack() from an empty LinkedList range of " ~ T.stringof);
 
-      Node* temp = backNode;
-      popBack();
-      Node* myNode = myList.remove(temp);
+      Node* myNode = myList.remove(backNode);
 
       return myNode.payload;
     }
