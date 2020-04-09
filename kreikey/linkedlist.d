@@ -26,25 +26,16 @@ template LinkedList(T) {
     }
 
     private void insert(Node* item, Node* existing) {
-      if (existing == null) {
-        item.next = first;
-        item.prev = null;
-        if (first)
-          first.prev = item;
+      item.prev = existing;
+      item.next = existing ? existing.next : first;
+      if (item.next)
+        item.next.prev = item;
+      if (item.prev)
+        item.prev.next = item;
+      if (item.next == first)
         first = item;
-        if (!item.next)
-          last = item;
-      } else {
-        item.next = existing.next;
-        item.prev = existing;
-        existing.next = item;
-
-        if (existing == last) {
-          last = item;
-        } else {
-          item.next.prev = item;
-        }
-      }
+      else if (item.prev == last)
+        last = item;
 
       length++;
     }
@@ -65,18 +56,6 @@ template LinkedList(T) {
 
     // existing is never null
     private Node* remove(Node* existing) {
-      //writeln("existing: ", existing);
-      //writeln("existing.prev ", existing.prev);
-      //writeln("existing.next ", existing.next);
-      //if (existing == first)
-        //writeln("existing == first");
-      //else
-        //writeln("existing != first");
-      //if (existing == last)
-        //writeln("existing == last");        
-      //else
-        //writeln("existing != last");
-
       if (existing == first) {
         first = first.next;
         if (first)
