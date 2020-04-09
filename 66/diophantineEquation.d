@@ -22,75 +22,30 @@ void main() {
     .map!(a => a^^2)();
   auto numbers = InfiniteIota(1);
   auto noSquares = setDifference(numbers, squares);
-  auto DsList = noSquares.until!(a => a > 1000).toLinkedList();
-
-  ulong x = 1;
-  ulong x2;
-  enum xmax = cast(ulong)sqrt(real(ulong.max));
-  writeln(xmax);
-  auto Ds = DsList.byItem();
+  auto DsList = noSquares
+    .until!(a => a > 1000)
+    .map!(a => a, getYMax)
+    .toLinkedList();
+  ulong y = 0;
+  ulong y2 = 0;
   real intpart;
-  bool didRemove = false;
 
   do {
-    x++;
-    x2 = x * x;
+    y++;
+    y2 = y * y;
 
-    writeln(DsList.byItem.take(10));
-    Ds = DsList.byItem();
-    //writefln("x: %s", x);
-
-    for (auto DsCopy = Ds; !DsCopy.empty; DsCopy.popFront()) {
-      auto D = DsCopy.front;
-      //if (DsList.length == 965) {
-        //writeln("Still trucking");
-      //}
-      if ((x2 - 1) % D == 0) {
-        //writefln("x^2 - 1 is divisible by %s", D);
-        if (modf(sqrt(real(x2 - 1)/D), intpart).feqrel(0.0) > 16) {
-          writefln("(%s^2 - 1) / %s is square", x, D);
-          writeln(D);
-          writeln(Ds.front);
-          //printList(DsList);
-          writeln(Ds.frontNode);
-          writeln(Ds.frontNode.next);
-          writeln(Ds.frontNode.prev);
-          //printList(DsList);
-          writeln(DsList.first.payload);
-          Ds.removeFront();
-          //didRemove = true;
-          //printList(DsList);
-          writeln(Ds.front);
-          writeln(DsList.length);
-        }
+    foreach (D; DsList) {
+      //writefln("%s, %s", D.expand);
+      if (y2 > D[1]) {
+        DsList.removeCur();
+        writeln(DsList.length);
+        writeln("too big");
+      } else if (modf(sqrt(real(y2 * D[0]) + 1), intpart).feqrel(0.0) > 16) {
+        DsList.removeCur();
+        writeln(DsList.length);
       }
-      //if (!didRemove)
-        //Ds.popFront();
-      //didRemove = false;
     }
-  } while (x < xmax);
-
-  //writeln(Ds.front);
-  //Ds.popFront();
-  //Ds.popFront();
-  //Ds.popFront();
-  //Ds.popFront();
-  //writeln(Ds.front);
-
-  //Ds.removeFront();
-  //Ds.popFront();
-  //Ds.popFront();
-  //Ds.popFront();
-  //Ds.popFront();
-  //Ds.popFront();
-  //Ds.removeFront();
-  //Ds = DsList.byItem();
-  //Ds.popFront();
-  //Ds.popFront();
-  //Ds.removeFront();
-  //DsList.printList();
-
-  //writeln(DsList.byItem());
+  } while (!DsList.empty);
 
   //auto num = noSquares
     //.enumerate
@@ -132,6 +87,10 @@ auto diophantineMinX(ulong d) {
   result = cast(ulong)x;
 
   return result;
+}
+
+ulong getYMax(ulong D) {
+  return cast(ulong)(sqrt(real(ulong.max)/D));
 }
 
 // xfrac.feqrel(0.0) <= 16
