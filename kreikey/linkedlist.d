@@ -7,7 +7,7 @@ import std.traits;
 import core.exception;
 
 auto toLinkedList(R)(R items)
-  if (isInputRange!R) {
+if (isInputRange!R) {
   return LinkedList!(ElementType!R)(items);
 }
 

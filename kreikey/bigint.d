@@ -1464,10 +1464,6 @@ public:
     return this.mant.retro.map!(a => cast(uint)a).array();
   }
 
-  ulong countDigits() const {
-    return this.mant.length;
-  }
-
   typeof(this) reverse() {
     byte[] resmant = this.mant.dup;
     std.algorithm.reverse(resmant);
@@ -1479,6 +1475,10 @@ public:
   }
 
   mixin RvalueRef;
+}
+
+ulong countDigits(BigInt source) {
+  return source.mant.length;
 }
 
 private:

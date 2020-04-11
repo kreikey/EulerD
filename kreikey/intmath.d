@@ -12,6 +12,7 @@ import std.typecons;
 import std.functional;
 import kreikey.bytemath;
 import kreikey.stack;
+import kreikey.digits;
 
 alias primeFactors = memoize!primeFactors2;
 
@@ -291,29 +292,32 @@ Tuple!(ulong, ulong) reduceFrac(ulong numerator, ulong denominator) {
   return tuple(numerator/divisor, denominator/divisor);
 }
 
-T sqrtInt(T)(T number)
+T sqrtInt(T)(T n)
 if (isIntegral!T || is(T == BigInt)) {
-  T start = 1;
-  T end = number;
-  T delta;
+  if (n == 0 || n == 1)
+    return n;
+
+  T minRoot = cast(T)pow(10, (countDigits(n) - 1) / 2);
+  T maxRoot = n / 2;
+  T delta = maxRoot - minRoot;
   T halfDelta;
   T candidate;
   T candidateSq;
 
-  if (number == 0)
-    return T(0);
-
   do {
-    delta = end - start;
-    halfDelta = delta / 2;
-    candidate = start + halfDelta;
+    halfDelta = delta / 2 + delta % 2;
+    candidate = minRoot + halfDelta;
     candidateSq = candidate ^^ 2;
-    if (candidateSq > number)
-      end = candidate;
-    else
-      start = candidate;
-    //writeln(delta);
+    if (candidateSq >= n)
+      maxRoot = candidate;
+    if (candidateSq <= n)
+      minRoot = candidate;
+    delta = maxRoot - minRoot;
+    //writeln("delta: ", delta);
   } while (delta > 1);
+
+  if (candidateSq > n)
+    candidate--;
 
   return candidate;
 }
