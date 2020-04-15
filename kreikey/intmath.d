@@ -292,12 +292,13 @@ Tuple!(ulong, ulong) reduceFrac(ulong numerator, ulong denominator) {
   return tuple(numerator/divisor, denominator/divisor);
 }
 
-T sqrtInt(T)(T n)
+T isqrt(T)(T n, out T remainder)
 if (isIntegral!T || is(T == BigInt)) {
   if (n == 0 || n == 1)
     return n;
 
   T minRoot = cast(T)pow(10, (countDigits(n) - 1) / 2);
+  T minSq = n;
   T maxRoot = n / 2;
   T delta = maxRoot - minRoot;
   T halfDelta;
@@ -308,18 +309,33 @@ if (isIntegral!T || is(T == BigInt)) {
     halfDelta = delta / 2 + delta % 2;
     candidate = minRoot + halfDelta;
     candidateSq = candidate ^^ 2;
-    if (candidateSq >= n)
+    if (candidateSq > n) {
       maxRoot = candidate;
-    if (candidateSq <= n)
+    } else {
       minRoot = candidate;
+      minSq = candidateSq;
+    }
     delta = maxRoot - minRoot;
-    //writeln("delta: ", delta);
   } while (delta > 1);
 
-  if (candidateSq > n)
-    candidate--;
+  remainder = n - minSq;
+  return minRoot;
+}
 
-  return candidate;
+T isqrt(T)(T n)
+if (isIntegral!T || is(T == BigInt)) {
+  T remainder;
+  T root = isqrt(n, remainder);
+  return root;
+}
+
+bool isSquare(T)(T n)
+if (isIntegral!T || is(T == BigInt)) {
+  T remainder;
+  T root;
+
+  root = sqrtInt(n, remainder);
+  return remainder == 0;
 }
 
 auto squareRootSequence(T)(T number)

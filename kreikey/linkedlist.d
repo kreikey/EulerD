@@ -45,6 +45,7 @@ template LinkedList(T) {
       
       insert(item, last);
       last = item;
+      cur = item;
     }
 
     void prepend(T value) {
@@ -52,6 +53,7 @@ template LinkedList(T) {
 
       insert(item, null);
       first = item;
+      cur = item;
     }
 
     // existing is never null
@@ -100,13 +102,13 @@ template LinkedList(T) {
       if (cur == null)
         throw new Exception("Cannot remove from an empty list.");
 
-      //if (cur != first)
-        //temp = cur.prev;
-      //else
-        //temp = cur.next;
+      if (cur != first)
+        temp = cur.prev;
+      else
+        temp = cur.next;
 
       result = remove(cur);
-      //cur = temp;
+      cur = temp;
 
       return result.payload;
     }
@@ -136,6 +138,10 @@ template LinkedList(T) {
     auto opSlice() {
       return ByItemResult(&this);
     }
+
+    bool empty() @property {
+      return length == 0;
+    }
   }
 
   private struct Node {
@@ -159,6 +165,7 @@ template LinkedList(T) {
     bool _empty;
 
     this(LinkedList* _myList) {
+      writeln("Constructing ByItemResult range over Linked List");
       frontNode = _myList.first;
       backNode = _myList.last;
       _empty = frontNode == null && backNode == null;
@@ -181,7 +188,9 @@ template LinkedList(T) {
         _empty = true;
 
       frontNode = frontNode.next;
-      myList.cur = frontNode;
+
+      if (frontNode)
+        myList.cur = frontNode;
     }
 
     T back() @property {
@@ -199,7 +208,9 @@ template LinkedList(T) {
         _empty = true;
 
       backNode = backNode.prev;
-      myList.cur = backNode;
+
+      if (backNode)
+        myList.cur = backNode;
     }
 
     bool empty() @property {

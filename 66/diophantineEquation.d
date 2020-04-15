@@ -17,14 +17,14 @@ void main() {
   StopWatch timer;
 
   timer.start();
-  //writeln(sqrtInt2(8443));
+  writeln(isqrt(99));
+  int remainder;
+  int root;
 
-  iota(0uL, uint.max)
-    .map!(a => a, a => cast(ulong)(sqrt(real(a))), sqrtInt, sqrtInt2)
-    .cache
-    .tee!(a => writefln("sqrt(%s): %s, %s, %s", a[0], a[1], a[2], a[3]))
-    .until!(a => a[1] != a[2] || a[1] != a[3])(OpenRight.no)
-    .each();
+  foreach (n; iota(0, 101)) {
+    root = isqrt(n, remainder);
+    writefln("sqrt(%s) = %s r %s", n, root, remainder);
+  }
 
   //auto squares = InfiniteIota(1)
     //.map!(a => a^^2)();
@@ -35,29 +35,48 @@ void main() {
     //.map!(a => a, getYMax)
     //.toLinkedList();
   //ulong y = 0;
+  //real x = 0;
   //ulong y2 = 0;
   //real intpart;
-  //int tooBigCount = 0;
+  int bigCount = 0;
+  //ulong Dmax = 0;
+  //ulong xmax = 0;
+  //BigInt x2 = 0;
+  //BigInt xBig = 0;
 
   //do {
     //y++;
-    //y2 = y * y;
 
     //foreach (D; DsList) {
-      //if (y2 > D[1]) {
+      //if (y > D[1]) {
+        //x2 = BigInt(y) * y * D[0] + 1;
+        //xBig = sqrtInt(x2);
+        //if (xBig ^^ 2 != x2)
+          //continue;
+        //if (xBig > xmax) {
+          //xmax = cast(ulong)xBig;
+          //Dmax = D[0];
+        //}
         //DsList.removeCur();
         ////writeln(DsList.length);
-        //writefln("%s, %s", D.expand);
-        //writeln("too big");
-        //tooBigCount++;
-      //} else if (modf(sqrt(real(y2 * D[0]) + 1), intpart).feqrel(0.0) > 16) {
+        //writefln("D: %s, ymax: %s, big", D.expand);
+        //bigCount++;
+      //} else {
+        //x = sqrt(real(y * y * D[0]) + 1);
+        //if (modf(x, intpart).feqrel(0.0) >= 16)
+          //continue;
+        //if (x > xmax) {
+          //xmax = cast(ulong)x;
+          //Dmax = D[0];
+        //}
         //DsList.removeCur();
+        //writefln("D: %s, ymax: %s", D.expand);
         ////writeln(DsList.length);
       //}
     //}
   //} while (!DsList.empty);
 
-  //writefln("too big count: %s", tooBigCount);
+  writefln("big count: %s", bigCount);
 
   //auto num = noSquares
     //.enumerate
@@ -76,36 +95,6 @@ void main() {
 
 ulong getYMax(ulong D) {
   return cast(ulong)(sqrt(real(ulong.max - 1)/D));
-}
-
-T sqrtInt2(T)(T n)
-if (isIntegral!T || is(T == BigInt)) {
-  if (n == 0 || n == 1)
-    return n;
-
-  T minRoot = cast(T)pow(10, (countDigits(n) - 1) / 2);
-  T maxRoot = n / 2;
-  T delta = maxRoot - minRoot;
-  T halfDelta;
-  T candidate;
-  T candidateSq;
-
-  do {
-    halfDelta = delta / 2 + delta % 2;
-    candidate = minRoot + halfDelta;
-    candidateSq = candidate ^^ 2;
-    if (candidateSq >= n)
-      maxRoot = candidate;
-    if (candidateSq <= n)
-      minRoot = candidate;
-    delta = maxRoot - minRoot;
-    //writeln("delta: ", delta);
-  } while (delta > 1);
-
-  if (candidateSq > n)
-    candidate--;
-
-  return candidate;
 }
 
 //auto diophantineMinX(ulong d) {
