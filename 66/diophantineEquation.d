@@ -7,24 +7,18 @@ import std.range;
 import std.experimental.checkedint;
 import std.math;
 import std.traits;
+import std.typecons;
 import kreikey.intmath;
 import kreikey.digits;
 import kreikey.util;
 import kreikey.bigint;
 import kreikey.linkedlist;
+import kreikey.primes;
 
 void main() {
   StopWatch timer;
 
   timer.start();
-  writeln(isqrt(99));
-  int remainder;
-  int root;
-
-  foreach (n; iota(0, 101)) {
-    root = isqrt(n, remainder);
-    writefln("sqrt(%s) = %s r %s", n, root, remainder);
-  }
 
   //auto squares = InfiniteIota(1)
     //.map!(a => a^^2)();
@@ -38,56 +32,79 @@ void main() {
   //real x = 0;
   //ulong y2 = 0;
   //real intpart;
-  int bigCount = 0;
+  //int bigCount = 0;
   //ulong Dmax = 0;
   //ulong xmax = 0;
+  //ulong xint = 0;
   //BigInt x2 = 0;
   //BigInt xBig = 0;
+  //BigInt remainder;
+  //ulong yprev;
+  //ulong ydiff;
 
   //do {
     //y++;
 
     //foreach (D; DsList) {
       //if (y > D[1]) {
-        //x2 = BigInt(y) * y * D[0] + 1;
-        //xBig = sqrtInt(x2);
-        //if (xBig ^^ 2 != x2)
+        //x2 = BigInt(D[0]) * y * y *  + 1;
+        //xBig = isqrt(x2, remainder);
+
+        //if (remainder != 0)
           //continue;
+
+        //ydiff = y - yprev;
+        //yprev = y;
+
         //if (xBig > xmax) {
           //xmax = cast(ulong)xBig;
           //Dmax = D[0];
         //}
+
         //DsList.removeCur();
-        ////writeln(DsList.length);
-        //writefln("D: %s, ymax: %s, big", D.expand);
+        //writefln("%s^2 - %s*%s^2 = 1\tydiff: %s, big", xBig, D[0], y, ydiff);
         //bigCount++;
       //} else {
-        //x = sqrt(real(y * y * D[0]) + 1);
-        //if (modf(x, intpart).feqrel(0.0) >= 16)
+        //x = sqrt(real(D[0] * y * y) + 1);
+
+        //if (modf(x, intpart).feqrel(0.0) < 16)
           //continue;
-        //if (x > xmax) {
-          //xmax = cast(ulong)x;
+
+        //ydiff = y - yprev;
+        //yprev = y;
+
+        //xint = cast(ulong)intpart;
+
+        //if (xint > xmax) {
+          //xmax = xint;
           //Dmax = D[0];
         //}
+
         //DsList.removeCur();
-        //writefln("D: %s, ymax: %s", D.expand);
-        ////writeln(DsList.length);
+        //writefln("%s^2 - %s*%s^2 = 1\tydiff: %s", xint, D[0], y, ydiff);
       //}
     //}
   //} while (!DsList.empty);
 
-  writefln("big count: %s", bigCount);
+  //writefln("big count: %s", bigCount);
+  //writefln("D with biggest min x: %s, biggest min x: %s", Dmax, xmax);
 
-  //auto num = noSquares
-    //.enumerate
-    //.map!(a => a[0], a => a[1], a => diophantineMinX(long(a[1])))
-    //.cache
-    //.until!(a => a[1] > 1000)
-    ////.filter!(a => a[2] == -1)
-    //.tee!(a => writefln("i: %s, d: %s, x: %s", a.expand))
-    //.count!(a => a[2] == 0)();
+  auto primes = new Primes!ulong();
+  auto parr = primes.until!(a => a >= 1001).array();
+  auto result = tuple(0uL, 0uL);
+  //writeln(parr);
 
-  //writeln(num);
+  //foreach (p; parr) {
+    //result = diophantineMinX(p);
+    //writefln("D: %s\tx: %s\ty: %s", p, result.expand);
+  //}
+
+  //writeln(diophantineMinX(parr[$-1]));
+  //writeln(diophantineMinX(997));
+  //writeln(parr[$-2]);
+  //writeln(diophantineMinX(parr[$-2]));
+  writeln(diophantineMinX(109));
+
   timer.stop();
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }
@@ -97,33 +114,61 @@ ulong getYMax(ulong D) {
   return cast(ulong)(sqrt(real(ulong.max - 1)/D));
 }
 
-//auto diophantineMinX(ulong d) {
-  //real x = 0;
-  //ulong y = 0;
-  //ulong y2;
-  //ulong x2;
-  //real intpart;
-  //real xfrac;
-  //ulong result;
+auto diophantineMinX(ulong d) {
+  ulong x = 0;
+  ulong y = 0;
+  ulong y2;
+  ulong x2;
+  real intpart;
+  real xfrac;
+  ulong result;
+  ulong ymax = getYMax(d);
+  ulong right;
+  BigInt xBig;
+  BigInt yBig;
+  BigInt x2Big;
+  BigInt y2Big;
+  BigInt remainder;
+  BigInt rightBig;
+  bool changeToBig = true;
 
-  //do {
-    //y++;
+  writeln(ymax);
+  do {
+    if (y < ymax) {
+      y++;
+      right = y * y * d + 1;
+      while (x2 < right) {
+        x++;
+        x2 = x * x;
+      }
+    } else {
+      if (changeToBig == true) {
+        writeln("Changing to BigInt");
+        xBig = x;
+        x2Big = xBig ^^ 2;
+        yBig = y;
+      }
+      ++yBig;
+      rightBig = yBig ^^ 2 * d + 1;
+      while (x2Big < rightBig) {
+        ++xBig;
+        x2Big = xBig ^^ 2;
+      }
+      writefln("%s^2*%s+1 = %s; %s^2 = %s", yBig, d, rightBig, xBig, x2Big);
+      if (rightBig < x2Big) {
+        yBig = isqrt((x2Big - 1)/d);
+        writefln("new y: %s", yBig);
+      }
+      changeToBig = false;
+    }
 
-    //try {
-      //y2 = (checked!Throw(y) * y).get;
-      //x2 = (checked!Throw(y2) * d + 1).get;
-    //} catch (Exception e) {
-      //return 0;
-    //}
-
-    //x = sqrt(real(x2));
-    //xfrac = modf(x, intpart);
-  //} while (xfrac.feqrel(0.0) <= 16);
+  } while (y <= ymax ? (x2 != right) : (x2Big != rightBig));
   
-  //result = cast(ulong)x;
+  x = y <= ymax ? x : cast(ulong)xBig;
+  y = y <= ymax ? y : cast(ulong)yBig; 
 
-  //return result;
-//}
+  return tuple(x, y);
+}
 
 // xfrac.feqrel(0.0) <= 16
 // x * x != x2

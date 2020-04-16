@@ -165,7 +165,6 @@ template LinkedList(T) {
     bool _empty;
 
     this(LinkedList* _myList) {
-      writeln("Constructing ByItemResult range over Linked List");
       frontNode = _myList.first;
       backNode = _myList.last;
       _empty = frontNode == null && backNode == null;
