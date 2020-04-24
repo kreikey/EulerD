@@ -15,6 +15,7 @@ import kreikey.stack;
 import kreikey.digits;
 
 alias primeFactors = memoize!primeFactors2;
+alias distinctPrimeFactors = memoize!distinctPrimeFactors2;
 
 long[] properDivisors(long number) {
   static long[][long] factorsCache;
@@ -299,8 +300,8 @@ if (isIntegral!T || is(T == BigInt)) {
 
   T minRoot = cast(T)pow(10, (countDigits(n) - 1) / 2);
   T minSq = n;
-  T maxRoot = n / 2;
-  T delta = maxRoot - minRoot;
+  T upperBound = n / 2 + 1;
+  T delta = upperBound - minRoot;
   T halfDelta;
   T candidate;
   T candidateSq;
@@ -310,12 +311,12 @@ if (isIntegral!T || is(T == BigInt)) {
     candidate = minRoot + halfDelta;
     candidateSq = candidate ^^ 2;
     if (candidateSq > n) {
-      maxRoot = candidate;
+      upperBound = candidate;
     } else {
       minRoot = candidate;
       minSq = candidateSq;
     }
-    delta = maxRoot - minRoot;
+    delta = upperBound - minRoot;
   } while (delta > 1);
 
   remainder = n - minSq;
