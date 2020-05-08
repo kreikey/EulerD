@@ -366,7 +366,12 @@ if (isIntegral!T || is(T == BigInt)) {
   return result;
 }
 
-struct ContinuedFraction(R, T = ElementType!R)
+auto continuedFraction(T)(T[] terms)
+if (isIntegral!T || is(T == BigInt)) {
+  return ContinuedFraction!(T[])(terms);
+}
+
+struct ContinuedFraction(R)
 if (isInputRange!(Unqual!R) && isIntegral!(ElementType!R) || is(ElementType!R == BigInt)) {
   alias E = ElementType!R;
   E first;
@@ -397,8 +402,8 @@ if (isInputRange!(Unqual!R) && isIntegral!(ElementType!R) || is(ElementType!R ==
     j++;
   }
 
-  Tuple!(T, T) opIndex(size_t i) {
-    Tuple!(T, T) result = tuple(T(0), T(1));
+  Tuple!(E, E) opIndex(size_t i) {
+    Tuple!(E, E) result = tuple(E(0), E(1));
 
     while (i >= cache.length) {
       cache ~= terms.front;
@@ -406,7 +411,11 @@ if (isInputRange!(Unqual!R) && isIntegral!(ElementType!R) || is(ElementType!R ==
     }
 
     foreach (item; cache.retro()) {
-      result[0] = T(item) * result[1] + result[0];
+      static if (isIntegral!E) {
+        result[0] = E(item) * result[1] + result[0];
+      } else {
+        result[0] = item * result[1] + result[0];
+      }
       swap(result[0], result[1]);
     }
 
