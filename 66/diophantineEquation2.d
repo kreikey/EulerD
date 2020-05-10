@@ -54,14 +54,13 @@ void main() {
 }
 
 auto diophantineMinX(ulong d) {
-  auto estimates =  BigInt(d)
+  auto estimates = d
     .squareRootSequence
-    .continuedFraction();
+    .continuedFraction!BigInt();
 
-  foreach (x, y; estimates) {
+  foreach (x, y; estimates)
     if (x ^^ 2 - BigInt(d) * y ^^ 2 == 1)
       return tuple(x, y);
-  }
 
   return tuple(BigInt(0), BigInt(0));
 }
