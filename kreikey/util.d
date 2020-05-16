@@ -11,7 +11,7 @@ T[] asort(alias less = (a, b) => a < b, T)(T[] source) {
   return source;
 }
 
-alias asortDescending = (a) {a.sort!((b, c) => c < b)(); return a;};
+//alias asortDescending = (a) {a.sort!((b, c) => c < b)(); return a;};
 
 template staticIota(size_t S, size_t E) {
     import std.range: iota;

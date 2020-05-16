@@ -92,9 +92,9 @@ ulong gcd(ulong a, ulong b) {
 
   while (b != a) {
     if (a > b)
-      a = a - b;
+      a -= b;
     else
-      b = b - a;
+      b -= a;
   }
 
   return b;
