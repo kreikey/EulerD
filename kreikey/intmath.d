@@ -277,6 +277,13 @@ auto maximizePower(Tuple!(ulong, ulong) source) {
 
 auto classifyPerfectPower(ulong source) {
   Tuple!(ulong, ulong) result;
+
+  if (source == 1) {
+    result[0] = 1;
+    result[1] = 1;
+    return result;
+  }
+
   auto primeFactorGroups = source.primeFactors.group.array();
   auto divisor = primeFactorGroups.map!(a => a[1]).fold!gcd();
   primeFactorGroups.each!((ref g) => g[1] /= divisor)();
