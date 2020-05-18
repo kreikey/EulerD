@@ -147,7 +147,7 @@ ulong[] primeFactors2(ulong num) {
   if (num % n == 0)
     factors ~= n;
 
-  return factors ~ memoize!(primeFactors2)(num / n);
+  return factors ~ memoize!primeFactors2(num / n);
 }
 
 ulong[] primeFactors1(ulong num) {
@@ -172,17 +172,15 @@ ulong[] distinctPrimeFactors2(ulong num) {
   if (num == 1)
     return [];
 
-  while (num % n != 0) {
+  while (num % n != 0)
     n++;
-  }
 
   factors ~= n;
 
-  while (num % n == 0) {
+  while (num % n == 0)
     num /= n;
-  }
 
-  return n ~ memoize!(distinctPrimeFactors2)(num);
+  return n ~ memoize!distinctPrimeFactors2(num);
 }
 
 ulong[] distinctPrimeFactors1(ulong num) {
@@ -190,15 +188,13 @@ ulong[] distinctPrimeFactors1(ulong num) {
   ulong n = 2;
 
   while (num > 1) {
-    while (num % n != 0) {
+    while (num % n != 0)
       n++;
-    }
 
     factors ~= n;
 
-    while (num % n == 0) {
+    while (num % n == 0)
       num /= n;
-    }
   }
 
   return factors;
