@@ -24,7 +24,7 @@ void main() {
     .permutations
     .filter!(a => a.front == a[0..$/2].fold!min())
     .map!describe
-    .filter!(a => a[1..$].all!(b => b.sum() == a[0].sum()))
+    .filter!(a => a.map!sum.slide(2).all!(b => b[0] == b[1]))
     .map!concatenate
     .array();
 
