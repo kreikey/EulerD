@@ -17,36 +17,24 @@ void main() {
   StopWatch timer;
   Tuple!(real, uint) maxNOverTotientN = tuple(0, 0);
   real nOverTotient;
-  ulong number = 0;
-  int[][ulong] numbersByFactor;
-  int[] numbersSharingPrimeFactors;
-  int[] coprimes;
-  ulong coprimeCount;
-  ulong top = 10001;
+  uint number = 0;
+  uint[][uint] numbersByFactor;
+  uint[] numbersSharingPrimeFactors;
+  uint[] coprimes;
+  uint coprimeCount;
+  uint top = 1_000_001;
 
   timer.start();
 
-  //writeln("building numbersByFactor from 2 through 1,000,000");
-  //foreach (n; 2..1_000_001) {
-    //foreach (f; distinctPrimeFactors(n)) {
-      //numbersByFactor[f] ~= n;
-    //}
-  //}
-
-  //writeln("finished building numbersByFactor");
-  
-  foreach (n; 2..100001) {
-    //numbersSharingPrimeFactors = n.distinctPrimeFactors.map!(a => numbersByFactor[a].filter!(a => a < n).array()).array.multiwayUnion.array();
-    //coprimeCount = setDifference(iota(1, n), numbersSharingPrimeFactors).count();
-    //writeln(coprimeCount);
+  foreach (n; 2..top) {
     coprimeCount = totient(n);
-    //writefln("n: %s, totient: %s", n, coprimeCount);
+    if (n % 10000 == 0)
+      writefln("n: %s, totient: %s", n, coprimeCount);
     nOverTotient = real(n)/coprimeCount;
     if (nOverTotient > maxNOverTotientN[0]) {
       maxNOverTotientN[0] = nOverTotient;
       maxNOverTotientN[1] = n;
     }
-    //numbersSharingPrimeFactors = [];
   }
 
   timer.stop();
@@ -56,12 +44,31 @@ void main() {
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }
 
-ulong totient(ulong number) {
-  ulong coprimeCount = 0;
+uint totient(uint number) {
+  uint coprimeCount = 0;
+  Tuple!(uint, uint)[uint[]] maxByDistinctPrimeFactors;
+  uint[] factors;
+  Tuple!(uint, uint)* lowerPtr;
+  Tuple!(uint, uint) lower;
 
-  foreach (n; 1..number) {
+  if (number == 0)
+    return 0;
+
+  //writefln("number: %s", number);
+  factors = number.distinctPrimeFactors.to!(uint[])();
+  //writeln(factors);
+  lowerPtr = factors in maxByDistinctPrimeFactors;
+  //writeln(lowerPtr);
+  lower = lowerPtr == null ? tuple(0u, 0u) : *lowerPtr;
+  //writeln(lower);
+
+  coprimeCount = lower[1];
+
+  foreach (n; lower[0]+1..number) {
     coprimeCount += areCoprime(number, n);
   }
+
+  maxByDistinctPrimeFactors[cast(immutable)factors] = tuple(number, coprimeCount);
 
   return coprimeCount;
 }
