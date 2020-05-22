@@ -9,11 +9,8 @@ import std.math;
 import std.traits;
 import std.typecons;
 import kreikey.intmath;
-import kreikey.digits;
 import kreikey.util;
 import kreikey.bigint;
-import kreikey.linkedlist;
-import kreikey.primes;
 
 /*
    x^2 - Dy^2 = 1

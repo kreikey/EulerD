@@ -810,9 +810,9 @@ private:
   BigInt mul(ref const BigInt rhs) const {
     BigInt pro;
 
-    //if (this.mant.length < MulThreshold && rhs.mant.length < MulThreshold)
-      //pro.mant = mulSmall(this.mant, rhs.mant);
-    //else
+    if (this.mant.length < MulThreshold && rhs.mant.length < MulThreshold)
+      pro.mant = mulSmall(this.mant, rhs.mant);
+    else
       pro.mant = karatsuba(this.mant, rhs.mant);
 
     if (pro.mant[$ - 1] == 0)
