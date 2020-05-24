@@ -40,9 +40,8 @@ void main() {
 
 int[][] describe(int[] ring) {
   int[][] description;
-  auto halfLen = ring.length / 2;
-  auto outer = ring[0..halfLen];
-  auto inner = ring[halfLen..$].cycle();
+  auto outer = ring[0..$/2];
+  auto inner = ring[$/2..$].cycle();
 
   foreach (i; 0..outer.length)
     description ~= [outer[i], inner[i], inner[i+1]];
