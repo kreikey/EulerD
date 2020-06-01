@@ -32,17 +32,10 @@ void main() {
   foreach (n; 2..10000) {
     tot1 = totient(n);
     tot2 = totient2(n);
-    writefln("totient(%s): %s totient2(%s): %s", n, tot1, n, tot2);
+    //writefln("totient(%s): %s totient2(%s): %s", n, tot1, n, tot2);
     assert(tot1 == tot2);
   }
 
-  foreach (n; iota(2, 10000).retro()) {
-    tot1 = totient(n);
-    tot2 = totient2(n);
-    writefln("totient(%s): %s totient2(%s): %s", n, tot1, n, tot2);
-    assert(tot1 == tot2);
-  }
-    
   timer.stop();
 
   writefln("n with max totient(n)/n from 2 through %s is:\n%s; totient: %s; ratio: %s", top, nTotientRatio.expand);
@@ -65,36 +58,34 @@ uint totient(uint number) {
 uint totient2(uint number) {
   uint[] factors = distinctPrimeFactors(number).to!(uint[])();
 
-  return exclusiveMultiples(number, 1, factors);
-}
+  uint exclusiveMultiples(uint factor, uint[] moreFactors) {
+    uint multiples = (number - 1) / factor;
+    uint[] mask = new uint[moreFactors.length];
+    uint mainFactor;
+    uint[] chosenFactors;
+    uint[] remainingFactors;
 
-uint exclusiveMultiples(uint number, uint factor, uint[] moreFactors) {
-  uint multiples = (number - 1) / factor;
-  uint[] mask = new uint[moreFactors.length];
-  uint mainFactor;
-  uint[] chosenFactors;
-  uint[] remainingFactors;
+    void separate(out uint[] chosenFactors, out uint[] remainingFactors) {
+      for (ulong i = 0; i < moreFactors.length; i++) {
+        if (mask[i])
+          chosenFactors ~= moreFactors[i];
+        else
+          remainingFactors ~= moreFactors[i];
+      }
+    }
 
-  foreach (k; iota(0, mask.length).retro()) {
-    mask[k..$] = 1;
-    do {
-      separate(moreFactors, mask, chosenFactors, remainingFactors);
-      mainFactor = factor * chosenFactors.fold!((a, b) => a * b)();
-      multiples -= exclusiveMultiples(number, mainFactor, remainingFactors);
-    } while (nextPermutation(mask));
-    mask[] = 0;
+    foreach (k; iota(0, mask.length).retro()) {
+      mask[k..$] = 1;
+      do {
+        separate(chosenFactors, remainingFactors);
+        mainFactor = factor * chosenFactors.fold!((a, b) => a * b)();
+        multiples -= exclusiveMultiples(mainFactor, remainingFactors);
+      } while (nextPermutation(mask));
+      mask[] = 0;
+    }
+
+    return multiples;
   }
 
-  return multiples;
-}
-
-void separate(uint[] factors, uint[] mask, ref uint[] chosenFactors, ref uint[] remainingFactors) {
-  chosenFactors.length = 0;
-  remainingFactors.length = 0;
-  for (ulong i = 0; i < factors.length; i++) {
-    if (factors[i])
-      chosenFactors ~= factors[i];
-    else
-      remainingFactors ~= factors[i];
-  }
+  return exclusiveMultiples(1, factors);
 }
