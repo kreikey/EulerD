@@ -428,3 +428,38 @@ if (isInputRange!(Unqual!R) && isIntegral!(ElementType!R) && (isIntegral!T || is
     return result;
   }
 }
+
+ulong totient(ulong number) {
+  ulong[] factors = distinctPrimeFactors(number);
+
+  ulong exclusiveMultiples(ulong factor, ulong[] moreFactors) {
+    ulong multiples = (number - 1) / factor;
+    ulong[] mask = new ulong[moreFactors.length];
+    ulong mainFactor;
+    ulong[] chosenFactors;
+    ulong[] remainingFactors;
+
+    void separate(out ulong[] chosenFactors, out ulong[] remainingFactors) {
+      for (ulong i = 0; i < moreFactors.length; i++) {
+        if (mask[i])
+          chosenFactors ~= moreFactors[i];
+        else
+          remainingFactors ~= moreFactors[i];
+      }
+    }
+
+    foreach (k; iota(0, mask.length).retro()) {
+      mask[k..$] = 1;
+      do {
+        separate(chosenFactors, remainingFactors);
+        mainFactor = factor * chosenFactors.fold!((a, b) => a * b)();
+        multiples -= exclusiveMultiples(mainFactor, remainingFactors);
+      } while (nextPermutation(mask));
+      mask[] = 0;
+    }
+
+    return multiples;
+  }
+
+  return exclusiveMultiples(1, factors);
+}
