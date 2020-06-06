@@ -20,18 +20,18 @@ import kreikey.bigint;
 
 void main() {
   StopWatch timer;
+  Tuple!(BigInt, BigInt) xy;
+  ulong x, y;
+  ulong Dmax = 0;
+  BigInt xmax = 0;
 
   timer.start();
+  writeln("Diophantine equation");
 
   auto squares = InfiniteIota(1)
     .map!(a => a^^2)();
   auto numbers = InfiniteIota(1);
   auto noSquares = setDifference(numbers, squares);
-  ulong Dmax = 0;
-  BigInt xmax = 0;
-
-  Tuple!(BigInt, BigInt) xy;
-  ulong x, y;
 
   foreach (d; noSquares.until!(a => a > 1000)) {
     xy = diophantineMinX(d);

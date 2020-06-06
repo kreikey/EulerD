@@ -452,7 +452,7 @@ ulong totient(ulong number) {
       mask[k..$] = 1;
       do {
         separate(chosenFactors, remainingFactors);
-        mainFactor = factor * chosenFactors.fold!((a, b) => a * b)();
+        mainFactor = only(factor).chain(chosenFactors).fold!((a, b) => a * b)();
         multiples -= exclusiveMultiples(mainFactor, remainingFactors);
       } while (nextPermutation(mask));
       mask[] = 0;

@@ -16,6 +16,7 @@ void main() {
   auto primes = new Primes!ulong();
 
   timer.start();
+  writeln("Totient maximum");
 
   nTotientRatio[0] = primes
     .cumulativeFold!((a, b) => a * b)
@@ -55,7 +56,7 @@ ulong totient(ulong number) {
       mask[k..$] = 1;
       do {
         separate(chosenFactors, remainingFactors);
-        mainFactor = factor * chosenFactors.fold!((a, b) => a * b)();
+        mainFactor = only(factor).chain(chosenFactors).fold!((a, b) => a * b)();
         multiples -= exclusiveMultiples(mainFactor, remainingFactors);
       } while (nextPermutation(mask));
       mask[] = 0;

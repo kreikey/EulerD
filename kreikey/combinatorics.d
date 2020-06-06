@@ -89,8 +89,14 @@ T[] nthPermutation(T)(ref T[] digits, ulong n) {
 }
 
 bool isPermutation(T)(T[] left, T[] right) {
-  import kreikey.util : asort;
+  import kreikey.util: asort;
   return left.dup.asort() == right.dup.asort();
+}
+
+bool isPermutation(T)(T left, T right)
+if (isIntegral!T || is(T == BigInt)) {
+  import kreikey.digits: toDigits;
+  return isPermutation(left.toDigits, right.toDigits);
 }
 
 T nChooseK(T)(T n, T k)
