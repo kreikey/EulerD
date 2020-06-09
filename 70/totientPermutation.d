@@ -18,6 +18,7 @@ alias isPermutation = kreikey.combinatorics.isPermutation;
 void main() {
   StopWatch timer;
   ulong top = 10000000;
+  auto primes = new Primes!ulong();
 
   timer.start();
   writeln("Totient permutation");
@@ -29,24 +30,24 @@ void main() {
   //writefln("factors of %s: %s", n1, factors);
   //writefln("%s is a permutation of %s: %s", t1, n1, isPermutation(t1, n1));
   //writefln("%s/totient(%s): %s", n1, n1, real(n1)/t1);
-  //writeln(9983167);
-  //writeln(distinctPrimeFactors(9983167));
 
-  auto result = getTotientPermutation(top);
+  //auto result = getTotientPermutation(top);
+  //writeln(distinctPrimeFactors(result[0]));
 
-  writefln("number: %s totient: %s ratio: %s", result.expand, real(result[0])/result[1]);
+  
+
+  //writefln("number: %s totient: %s ratio: %s", result.expand, real(result[0])/result[1]);
   timer.stop();
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }
 
 auto getTotientPermutation(ulong top) {
   auto primes = new Primes!ulong();
-  primes.reset();
   ulong product;
   ulong totient1;
 
   for (ulong low = primes.countUntil!(a => a >= sqrt(real(top)))() - 1; low < ulong.max; low--) {
-    primes.reset();
+    writeln(primes.front);
     for (ulong high = primes.countUntil!(a => a >= real(top)/primes[low])() - 1; high > low; high--) {
       product = primes[low] * primes[high];
       totient1 = totient(product);

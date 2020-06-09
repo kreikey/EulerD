@@ -11,24 +11,25 @@ import kreikey.primes;
 
 void main() {
   StopWatch timer;
-  Tuple!(ulong, ulong, real) nTotientRatio = tuple(0, 0, 0);
+  ulong n, totient1;
+  real ratio;
   ulong top = 1_000_000;
   auto primes = new Primes!ulong();
 
   timer.start();
   writeln("Totient maximum");
 
-  nTotientRatio[0] = primes
+  n = primes
     .cumulativeFold!((a, b) => a * b)
     .until!(a => a > top)
     .tail(1)
     .front;
 
-  nTotientRatio[1] = totient(nTotientRatio[0]);
-  nTotientRatio[2] = real(nTotientRatio[0])/nTotientRatio[1];
+  totient1 = totient(n);
+  ratio = real(n)/totient1;
 
   timer.stop();
-  writefln("n with max totient(n)/n from 2 through %s is:\n%s; totient: %s; ratio: %s", top, nTotientRatio.expand);
+  writefln("n with max totient(n)/n from 2 through %s is:\n%s; totient: %s; ratio: %s", top, n, totient1, ratio);
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }
 
