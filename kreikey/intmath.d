@@ -429,7 +429,7 @@ if (isInputRange!(Unqual!R) && isIntegral!(ElementType!R) && (isIntegral!T || is
   }
 }
 
-ulong totient(ulong number) {
+ulong getTotient(ulong number) {
   ulong[] factors = distinctPrimeFactors(number);
 
   ulong exclusiveMultiples(ulong factor, ulong[] moreFactors) {

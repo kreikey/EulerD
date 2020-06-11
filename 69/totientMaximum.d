@@ -11,7 +11,8 @@ import kreikey.primes;
 
 void main() {
   StopWatch timer;
-  ulong n, totient1;
+  ulong n;
+  ulong totient;
   real ratio;
   ulong top = 1_000_000;
   auto primes = new Primes!ulong();
@@ -25,16 +26,16 @@ void main() {
     .tail(1)
     .front;
 
-  totient1 = totient(n);
-  ratio = real(n)/totient1;
+  totient = getTotient(n);
+  ratio = real(n)/totient;
 
   timer.stop();
-  writefln("n with max totient(n)/n from 2 through %s is:\n%s; totient: %s; ratio: %s", top, n, totient1, ratio);
+  writefln("n with max totient(n)/n from 2 through %s is:\n%s; totient: %s; ratio: %s", top, n, totient, ratio);
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }
 
 /*
-ulong totient(ulong number) {
+ulong getTotient(ulong number) {
   ulong[] factors = distinctPrimeFactors(number);
 
   ulong exclusiveMultiples(ulong factor, ulong[] moreFactors) {

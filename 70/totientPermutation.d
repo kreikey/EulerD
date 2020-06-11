@@ -7,6 +7,7 @@ import std.range;
 import std.math;
 import std.typecons;
 import kreikey.intmath;
+import kreikey.util;
 import kreikey.combinatorics;
 import kreikey.digits;
 import kreikey.primes;
@@ -17,25 +18,12 @@ alias isPermutation = kreikey.combinatorics.isPermutation;
 
 void main() {
   StopWatch timer;
-  ulong top = 10000000;
-  auto primes = new Primes!ulong();
+  ulong top = 1000000;
 
   timer.start();
   writeln("Totient permutation");
 
-  //auto n1 = 87109;
-  //auto t1 = totient(n1);
-  //writefln("totient(%s): %s", n1, t1);
-  //auto factors = primeFactors(n1);
-  //writefln("factors of %s: %s", n1, factors);
-  //writefln("%s is a permutation of %s: %s", t1, n1, isPermutation(t1, n1));
-  //writefln("%s/totient(%s): %s", n1, n1, real(n1)/t1);
-
-  //auto result = getTotientPermutation(top);
-  //writeln(distinctPrimeFactors(result[0]));
-
-  
-
+  printTotients(top);
   //writefln("number: %s totient: %s ratio: %s", result.expand, real(result[0])/result[1]);
   timer.stop();
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
@@ -44,18 +32,42 @@ void main() {
 auto getTotientPermutation(ulong top) {
   auto primes = new Primes!ulong();
   ulong product;
-  ulong totient1;
+  ulong totient;
 
   for (ulong low = primes.countUntil!(a => a >= sqrt(real(top)))() - 1; low < ulong.max; low--) {
     writeln(primes.front);
     for (ulong high = primes.countUntil!(a => a >= real(top)/primes[low])() - 1; high > low; high--) {
       product = primes[low] * primes[high];
-      totient1 = totient(product);
-      writeln(primes[low], " ", primes[high], " ", product, " ", totient1, " ", real(product)/totient1);
-      if (isPermutation(product, totient1))
-        return tuple(product, totient1);
+      totient = getTotient(product);
+      writeln(primes[low], " ", primes[high], " ", product, " ", totient, " ", real(product)/totient);
+      if (isPermutation(product, totient))
+        return tuple(product, totient);
     }
   }
 
   return tuple(0uL, 0uL);
-}  
+}
+
+void printTotients(ulong upper) {
+  auto primes = new Primes!ulong();
+  //auto primeIndexes = primes.cumulativeFold!((a, b) => a * b).until!(a => a >= upper).enumerate.map!(a => a[0]).array();
+  //writeln(primeIndexes.map!(a => primes[a]));
+  ulong bigNdx = 0;
+  ulong[] pNdxs = [bigNdx];
+
+  void inner(ulong[] pNdxs) {
+    ulong number;
+    ulong totient;
+    //number = pNdxs.map!(a => primes[a]).fold!((a, b) => a * b)();
+    //writeln(pNdxs);
+    writeln(pNdxs.map!(a => primes[a])());
+    if (pNdxs.chain(only(pNdxs[$-1] + 1)).map!(a => primes[a]).fold!((a, b) => a * b)() < upper) {
+      //writeln(pNdxs.map!(a => primes[a])());
+      inner(pNdxs ~ (pNdxs[$-1] + 1uL));
+    }
+    //totient = getTotient(number);
+    //writefln("number: %s totient: %s", number, totient);
+  }
+  
+  inner(pNdxs);
+}
