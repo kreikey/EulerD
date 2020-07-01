@@ -6,6 +6,8 @@ import std.algorithm;
 import std.range;
 import std.math;
 import std.typecons;
+import std.traits;
+import std.conv;
 import kreikey.intmath;
 import kreikey.util;
 import kreikey.combinatorics;
@@ -13,23 +15,82 @@ import kreikey.digits;
 import kreikey.primes;
 
 alias isPermutation = kreikey.combinatorics.isPermutation;
+typeof(isPrimeInit()) isPrime;
+
+static this() {
+  isPrime = isPrimeInit();
+}
 
 // number: 9983167 totient: 9973816 ratio: 1.00094
 
 void main() {
   StopWatch timer;
-  ulong top = 1000000;
+  ulong top = 9999999;
+  ulong number;
+  ulong totient;
+  real ratio;
+  ulong[] factors;
 
   timer.start();
   writeln("Totient permutation");
 
-  printTotients(top);
-  //writefln("number: %s totient: %s ratio: %s", result.expand, real(result[0])/result[1]);
+  auto tumber = findTotientPermutation(top, sqrt(real(top)).to!ulong());
+  number = tumber[0];
+  totient = tumber[1];
+  ratio = real(number)/totient;
+
+  writefln("number: %s totient: %s ratio: %s", number, totient, ratio);
+
   timer.stop();
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }
 
-auto getTotientPermutation(ulong top) {
+auto findTotientPermutation(ulong top, ulong topFactor) {
+  auto primes = new Primes!ulong();
+  real minRatio = real.max;
+  ulong bestNumber = top;
+  ulong bestTotient = 0;
+
+  bool inner(ulong[] factors) {
+    ulong number = factors.fold!((a, b) => a * b)(1uL);
+    auto currentFactors = primes
+      .save
+      .find!(a => a > factors[$-1])
+      .until!(a => a > top / number)
+      .array();
+    auto totient = getTotient(number);
+    auto ratio = real(number)/totient;
+
+    if (number != 1 && totient.isPermutation(number) && ratio < minRatio) {
+      minRatio = ratio;
+      bestNumber = number;
+      bestTotient = totient;
+    }
+
+    foreach (factor; currentFactors.retro())
+      if (inner(factors ~ factor))
+        break;
+
+    return ratio > minRatio;
+  }
+
+  auto initialNumbers = primes
+    .save
+    .until!(a => a > topFactor)
+    .array();
+  
+  foreach (initial; initialNumbers.retro()) {
+    inner([initial]);
+  }
+
+  return tuple(bestNumber, bestTotient);
+}
+
+void findTotientPermutation(ulong upper) {
+  findTotientPermutation(upper, upper);
+}
+
+auto getTotientPermutation2(ulong top) {
   auto primes = new Primes!ulong();
   ulong product;
   ulong totient;
@@ -46,28 +107,4 @@ auto getTotientPermutation(ulong top) {
   }
 
   return tuple(0uL, 0uL);
-}
-
-void printTotients(ulong upper) {
-  auto primes = new Primes!ulong();
-  //auto primeIndexes = primes.cumulativeFold!((a, b) => a * b).until!(a => a >= upper).enumerate.map!(a => a[0]).array();
-  //writeln(primeIndexes.map!(a => primes[a]));
-  ulong bigNdx = 0;
-  ulong[] pNdxs = [bigNdx];
-
-  void inner(ulong[] pNdxs) {
-    ulong number;
-    ulong totient;
-    //number = pNdxs.map!(a => primes[a]).fold!((a, b) => a * b)();
-    //writeln(pNdxs);
-    writeln(pNdxs.map!(a => primes[a])());
-    if (pNdxs.chain(only(pNdxs[$-1] + 1)).map!(a => primes[a]).fold!((a, b) => a * b)() < upper) {
-      //writeln(pNdxs.map!(a => primes[a])());
-      inner(pNdxs ~ (pNdxs[$-1] + 1uL));
-    }
-    //totient = getTotient(number);
-    //writefln("number: %s totient: %s", number, totient);
-  }
-  
-  inner(pNdxs);
 }

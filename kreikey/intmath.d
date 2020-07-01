@@ -449,17 +449,20 @@ ulong getTotient(ulong number) {
     }
 
     foreach (k; iota(0, mask.length).retro()) {
+      mask[] = 0;
       mask[k..$] = 1;
       do {
         separate(chosenFactors, remainingFactors);
         mainFactor = only(factor).chain(chosenFactors).fold!((a, b) => a * b)();
         multiples -= exclusiveMultiples(mainFactor, remainingFactors);
       } while (nextPermutation(mask));
-      mask[] = 0;
     }
 
     return multiples;
   }
+
+  if (number == 1)
+    return 1uL;
 
   return exclusiveMultiples(1, factors);
 }
