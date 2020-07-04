@@ -25,26 +25,19 @@ static this() {
 
 void main() {
   StopWatch timer;
-  ulong top = 9999999;
-  ulong number;
-  ulong totient;
-  real ratio;
-  ulong[] factors;
 
   timer.start();
   writeln("Totient permutation");
 
-  auto numTotientRatios = File("totients.txt")
+  auto numbers = File("numbers2.txt")
     .byLine
-    .map!(a => a.split(" ").map!(to!ulong).array())
-    .map!(a => a[0], a => a[1], a => real(a[0])/a[1])
+    .map!(to!ulong)
     .array();
 
-  numTotientRatios.sort!((a, b) => a[2] < b[2])();
+  numbers.sort();
 
-  auto sortedTotientsFile = File("sortedTotients.txt", "w");
-  numTotientRatios
-    .each!(a => sortedTotientsFile.writefln!"%(%s %s %s%)"(a))();
+  auto sortedNumbersFile = File("sortedNumbers.txt", "w");
+  numbers.each!(a => sortedNumbersFile.writeln(a))();
 
   timer.stop();
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());

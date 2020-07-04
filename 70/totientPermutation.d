@@ -25,7 +25,7 @@ static this() {
 
 void main() {
   StopWatch timer;
-  ulong top = 9999999;
+  ulong top = 10000000;
   ulong number;
   ulong totient;
   real ratio;
@@ -56,12 +56,13 @@ auto findTotientPermutation(ulong top, ulong topFactor) {
     auto currentFactors = primes
       .save
       .find!(a => a > factors[$-1])
-      .until!(a => a > top / number)
+      .until!(a => a >= real(top)/number)
       .array();
     auto totient = getTotient(number);
     auto ratio = real(number)/totient;
 
-    if (number != 1 && totient.isPermutation(number) && ratio < minRatio) {
+    if (totient.isPermutation(number) && ratio < minRatio) {
+      writefln("%s, %s, %s", number, totient, ratio);
       minRatio = ratio;
       bestNumber = number;
       bestTotient = totient;
@@ -79,32 +80,12 @@ auto findTotientPermutation(ulong top, ulong topFactor) {
     .until!(a => a > topFactor)
     .array();
   
-  foreach (initial; initialNumbers.retro()) {
+  foreach (initial; initialNumbers.retro())
     inner([initial]);
-  }
 
   return tuple(bestNumber, bestTotient);
 }
 
 void findTotientPermutation(ulong upper) {
   findTotientPermutation(upper, upper);
-}
-
-auto getTotientPermutation2(ulong top) {
-  auto primes = new Primes!ulong();
-  ulong product;
-  ulong totient;
-
-  for (ulong low = primes.countUntil!(a => a >= sqrt(real(top)))() - 1; low < ulong.max; low--) {
-    writeln(primes.front);
-    for (ulong high = primes.countUntil!(a => a >= real(top)/primes[low])() - 1; high > low; high--) {
-      product = primes[low] * primes[high];
-      totient = getTotient(product);
-      writeln(primes[low], " ", primes[high], " ", product, " ", totient, " ", real(product)/totient);
-      if (isPermutation(product, totient))
-        return tuple(product, totient);
-    }
-  }
-
-  return tuple(0uL, 0uL);
 }
