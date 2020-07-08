@@ -55,7 +55,8 @@ auto findTotientPermutation(ulong top) {
   real ratio;
 
   for (ulong low = primes.countUntil!(a => a >= sqrt(real(top)))() - 1; low < ulong.max; low--) {
-    for (ulong high = primes.countUntil!(a => a >= real(top)/primes[low])() - 1; high > low; high--) {
+    primes[low];
+    for (ulong high = low + primes.countUntil!(a => a >= real(top)/primes[low])() - 1; high > low; high--) {
       number = primes[low] * primes[high];
       totient = getTotient(number);
       ratio = real(number)/totient;

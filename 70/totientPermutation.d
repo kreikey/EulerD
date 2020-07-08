@@ -51,11 +51,10 @@ auto findTotientPermutation(ulong top, ulong topFactor) {
   ulong bestNumber = top;
   ulong bestTotient = 0;
 
-  bool inner(ulong[] factors) {
+  bool inner(ulong[] factors, ulong index) {
     ulong number = factors.fold!((a, b) => a * b)(1uL);
+    primes[index];
     auto currentFactors = primes
-      .save
-      .find!(a => a > factors[$-1])
       .until!(a => a >= real(top)/number)
       .array();
     auto totient = getTotient(number);
@@ -68,8 +67,8 @@ auto findTotientPermutation(ulong top, ulong topFactor) {
       bestTotient = totient;
     }
 
-    foreach (factor; currentFactors.retro())
-      if (inner(factors ~ factor))
+    foreach (offset, factor; currentFactors.enumerate.retro())
+      if (inner(factors ~ factor, index + offset))
         break;
 
     return ratio > minRatio;
@@ -80,8 +79,8 @@ auto findTotientPermutation(ulong top, ulong topFactor) {
     .until!(a => a > topFactor)
     .array();
   
-  foreach (initial; initialNumbers.retro())
-    inner([initial]);
+  foreach (index, initial; initialNumbers.enumerate.retro())
+    inner([initial], index);
 
   return tuple(bestNumber, bestTotient);
 }
