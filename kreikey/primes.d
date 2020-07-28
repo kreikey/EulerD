@@ -6,8 +6,9 @@ import std.format;
 
 class Primes(T = ulong)
 if (isIntegral!T) {
-private:
+//private:
   size_t ndx;
+  size_t offset;    // necessary for correct semantics for countUntil with opIndex. It should work like an array.
   static T root = 1;
   static T nextSquare = 4;
   static T[] primes = [2];
@@ -28,8 +29,10 @@ public:
 
   // ------- Constructors -------
   this() {
+    //writeln("Primes.this");
     primes.reserve(1000);
     ndx = 0;
+    offset = 0;
     cache[2] = true;
   }
 
@@ -37,9 +40,10 @@ public:
   enum bool empty = false;
 
   void popFront() {
+    //writeln("Primes.popFront");
     ndx++;
 
-    if (ndx < primes.length) {
+    if (ndx + offset < primes.length) {
       return;
     }
 
@@ -59,31 +63,42 @@ public:
   }
 
   T front() @property {
-    return primes[ndx];
+    //writeln("Primes.front");
+    return primes[ndx + offset];
   }
 
   typeof(this) save() @property {
+    //writeln("Primes.save");
     auto ret = new typeof(this)();
     ret.ndx = this.ndx;
+    ret.offset = this.offset;
     return ret;
   }
 
   T opIndex(size_t i) {
-    if (i < primes.length) {
+    //writeln("Primes.opIndex");
+    if (i + offset < primes.length) {
       ndx = i;
-      return primes[ndx];
+      //writeln(ndx, " ", offset, " ", primes.length);
+      return primes[ndx + offset];
     }
 
-    ndx = primes.length - 1;
+    ndx = primes.length - 1 - offset;
 
     do popFront();
-    while (ndx < i);
+    while (ndx + offset < i);
 
-    return primes[ndx];
+    return primes[ndx + offset];
   }
 
   // ------- Other useful methods -------
   void reset() {
+    ndx = 0;
+    offset = 0;
+  }
+
+  void reindex() {
+    offset = ndx;
     ndx = 0;
   }
 
@@ -92,6 +107,6 @@ public:
   }
 
   override string toString() {
-    return format("%s\t%s\t%s\n%s", ndx, root, nextSquare, primes);
+    return format("%s\t%s\t%s", ndx, root, nextSquare);
   }
 }

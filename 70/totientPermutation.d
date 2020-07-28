@@ -15,11 +15,6 @@ import kreikey.digits;
 import kreikey.primes;
 
 alias isPermutation = kreikey.combinatorics.isPermutation;
-typeof(isPrimeInit()) isPrime;
-
-static this() {
-  isPrime = isPrimeInit();
-}
 
 // number: 9983167 totient: 9973816 ratio: 1.00094
 
@@ -67,7 +62,7 @@ auto findTotientPermutation(ulong top, ulong topFactor) {
       bestTotient = totient;
     }
 
-    foreach (offset, factor; currentFactors.enumerate.retro())
+    foreach (offset, factor; currentFactors.enumerate(1).retro())
       if (inner(factors ~ factor, index + offset))
         break;
 
@@ -79,7 +74,7 @@ auto findTotientPermutation(ulong top, ulong topFactor) {
     .until!(a => a > topFactor)
     .array();
   
-  foreach (index, initial; initialNumbers.enumerate.retro())
+  foreach (index, initial; initialNumbers.enumerate(1).retro())
     inner([initial], index);
 
   return tuple(bestNumber, bestTotient);

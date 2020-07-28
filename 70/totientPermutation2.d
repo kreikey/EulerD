@@ -15,11 +15,6 @@ import kreikey.digits;
 import kreikey.primes;
 
 alias isPermutation = kreikey.combinatorics.isPermutation;
-typeof(isPrimeInit()) isPrime;
-
-static this() {
-  isPrime = isPrimeInit();
-}
 
 // number: 9983167 totient: 9973816 ratio: 1.00094
 
@@ -53,11 +48,17 @@ auto findTotientPermutation(ulong top) {
   ulong bestTotient;
   real smallestRatio = real.max;
   real ratio;
+  ulong highNdx;
+  ulong lowPrime;
 
-  for (ulong low = primes.countUntil!(a => a >= sqrt(real(top)))() - 1; low < ulong.max; low--) {
-    primes[low];
-    for (ulong high = low + primes.countUntil!(a => a >= real(top)/primes[low])() - 1; high > low; high--) {
-      number = primes[low] * primes[high];
+  for (ulong lowNdx = primes.countUntil!(a => a >= sqrt(real(top)))() - 1; lowNdx < ulong.max; lowNdx--) {
+    lowPrime = primes[lowNdx];
+    primes.reindex();
+    highNdx = lowNdx + primes.countUntil!(a => a >= real(top)/lowPrime)() - 1;
+    primes.reset();
+    //writeln(low, " ", high, " ", primes[low], " ", primes[high], " ", primes[low] * primes[high]);
+    for (; highNdx > lowNdx; highNdx--) {
+      number = primes[lowNdx] * primes[highNdx];
       totient = getTotient(number);
       ratio = real(number)/totient;
 
@@ -71,6 +72,7 @@ auto findTotientPermutation(ulong top) {
         bestTotient = totient;
       }
     }
+    //writeln(primes[0]);
   }
 
   return tuple(bestProduct, bestTotient);
