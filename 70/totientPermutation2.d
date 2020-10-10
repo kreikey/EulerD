@@ -56,7 +56,7 @@ auto findTotientPermutation(ulong top) {
     primes.reindex();
     highNdx = lowNdx + primes.countUntil!(a => a >= real(top)/lowPrime)() - 1;
     primes.reset();
-    //writeln(low, " ", high, " ", primes[low], " ", primes[high], " ", primes[low] * primes[high]);
+
     for (; highNdx > lowNdx; highNdx--) {
       number = primes[lowNdx] * primes[highNdx];
       totient = getTotient(number);
@@ -72,7 +72,6 @@ auto findTotientPermutation(ulong top) {
         bestTotient = totient;
       }
     }
-    //writeln(primes[0]);
   }
 
   return tuple(bestProduct, bestTotient);
