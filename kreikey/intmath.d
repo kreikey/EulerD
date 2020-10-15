@@ -466,3 +466,30 @@ ulong getTotient(ulong number) {
 
   return exclusiveMultiples(1, factors);
 }
+
+ulong[] getCoprimes(ulong number) {
+  ulong[] result;
+  ulong[] factors = makePrimes
+    .until!((a, b) => a >= b)(number)
+    .setDifference(distinctPrimeFactors(number))
+    .array();
+
+  void inner(ulong product, ulong[] someFactors) {
+    ulong nextProduct;
+
+    result ~= product;
+
+    foreach (i, f; someFactors) {
+      nextProduct = product * f;
+
+      if (nextProduct > number)
+        break;
+
+      inner(nextProduct, someFactors[i .. $]);
+    }
+  }
+
+  inner(1, factors);
+
+  return result;
+}

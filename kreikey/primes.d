@@ -4,9 +4,14 @@ import std.stdio;
 import std.stdio;
 import std.format;
 
+auto makePrimes(T = ulong)()
+if (isIntegral!T) {
+  return new Primes!T();
+}
+
 class Primes(T = ulong)
 if (isIntegral!T) {
-//private:
+private:
   size_t ndx;
   size_t offset;    // necessary for correct semantics for countUntil with opIndex. It should work like an array.
   static T root = 1;
