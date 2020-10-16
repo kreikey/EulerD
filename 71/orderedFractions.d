@@ -13,6 +13,8 @@ void main() {
 
   timer.start();
 
+  writeln("Ordered fractions");
+
   //auto fraction = iota(2, 1000001)
     //.filter!(d => d % 7 != 0)
     //.map!(d => cast(int)floor(d * 3. / 7), d => d)

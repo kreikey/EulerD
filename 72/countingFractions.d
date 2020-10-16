@@ -17,10 +17,13 @@ void main() {
 
   timer.start();
 
-  auto denominators = iota(2, 12001)
-    .map!getCoprimes
-    .join();
-  writeln(denominators.length);
+  writeln("Counting fractions");
+
+  auto fractionCount = iota(2, 1000001)
+    .map!getTotient
+    .sum();
+
+  writeln(fractionCount);
 
   timer.stop();
 
@@ -54,4 +57,4 @@ ulong[] getCoprimes(ulong number) {
 
   return result;
 }
-/*
+*/
