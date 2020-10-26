@@ -14,6 +14,7 @@ import kreikey.bytemath;
 import kreikey.stack;
 import kreikey.digits;
 
+alias getPrimeFactorGroups = memoize!primeFactorGroups2;
 alias primeFactors = memoize!primeFactors2;
 alias distinctPrimeFactors = memoize!distinctPrimeFactors2;
 
@@ -134,6 +135,24 @@ string recipDigits(int divisor, int length) {
   return cast(string)digits;
 }
 
+Tuple!(ulong, ulong)[] primeFactorGroups2(ulong num) {
+  ulong n = 2;
+  ulong count = 0;
+
+  if (num == 1)
+    return [];
+
+  while (num % n != 0)
+    n++;
+
+  while (num % n == 0) {
+    num /= n;
+    count++;
+  }
+
+  return [tuple(n, count)] ~ memoize!primeFactorGroups2(num);
+}
+
 ulong[] primeFactors2(ulong num) {
   ulong[] factors;
   ulong n = 2;
@@ -166,7 +185,6 @@ ulong[] primeFactors1(ulong num) {
 }
 
 ulong[] distinctPrimeFactors2(ulong num) {
-  ulong[] factors;
   ulong n = 2;
 
   if (num == 1)
@@ -175,12 +193,10 @@ ulong[] distinctPrimeFactors2(ulong num) {
   while (num % n != 0)
     n++;
 
-  factors ~= n;
-
   while (num % n == 0)
     num /= n;
 
-  return n ~ memoize!distinctPrimeFactors2(num);
+  return [n] ~ memoize!distinctPrimeFactors2(num);
 }
 
 ulong[] distinctPrimeFactors1(ulong num) {
@@ -429,6 +445,49 @@ if (isInputRange!(Unqual!R) && isIntegral!(ElementType!R) && (isIntegral!T || is
   }
 }
 
+ulong getNonCoprimeCount(ulong[] factors) {
+  bool[] mask = new bool[factors.length];
+  ulong product = 0;
+  ulong nonCoprimes = 0;
+  ulong innerSum = 0;
+  bool subtract = false;
+
+  for (ulong k = 1; k < factors.length; k++) {
+    mask[] = false;
+    mask[k .. $] = true;
+    innerSum = 0;
+
+    do {
+      product = zip(factors, mask).fold!((a, b) => tuple(b[1] ? a[0] * b[0] : a[0], true))(tuple(1uL, true))[0];
+      innerSum += product;
+    } while (nextPermutation(mask));
+
+    if (subtract)
+      nonCoprimes -= innerSum;
+    else
+      nonCoprimes += innerSum;
+
+    subtract = !subtract;
+  }
+
+  if (subtract)
+    nonCoprimes -= 1;
+  else
+    nonCoprimes += 1;
+
+  return nonCoprimes;
+}
+
+ulong getTotient2(ulong number) {
+  auto factorGroups = getPrimeFactorGroups(number);
+  auto duplicateFactorProduct = factorGroups.fold!((a, b) => tuple(a[0] * b[0] ^^ (b[1] - 1), 1))(tuple(1uL, 1u))[0];
+  auto factors = factorGroups.map!(a => a[0]).array();
+  ulong nonCoprimes = memoize!getNonCoprimeCount(factors);
+  nonCoprimes *= duplicateFactorProduct;
+
+  return number == 1 ? 1 : number - nonCoprimes;
+}
+
 ulong getTotient(ulong number) {
   ulong[] factors = distinctPrimeFactors(number);
 
@@ -492,4 +551,32 @@ ulong[] getCoprimes(ulong number) {
   inner(1, factors);
 
   return result;
+}
+
+ulong getTotientsSum(ulong topNumber) {
+  ulong sum = 1;
+  ulong[] factors = makePrimes
+    .until!((a, b) => a >= b)(topNumber)
+    .array();
+  Tuple!(ulong, ulong)[] numbersTotients;
+
+  void inner(ulong baseNumber, ulong multiplier, ulong[] someFactors, ulong[] distinctFactors) {
+    ulong totient = multiplier * (baseNumber - memoize!getNonCoprimeCount(distinctFactors[1..$]));
+
+    sum += totient;
+
+    foreach (i, f; someFactors) {
+      if (baseNumber * multiplier * f > topNumber)
+        break;
+
+      if (f == distinctFactors[$-1])
+        inner(baseNumber, multiplier * f, someFactors[i .. $], distinctFactors);
+      else
+        inner(baseNumber * f, multiplier, someFactors[i .. $], distinctFactors ~ f);
+    }
+  }
+
+  inner(1, 1, factors, [1]);
+
+  return sum;
 }

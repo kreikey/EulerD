@@ -19,10 +19,9 @@ void main() {
 
   writeln("Counting fractions");
 
-  auto fractionCount = iota(2, 1000001)
-    .map!getTotient2
-    .sum();
-
+  auto fractionCount = getTotientsSum(1000000) - 1;
+  writeln("The number of reduced proper fractions from 1/1000000 through 999999/1000000 is:");
+  writeln("The sum of the totients of 2 through 1,000,000, which is:");
   writeln(fractionCount);
 
   timer.stop();
@@ -64,13 +63,30 @@ ulong getNonCoprimeCount(ulong[] factors) {
   return nonCoprimes;
 }
 
-ulong getTotient2(ulong number) {
-  auto factorGroups = getPrimeFactorGroups(number);
-  auto duplicateFactorProduct = factorGroups.fold!((a, b) => tuple(a[0] * b[0] ^^ (b[1] - 1), 1))(tuple(1uL, 1u))[0];
-  auto factors = factorGroups.map!(a => a[0]).array();
-  ulong nonCoprimes = memoize!getNonCoprimeCount(factors);
-  nonCoprimes *= duplicateFactorProduct;
+ulong getTotientsSum(ulong topNumber) {
+  ulong sum = 0;
+  ulong[] factors = makePrimes
+    .until!((a, b) => a >= b)(topNumber)
+    .array();
+  Tuple!(ulong, ulong)[] numbersTotients;
 
-  return number == 1 ? 1 : number - nonCoprimes;
+  void inner(ulong baseNumber, ulong multiplier, ulong[] someFactors, ulong[] distinctFactors) {
+    ulong totient = baseNumber == 1 ? 1 : multiplier * (baseNumber - memoize!getNonCoprimeCount(distinctFactors[1..$]));
+    sum += totient;
+
+    foreach (i, f; someFactors) {
+      if (baseNumber * multiplier * f > topNumber)
+        break;
+
+      if (f == distinctFactors[$-1])
+        inner(baseNumber, multiplier * f, someFactors[i .. $], distinctFactors);
+      else
+        inner(baseNumber * f, multiplier, someFactors[i .. $], distinctFactors ~ f);
+    }
+  }
+
+  inner(1, 1, factors, [1]);
+
+  return sum;
 }
 */
