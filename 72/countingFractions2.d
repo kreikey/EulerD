@@ -20,7 +20,7 @@ void main() {
   writeln("Counting fractions");
 
   auto fractionCount = getTotientsSum(1000000) - 1;
-  writeln("The number of reduced proper fractions from 1/1000000 through 999999/1000000 is:");
+  writeln("The number of reduced proper fractions with denominators from 2 through 1,000,000 is:");
   writeln("The sum of the totients of 2 through 1,000,000, which is:");
   writeln(fractionCount);
 
