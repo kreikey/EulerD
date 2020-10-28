@@ -23,6 +23,8 @@ template LinkedList(T) {
       foreach (item; items) {
         append(item);
       }
+
+      cur = first;
     }
 
     private void insert(Node* item, Node* existing) {
@@ -130,6 +132,31 @@ template LinkedList(T) {
 
       //return result.payload;
     //}
+
+    T getFirst() {
+      cur = first;
+
+      if (cur == null)
+        throw new Exception("Attempting to getFirst() in LinkedList of type " ~ T.stringof ~ " with null first node");
+
+      return cur.payload;
+    }
+
+    T getLast() {
+      cur = last;
+
+      if (cur == null)
+        throw new Exception("Attempting to getLast() in LinkedList of type " ~ T.stringof ~ " with null last node");
+
+      return cur.payload;
+    }
+
+    T getCur() {
+      if (cur == null)
+        throw new Exception("Attempting to getCur() in a LinkedList of type " ~ T.stringof ~ " with null cur node");
+
+      return cur.payload;
+    }
 
     auto byItem() @property {
       return ByItemResult(&this);

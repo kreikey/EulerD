@@ -31,30 +31,30 @@ void main() {
 }
 
 /*
- *auto squareRootSequence(T)(T number)
- *if (isIntegral!T || is(T == BigInt)) {
- *  T a0 = cast(T)sqrt(cast(real)number);
- *  T[] result;
- *  T a;
- *  T b = a0;
- *  T d = 1;
- *  T n = 1;
- *  T t;
- *
- *  result ~= a0;
- *
- *  do {
- *    d = number - b^^2;
- *    if (d == 0)
- *      break;
- *    d /= n;
- *    t = a0 + b;
- *    a = t / d;
- *    result ~= a;
- *    n = d;
- *    b = a0 - (t % d);
- *  } while (d != 1);
- *
- *  return result;
- *}
- */
+auto squareRootSequence(T)(T number)
+if (isIntegral!T || is(T == BigInt)) {
+  T a0 = cast(T)sqrt(cast(real)number);
+  T[] result;
+  T a;
+  T b = a0;
+  T d = 1;
+  T n = 1;
+  T t;
+
+  result ~= a0;
+
+  do {
+    d = number - b^^2;
+    if (d == 0)
+      break;
+    d /= n;
+    t = a0 + b;
+    a = t / d;
+    result ~= a;
+    n = d;
+    b = a0 - (t % d);
+  } while (d != 1);
+
+  return result;
+}
+*/

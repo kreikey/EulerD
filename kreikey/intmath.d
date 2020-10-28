@@ -14,7 +14,7 @@ import kreikey.bytemath;
 import kreikey.stack;
 import kreikey.digits;
 
-alias getPrimeFactorGroups = memoize!primeFactorGroups2;
+alias getPrimeFactorGroups = memoize!primeFactorGroups1;
 alias primeFactors = memoize!primeFactors2;
 alias distinctPrimeFactors = memoize!distinctPrimeFactors2;
 
@@ -135,7 +135,7 @@ string recipDigits(int divisor, int length) {
   return cast(string)digits;
 }
 
-Tuple!(ulong, ulong)[] primeFactorGroups2(ulong num) {
+Tuple!(ulong, ulong)[] primeFactorGroups1(ulong num) {
   ulong n = 2;
   ulong count = 0;
 
@@ -150,7 +150,7 @@ Tuple!(ulong, ulong)[] primeFactorGroups2(ulong num) {
     count++;
   }
 
-  return [tuple(n, count)] ~ memoize!primeFactorGroups2(num);
+  return [tuple(n, count)] ~ memoize!primeFactorGroups1(num);
 }
 
 ulong[] primeFactors2(ulong num) {
