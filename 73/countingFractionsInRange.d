@@ -19,9 +19,7 @@ void main() {
   writeln("Counting fractions");
 
   auto number = iota(2, 12001)
-    .map!(a => a, getCoprimes)
-    .map!(a => repeat(a[0], a[1].length).array(), a => a[1])
-    .map!(a => zip(a.reverse.expand))
+    .map!(a => zip(getCoprimes(a), repeat(a)))
     .join
     .filter!(a => double(a[0])/a[1] > 1.0/3 && double(a[0])/a[1]< 1.0/2)
     .count();
