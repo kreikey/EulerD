@@ -10,6 +10,7 @@ import std.math;
 import std.conv;
 import std.typecons;
 import std.functional;
+import std.concurrency;
 import kreikey.bytemath;
 import kreikey.stack;
 import kreikey.digits;
@@ -434,7 +435,7 @@ if (isInputRange!(Unqual!R) && isIntegral!(ElementType!R) && (isIntegral!T || is
       terms.popFront();
     }
 
-    foreach (item; cache.retro()) {
+    foreach (item; cache[0 .. i+1].retro()) {
       result[0] = T(item) * result[1] + result[0];
       swap(result[0], result[1]);
     }
@@ -452,7 +453,7 @@ ulong getNonCoprimeCount(ulong[] factors) {
   ulong innerSum = 0;
   bool subtract = false;
 
-  for (ulong k = 1; k < factors.length; k++) {
+  for (ulong k = 1; k <= factors.length; k++) {
     mask[] = false;
     mask[k .. $] = true;
     innerSum = 0;
@@ -469,11 +470,6 @@ ulong getNonCoprimeCount(ulong[] factors) {
 
     subtract = !subtract;
   }
-
-  if (subtract)
-    nonCoprimes -= 1;
-  else
-    nonCoprimes += 1;
 
   return nonCoprimes;
 }
@@ -554,7 +550,7 @@ ulong[] getCoprimes(ulong number) {
 }
 
 ulong getTotientsSum(ulong topNumber) {
-  ulong sum = 1;
+  ulong sum = 0;
   ulong[] factors = makePrimes
     .until!((a, b) => a >= b)(topNumber)
     .array();
@@ -579,4 +575,32 @@ ulong getTotientsSum(ulong topNumber) {
   inner(1, 1, factors, [1]);
 
   return sum;
+}
+
+auto getMultiTotientsInit(ulong topNumber) {
+  void getMultiTotients() {
+    ulong[] factors = makePrimes
+      .until!((a, b) => a >= b)(topNumber)
+      .array();
+
+    void inner(ulong baseNumber, ulong multiplier, ulong[] someFactors, ulong[] distinctFactors) {
+      ulong totient = multiplier * (baseNumber - memoize!getNonCoprimeCount(distinctFactors[1..$]));
+
+      yield(tuple(ulong(baseNumber * multiplier), ulong(totient)));
+
+      foreach (i, f; someFactors) {
+        if (baseNumber * multiplier * f > topNumber)
+          break;
+
+        if (f == distinctFactors[$-1])
+          inner(baseNumber, multiplier * f, someFactors[i .. $], distinctFactors);
+        else
+          inner(baseNumber * f, multiplier, someFactors[i .. $], distinctFactors ~ f);
+      }
+    }
+
+    inner(1, 1, factors, [1]);
+  }
+
+  return &getMultiTotients;
 }

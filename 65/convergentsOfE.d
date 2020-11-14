@@ -38,53 +38,53 @@ void contFracE() {
 }
 
 /*
- *struct ContinuedFraction(R, T = ElementType!R)
- *if (isInputRange!(Unqual!R) && isIntegral!(ElementType!R) || is(ElementType!R == BigInt)) {
- *  alias E = ElementType!R;
- *  E first;
- *  R range;
- *  static if (hasLength!R)
- *    alias Terms = typeof(only(first).chain(range.cycle()));
- *  else
- *    alias Terms = typeof(only(first).chain(range));
- *  Terms terms;
- *  size_t j = 0;
- *  enum bool empty = false;
- *  E[] cache;
- *
- *  this(R _terms) {
- *    first = _terms.front;
- *    range = _terms.dropOne();
- *    static if (hasLength!R)
- *      terms = only(first).chain(range.cycle());
- *    else
- *      terms = only(first).chain(range);
- *  }
- *
- *  auto front() @property {
- *    return this[j];
- *  }
- *
- *  auto popFront() {
- *    j++;
- *  }
- *
- *  Tuple!(T, T) opIndex(size_t i) {
- *    Tuple!(T, T) result = tuple(T(0), T(1));
- *
- *    while (i >= cache.length) {
- *      cache ~= terms.front;
- *      terms.popFront();
- *    }
- *
- *    foreach (item; cache.retro()) {
- *      result[0] = T(item) * result[1] + result[0];
- *      swap(result[0], result[1]);
- *    }
- *
- *    swap(result[0], result[1]);
- *
- *    return result;
- *  }
- *}
- */
+struct ContinuedFraction(R, T = ElementType!R)
+if (isInputRange!(Unqual!R) && isIntegral!(ElementType!R) || is(ElementType!R == BigInt)) {
+  alias E = ElementType!R;
+  E first;
+  R range;
+  static if (hasLength!R)
+    alias Terms = typeof(only(first).chain(range.cycle()));
+  else
+    alias Terms = typeof(only(first).chain(range));
+  Terms terms;
+  size_t j = 0;
+  enum bool empty = false;
+  E[] cache;
+
+  this(R _terms) {
+    first = _terms.front;
+    range = _terms.dropOne();
+    static if (hasLength!R)
+      terms = only(first).chain(range.cycle());
+    else
+      terms = only(first).chain(range);
+  }
+
+  auto front() @property {
+    return this[j];
+  }
+
+  auto popFront() {
+    j++;
+  }
+
+  Tuple!(T, T) opIndex(size_t i) {
+    Tuple!(T, T) result = tuple(T(0), T(1));
+
+    while (i >= cache.length) {
+      cache ~= terms.front;
+      terms.popFront();
+    }
+
+    foreach (item; cache.retro()) {
+      result[0] = T(item) * result[1] + result[0];
+      swap(result[0], result[1]);
+    }
+
+    swap(result[0], result[1]);
+
+    return result;
+  }
+}
+*/
