@@ -29,7 +29,7 @@ void main() {
     .map!(f => f[0], f => f[1], f => double(f[0])/f[1])
     .fold!((a, b) => a[2] > b[2] ? a : b)();
 
-  writefln!"%s/%s = %s"(fraction[0], fraction[1], fraction[2]);
+  writefln!"%s/%s = %s"(fraction.expand);
 
   timer.stop();
 

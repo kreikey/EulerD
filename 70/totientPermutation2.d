@@ -16,25 +16,14 @@ import kreikey.primes;
 
 alias isPermutation = kreikey.combinatorics.isPermutation;
 
-// number: 9983167 totient: 9973816 ratio: 1.00094
-
 void main() {
   StopWatch timer;
-  ulong top = 10000000;
-  ulong number;
-  ulong totient;
-  real ratio;
-  ulong[] factors;
 
   timer.start();
   writeln("Totient permutation");
 
-  auto tumber = findTotientPermutation(top);
-  number = tumber[0];
-  totient = tumber[1];
-  ratio = real(number)/totient;
-
-  writefln("number: %s totient: %s ratio: %s", number, totient, ratio);
+  auto tumber = findTotientPermutation(10000000);
+  writefln("number: %s totient: %s ratio: %s", tumber.expand);
 
   timer.stop();
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
@@ -74,5 +63,5 @@ auto findTotientPermutation(ulong top) {
     }
   }
 
-  return tuple(bestProduct, bestTotient);
+  return tuple(bestProduct, bestTotient, smallestRatio);
 }

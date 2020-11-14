@@ -16,31 +16,20 @@ import kreikey.primes;
 
 alias isPermutation = kreikey.combinatorics.isPermutation;
 
-// number: 9983167 totient: 9973816 ratio: 1.00094
-
 void main() {
   StopWatch timer;
-  ulong top = 10000000;
-  ulong number;
-  ulong totient;
-  real ratio;
-  ulong[] factors;
 
   timer.start();
   writeln("Totient permutation");
 
-  auto tumber = findTotientPermutation(top, sqrt(real(top)).to!ulong());
-  number = tumber[0];
-  totient = tumber[1];
-  ratio = real(number)/totient;
-
-  writefln("number: %s totient: %s ratio: %s", number, totient, ratio);
+  auto tumber = findTotientPermutation(10000000);
+  writefln("number: %s totient: %s ratio: %s", tumber.expand);
 
   timer.stop();
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }
 
-auto findTotientPermutation(ulong top, ulong topFactor) {
+auto findTotientPermutation(ulong top) {
   auto primes = new Primes!ulong();
   real minRatio = real.max;
   ulong bestNumber = top;
@@ -56,7 +45,7 @@ auto findTotientPermutation(ulong top, ulong topFactor) {
     auto ratio = real(number)/totient;
 
     if (totient.isPermutation(number) && ratio < minRatio) {
-      writefln("%s, %s, %s", number, totient, ratio);
+      writefln("t(%s) = %s ratio: %s", number, totient, ratio);
       minRatio = ratio;
       bestNumber = number;
       bestTotient = totient;
@@ -71,15 +60,11 @@ auto findTotientPermutation(ulong top, ulong topFactor) {
 
   auto initialNumbers = primes
     .save
-    .until!(a => a > topFactor)
+    .until!(a => a > sqrt(real(top)))
     .array();
   
   foreach (index, initial; initialNumbers.enumerate(1).retro())
     inner([initial], index);
 
-  return tuple(bestNumber, bestTotient);
-}
-
-void findTotientPermutation(ulong upper) {
-  findTotientPermutation(upper, upper);
+  return tuple(bestNumber, bestTotient, minRatio);
 }

@@ -474,7 +474,7 @@ ulong getNonCoprimeCount(ulong[] factors) {
   return nonCoprimes;
 }
 
-ulong getTotient2(ulong number) {
+ulong getTotient(ulong number) {
   auto factorGroups = getPrimeFactorGroups(number);
   auto duplicateFactorProduct = factorGroups.fold!((a, b) => tuple(a[0] * b[0] ^^ (b[1] - 1), 1))(tuple(1uL, 1u))[0];
   auto factors = factorGroups.map!(a => a[0]).array();
@@ -484,7 +484,7 @@ ulong getTotient2(ulong number) {
   return number == 1 ? 1 : number - nonCoprimes;
 }
 
-ulong getTotient(ulong number) {
+ulong getTotientOld(ulong number) {
   ulong[] factors = distinctPrimeFactors(number);
 
   ulong exclusiveMultiples(ulong factor, ulong[] moreFactors) {
@@ -522,59 +522,32 @@ ulong getTotient(ulong number) {
   return exclusiveMultiples(1, factors);
 }
 
-ulong[] getCoprimes(ulong number) {
-  ulong[] result;
-  ulong[] factors = makePrimes
-    .until!((a, b) => a >= b)(number)
-    .setDifference(distinctPrimeFactors(number))
-    .array();
+auto getCoprimesInit(ulong number) {
+  void getCoprimes() {
+    ulong[] factors = makePrimes
+      .until!((a, b) => a >= b)(number)
+      .setDifference(distinctPrimeFactors(number))
+      .array();
 
-  void inner(ulong product, ulong[] someFactors) {
-    ulong nextProduct;
+    void inner(ulong product, ulong[] someFactors) {
+      ulong nextProduct;
 
-    result ~= product;
+      yield(product);
 
-    foreach (i, f; someFactors) {
-      nextProduct = product * f;
+      foreach (i, f; someFactors) {
+        nextProduct = product * f;
 
-      if (nextProduct > number)
-        break;
+        if (nextProduct > number)
+          break;
 
-      inner(nextProduct, someFactors[i .. $]);
+        inner(nextProduct, someFactors[i .. $]);
+      }
     }
+
+    inner(1, factors);
   }
-
-  inner(1, factors);
-
-  return result;
-}
-
-ulong getTotientsSum(ulong topNumber) {
-  ulong sum = 0;
-  ulong[] factors = makePrimes
-    .until!((a, b) => a >= b)(topNumber)
-    .array();
-  Tuple!(ulong, ulong)[] numbersTotients;
-
-  void inner(ulong baseNumber, ulong multiplier, ulong[] someFactors, ulong[] distinctFactors) {
-    ulong totient = multiplier * (baseNumber - memoize!getNonCoprimeCount(distinctFactors[1..$]));
-
-    sum += totient;
-
-    foreach (i, f; someFactors) {
-      if (baseNumber * multiplier * f > topNumber)
-        break;
-
-      if (f == distinctFactors[$-1])
-        inner(baseNumber, multiplier * f, someFactors[i .. $], distinctFactors);
-      else
-        inner(baseNumber * f, multiplier, someFactors[i .. $], distinctFactors ~ f);
-    }
-  }
-
-  inner(1, 1, factors, [1]);
-
-  return sum;
+  
+  return &getCoprimes;
 }
 
 auto getMultiTotientsInit(ulong topNumber) {
