@@ -20,7 +20,7 @@ void main() {
   writeln("Counting fractions");
 
   auto fractionCount = iota(2, 1000001)
-    .map!getTotient2
+    .map!getTotient
     .sum();
 
   writeln(fractionCount);
@@ -38,7 +38,7 @@ ulong getNonCoprimeCount(ulong[] factors) {
   ulong innerSum = 0;
   bool subtract = false;
 
-  for (ulong k = 1; k < factors.length; k++) {
+  for (ulong k = 1; k <= factors.length; k++) {
     mask[] = false;
     mask[k .. $] = true;
     innerSum = 0;
@@ -56,13 +56,9 @@ ulong getNonCoprimeCount(ulong[] factors) {
     subtract = !subtract;
   }
 
-  if (subtract)
-    nonCoprimes -= 1;
-  else
-    nonCoprimes += 1;
-
   return nonCoprimes;
 }
+
 
 ulong getTotient2(ulong number) {
   auto factorGroups = getPrimeFactorGroups(number);
