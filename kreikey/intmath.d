@@ -522,32 +522,31 @@ ulong getTotientOld(ulong number) {
   return exclusiveMultiples(1, factors);
 }
 
-auto getCoprimesInit(ulong number) {
-  void getCoprimes() {
-    ulong[] factors = makePrimes
-      .until!((a, b) => a >= b)(number)
-      .setDifference(distinctPrimeFactors(number))
-      .array();
+ulong[] getCoprimes(ulong number) {
+  ulong[] result;
+  ulong[] factors = makePrimes
+    .until!((a, b) => a >= b)(number)
+    .setDifference(distinctPrimeFactors(number))
+    .array();
 
-    void inner(ulong product, ulong[] someFactors) {
-      ulong nextProduct;
+  void inner(ulong product, ulong[] someFactors) {
+    ulong nextProduct;
 
-      yield(product);
+    result ~= product;
 
-      foreach (i, f; someFactors) {
-        nextProduct = product * f;
+    foreach (i, f; someFactors) {
+      nextProduct = product * f;
 
-        if (nextProduct > number)
-          break;
+      if (nextProduct > number)
+        break;
 
-        inner(nextProduct, someFactors[i .. $]);
-      }
+      inner(nextProduct, someFactors[i .. $]);
     }
-
-    inner(1, factors);
   }
-  
-  return &getCoprimes;
+
+  inner(1, factors);
+
+  return result;
 }
 
 auto getMultiTotientsInit(ulong topNumber) {

@@ -34,6 +34,7 @@ void main() {
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }
 
+/*
 ulong[] getCoprimes(ulong number) {
   ulong[] result;
   ulong[] factors = makePrimes
@@ -60,3 +61,4 @@ ulong[] getCoprimes(ulong number) {
 
   return result;
 }
+*/
