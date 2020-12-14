@@ -117,7 +117,7 @@ if (isIntegral!T || is(T == BigInt)) {
   static if (is(T == BigInt))
     T sum = 0;
   else
-    auto sum = checked!Throw(0uL);
+    auto sum = checked!Throw(T(0));
   T leftSum;
   T rightSum;
   T product;
