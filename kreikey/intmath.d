@@ -576,3 +576,33 @@ auto getMultiTotientsInit(ulong topNumber) {
 
   return &getMultiTotients;
 }
+
+auto getSortedDigitsInit(ulong lowerUpper) {
+  return getSortedDigitsInit(lowerUpper, lowerUpper);
+}
+
+auto getSortedDigitsInit(ulong lower, ulong upper) {
+  assert(lower <= upper);
+  uint[] digits;
+
+  void getSortedDigits() {
+    void inner(size_t index, uint start) {
+      if (index == digits.length)
+        return;
+
+      foreach (d; start .. 10u) {
+        inner(index + 1, d);
+        digits[index .. $] = d;
+        yield(digits.dup);
+      }
+    }
+
+    foreach (ulong s; lower .. upper + 1) {
+      digits = new uint[s];
+      digits[] = 0;
+      inner(0, 1);
+    }
+  }
+
+  return &getSortedDigits;
+}
