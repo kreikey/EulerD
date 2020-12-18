@@ -30,7 +30,6 @@ void main() {
     .filter!(a => factorialDigitChainLength(a) == 60)
     .map!permutations
     .join
-    .array
     .sort
     .uniq
     .filter!(a => a[0] != 0)
