@@ -27,8 +27,7 @@ void main() {
     .array();
   bool[uint[]] specialCycleMembers = specialCycles
     .join
-    .map!(a => a.toDigits.permutations)
-    .join
+    .map!(a => a.toDigits.asort())
     .map!(a => cast(const(uint)[])a)
     .zip(repeat(true))
     //.tee!writeln
@@ -39,13 +38,13 @@ void main() {
   writeln("with 60 non-repeating terms is:");
 
   auto maxDigs = (limit - 1).countDigits();
-  
+
   auto sortedDigits = new Generator!(uint[])(getSortedDigitsInit(1, maxDigs));
   sortedDigits
     .filter!(a => a !in specialCycleMembers)
     .map!(a => a, factorialDigitChainLength)
     .filter!(a => a[1] == 60)
-    .tee!(a => writefln("%(%s %s%)", a))
+    //.tee!(a => writefln("%(%s %s%)", a))
     .map!(a => a[0].dup)
     .map!permutations
     .join
@@ -56,6 +55,21 @@ void main() {
     .writeln();
 
   timer.stop();
+
+  writeln();
+
+  writeln(specialCycleRoots);
+
+  writeln();
+
+  writeln(specialCycleMembers);
+
+  writeln();
+
+  specialCycles
+    .join
+    .map!(factorialDigitChain, a => a.toDigits.factorialDigitChainLength())
+    .each!writeln();
 
   writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
 }
