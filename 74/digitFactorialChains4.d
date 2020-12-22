@@ -18,15 +18,13 @@ ulong[] cycleRoots = [169, 871, 872];
 
 void main() {
   StopWatch timer;
-  ulong limit = 1000000;
+  ulong maxDigs = 6;
 
   timer.start();
 
   writeln("Digit factorial chains");
-  writefln("The number of digit factorial chains below %s", limit);
+  writefln("The number of digit factorial chains below %s", repeat(9u).take(maxDigs).array.toNumber() + 1);
   writeln("with 60 non-repeating terms is:");
-
-  auto maxDigs = (limit - 1).countDigits();
 
   writeln(countFactorialDigitChainsWithLength(maxDigs, 60));
 
