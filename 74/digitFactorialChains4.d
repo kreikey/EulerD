@@ -14,7 +14,7 @@ import kreikey.util;
 import kreikey.combinatorics;
 
 alias permutations = kreikey.combinatorics.permutations;
-ulong[] specialCycleRoots = [169, 871, 872];
+ulong[] cycleRoots = [169, 871, 872];
 
 void main() {
   StopWatch timer;
@@ -22,63 +22,71 @@ void main() {
 
   timer.start();
 
-  ulong[][] specialCycles = specialCycleRoots
-    .map!factorialDigitChain
-    .array();
-  bool[uint[]] specialCycleMembers = specialCycles
-    .join
-    .map!(a => a.toDigits.asort())
-    .map!(a => cast(const(uint)[])a)
-    .zip(repeat(true))
-    //.tee!writeln
-    .assocArray();
-
   writeln("Digit factorial chains");
   writefln("The number of digit factorial chains below %s", limit);
   writeln("with 60 non-repeating terms is:");
 
   auto maxDigs = (limit - 1).countDigits();
 
+  writeln(countFactorialDigitChainsWithLength(maxDigs, 60));
+
+  timer.stop();
+
+  writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
+}
+
+ulong countFactorialDigitChainsWithLength(ulong maxDigs, ulong length) {
+  ulong number = 0;
+  ulong[][] cycles = cycleRoots
+    .map!factorialDigitChain
+    .array();
+  bool[uint[]] cycleMembers = cycles
+    .join
+    .map!(a => a.toDigits.asort())
+    .map!(a => cast(const(uint)[])a)
+    .zip(repeat(true))
+    //.tee!writeln
+    .assocArray();
   auto sortedDigits = new Generator!(uint[])(getSortedDigitsInit(1, maxDigs));
-  sortedDigits
-    .filter!(a => a !in specialCycleMembers)
+
+  number = sortedDigits
+    .filter!(a => a !in cycleMembers)
     .map!(a => a, factorialDigitChainLength)
-    .filter!(a => a[1] == 60)
+    .filter!(a => a[1] == length)
     //.tee!(a => writefln("%(%s %s%)", a))
-    .map!(a => a[0].dup)
-    .map!permutations
+    .map!(a => a[0].permutations())
     .join
     .sort
     .uniq
     .filter!(a => a[0] != 0)
-    .count
-    .writeln();
+    .count();
 
-  timer.stop();
-
-  writeln();
-
-  writeln(specialCycleRoots);
-
-  writeln();
-
-  writeln(specialCycleMembers);
-
-  writeln();
-
-  specialCycles
+  auto cycleDigitsLengths = cycles
     .join
-    .map!(factorialDigitChain, a => a.toDigits.factorialDigitChainLength())
-    .each!writeln();
+    .map!toDigits
+    .map!(a => a, a => a.factorialDigitChainLength())
+    //.tee!(a => writefln("%(%s, %s%)", a))
+    .array();
 
-  writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
+  number += cycleDigitsLengths
+    .filter!(a => a[1] == length)
+    .count();
+
+  number += cycleDigitsLengths
+    .map!(a => zip(a[0].permutations.dropOne(), repeat(a[1] + 1)))
+    .join
+    //.tee!(a => writefln("%(%s, %s%)", a))
+    .filter!(a => a[1] == length)
+    .count();
+
+  return number;
 }
 
 ulong[] factorialDigitChain(ulong source) {
   ulong[] chain;
   ulong index = 0;
   ulong[ulong] factorialSumIndex = [source:index];
-  ulong sum = source.toDigits.map!factorial.sum();
+  ulong sum = source.factDigSum();
   index++;
 
   chain ~= source;
@@ -86,7 +94,7 @@ ulong[] factorialDigitChain(ulong source) {
   while (sum !in factorialSumIndex) {
     chain ~= sum;
     factorialSumIndex[cast(immutable)sum] = index;
-    sum = sum.toDigits.map!factorial.sum();
+    sum = sum.factDigSum();
     index++;
   }
 
@@ -112,3 +120,6 @@ uint[] factDigSumDigs(uint[] source) {
   return source.map!factorial.sum.toDigits();
 }
 
+ulong factDigSum(ulong source) {
+  return source.toDigits.map!factorial.sum();
+}

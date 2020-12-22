@@ -20,7 +20,7 @@ struct Permutations(T) {
   bool _empty = false;
 
   this(T[] _digits) {
-    digits = _digits;
+    digits = _digits.dup;
     fillStack(0);
   }
 
