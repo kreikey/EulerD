@@ -14,10 +14,51 @@ import std.concurrency;
 import kreikey.bytemath;
 import kreikey.stack;
 import kreikey.digits;
+import kreikey.combinatorics;
 
-alias getPrimeFactorGroups = memoize!primeFactorGroups1;
-alias primeFactors = memoize!primeFactors2;
-alias distinctPrimeFactors = memoize!distinctPrimeFactors2;
+alias nextPermutation = kreikey.combinatorics.nextPermutation;
+//alias nextPermutation = std.algorithm.nextPermutation;
+
+ulong[] getAllFactors(ulong number) {
+  auto factorGroups = getPrimeFactorGroups(number);
+  bool[] mask = new bool[factorGroups.length];
+  Tuple!(ulong, ulong)[] chosenFactorGroups;
+  ulong[] result;
+
+  ulong[] inner(Tuple!(ulong, ulong)[] myFactorGroups) {
+    ulong product = 1;
+    ulong[] result;
+
+    if (myFactorGroups.length == 0)
+      return [1];
+
+    foreach (e; 1 .. myFactorGroups[0][1] + 1) {
+      product *= myFactorGroups[0][0];
+      result ~= memoize!inner(myFactorGroups[1 .. $])
+        .map!(a => a * product)
+        .array();
+    }
+
+    return result;
+  }
+
+  for (ulong k = mask.length - 1; k < ulong.max; k--) {
+    mask[] = false;
+    mask[k .. $] = true;
+
+    do {
+      chosenFactorGroups = factorGroups
+        .zip(mask)
+        .filter!(a => a[1])
+        .map!(a => a[0])
+        .array();
+
+      result ~= memoize!inner(chosenFactorGroups);
+    } while (mask.nextPermutation());
+  }
+
+  return [1uL] ~ result;
+}
 
 long[] properDivisors(long number) {
   static long[][long] factorsCache;
@@ -136,38 +177,61 @@ string recipDigits(int divisor, int length) {
   return cast(string)digits;
 }
 
-Tuple!(ulong, ulong)[] primeFactorGroups1(ulong num) {
-  ulong n = 2;
-  ulong count = 0;
+template getPrimeFactorGroups(T) if (isIntegral!T) {
+  Tuple!(T, T)[] getPrimeFactorGroups(T num) {
+    Tuple!(T, T)[] inner(T num) {
+      T n = 2;
+      T count = 0;
+      Tuple!(T, T)[] result;
 
-  if (num == 1)
-    return [];
+      if (num == 1)
+        return result;
 
-  while (num % n != 0)
-    n++;
+      while (num % n != 0)
+        n++;
 
-  while (num % n == 0) {
-    num /= n;
-    count++;
+      while (num % n == 0) {
+        num /= n;
+        count++;
+      }
+
+      auto temp = memoize!inner(num);
+      return [tuple(n, count)] ~ temp;
+    }
+
+    return memoize!inner(num);
   }
-
-  return [tuple(n, count)] ~ memoize!primeFactorGroups1(num);
 }
 
-ulong[] primeFactors2(ulong num) {
-  ulong[] factors;
-  ulong n = 2;
+//Tuple!(ulong, ulong)[] primeFactorGroups1(ulong num, ulong n) {
+  //ulong count = 0;
 
-  if (num == 1)
-    return [];
+  //if (num == 1)
+    //return [];
 
-  while (num % n != 0)
-    n++;
+  //while (num % n != 0)
+    //n++;
 
-  if (num % n == 0)
-    factors ~= n;
+  //while (num % n == 0) {
+    //num /= n;
+    //count++;
+  //}
 
-  return factors ~ memoize!primeFactors2(num / n);
+  //return [tuple(n, count)] ~ memoize!primeFactorGroups1(num, n);
+//}
+
+ulong[] getPrimeFactors(ulong num) {
+  ulong[] inner(ulong num, ulong n) {
+    if (num == 1)
+      return [];
+
+    while (num % n != 0)
+      n++;
+
+    return [n] ~ memoize!inner(num / n, n);
+  }
+
+  return inner(num, 2);
 }
 
 ulong[] primeFactors1(ulong num) {
@@ -185,20 +249,25 @@ ulong[] primeFactors1(ulong num) {
   return factors;
 }
 
-ulong[] distinctPrimeFactors2(ulong num) {
-  ulong n = 2;
+ulong[] getDistinctPrimeFactors(ulong num) {
+  ulong[] inner(ulong num) {
+    ulong n = 2;
 
-  if (num == 1)
-    return [];
+    if (num == 1)
+      return [];
 
-  while (num % n != 0)
-    n++;
+    while (num % n != 0)
+      n++;
 
-  while (num % n == 0)
-    num /= n;
+    while (num % n == 0)
+      num /= n;
 
-  return [n] ~ memoize!distinctPrimeFactors2(num);
+    return [n] ~ memoize!inner(num);
+  }
+
+  return memoize!inner(num);
 }
+
 
 ulong[] distinctPrimeFactors1(ulong num) {
   ulong[] factors;
@@ -297,7 +366,8 @@ auto classifyPerfectPower(ulong source) {
     return result;
   }
 
-  auto primeFactorGroups = source.primeFactors.group.array();
+  //auto primeFactorGroups = source.getPrimeFactors.group.array();
+  auto primeFactorGroups = source.getPrimeFactorGroups();
   auto divisor = primeFactorGroups.map!(a => a[1]).fold!gcd();
   primeFactorGroups.each!((ref g) => g[1] /= divisor)();
   result[0] = primeFactorGroups
@@ -453,7 +523,7 @@ ulong getNonCoprimeCount(ulong[] factors) {
   ulong innerSum = 0;
   bool subtract = false;
 
-  for (ulong k = 1; k <= factors.length; k++) {
+  for (ulong k = 1; k <= mask.length; k++) {
     mask[] = false;
     mask[k .. $] = true;
     innerSum = 0;
@@ -485,7 +555,7 @@ ulong getTotient(ulong number) {
 }
 
 ulong getTotientOld(ulong number) {
-  ulong[] factors = distinctPrimeFactors(number);
+  ulong[] factors = getDistinctPrimeFactors(number);
 
   ulong exclusiveMultiples(ulong factor, ulong[] moreFactors) {
     ulong multiples = (number - 1) / factor;
@@ -526,7 +596,7 @@ ulong[] getCoprimes(ulong number) {
   ulong[] result;
   ulong[] factors = makePrimes
     .until!((a, b) => a >= b)(number)
-    .setDifference(distinctPrimeFactors(number))
+    .setDifference(getDistinctPrimeFactors(number))
     .array();
 
   void inner(ulong product, ulong[] someFactors) {
