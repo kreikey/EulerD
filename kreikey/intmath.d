@@ -19,6 +19,10 @@ import kreikey.combinatorics;
 alias nextPermutation = kreikey.combinatorics.nextPermutation;
 //alias nextPermutation = std.algorithm.nextPermutation;
 
+auto getProperDivisors(ulong number) {
+  return getAllFactors(number)[0 .. $ - 1];
+}
+
 ulong[] getAllFactors(ulong number) {
   auto factorGroups = getPrimeFactorGroups(number);
   bool[] mask = new bool[factorGroups.length];
@@ -60,7 +64,7 @@ ulong[] getAllFactors(ulong number) {
   return [1uL] ~ result;
 }
 
-long[] properDivisors(long number) {
+long[] properDivisorsOld(long number) {
   static long[][long] factorsCache;
   long[] factors;
   long[] factorsBig;
@@ -89,6 +93,50 @@ long[] properDivisors(long number) {
   factorsCache[number] = factors;
 
   return factors;
+}
+
+T countFactors1(T = int)(T num)
+if (isIntegral!T) {
+  T count;
+  T max = num;
+  T fac = 1;
+
+  if (num == 1)
+    return 1;
+
+  while (fac < max) {
+    if (num % fac == 0) {
+      count += 2;
+      max = num / fac;
+      if (fac == max)
+        count--;
+    }
+    fac++;
+  }
+
+  return count;
+}
+
+T countFactors2(T = int)(T num) 
+if (isIntegral!T) {
+  T count = 1;
+  auto factorGroups = getPrimeFactorGroups(num);
+  bool[] mask = new bool[factorGroups.length];
+
+  foreach (k; 1 .. mask.length + 1) {
+    mask[] = true;
+    mask[0 .. $ - k] = false;
+
+    do {
+      count += factorGroups
+        .zip(mask)
+        .filter!(a => a[1])
+        .map!(a => a[0][1])
+        .reduce!((a, b) => a * b)();
+    } while (mask.nextPermutation());
+  }
+
+  return count;
 }
 
 ulong mulOrder(ulong a, ulong n) {

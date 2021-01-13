@@ -9,6 +9,8 @@ import kreikey.combinatorics;
 import kreikey.intmath;
 
 alias nextPermutation = kreikey.combinatorics.nextPermutation;
+alias countFactorsFast = memoize!countFactors1;
+alias countFactors = countFactors1;
 
 void main(string[] args) {
   StopWatch timer;
@@ -21,9 +23,8 @@ void main(string[] args) {
 
   timer.start();
 
-  while (countTrianFactors(n) <= topNum) {
+  while (countTrianFactors(n) <= topNum)
     n++;
-  }
 
   writefln("n: %s t: %s factor count: %s", n, triangularize(n), countTrianFactors(n));
   timer.stop();
@@ -39,21 +40,17 @@ int countTrianFactors(int n) {
   int count;
 
   if (n % 2 == 0)
-    count = countFactors(n / 2) * countFactors(n + 1);
+    count = countFactorsFast(n / 2) * countFactorsFast(n + 1);
   else
-    count = countFactors(n) * countFactors((n + 1)/2);
+    count = countFactorsFast(n) * countFactorsFast((n + 1)/2);
 
   return count;
 }
 
-int countFactors(int num) {
-  static int[int] facCounts;
-  int count = 1;
+ulong countFactors2(ulong num) {
+  ulong count = 1;
   auto factorGroups = getPrimeFactorGroups(num);
   bool[] mask = new bool[factorGroups.length];
-
-  if (num in facCounts)
-    return facCounts[num];
 
   for (ulong k = mask.length - 1; k < ulong.max; k--) {
     mask[] = false;
@@ -63,28 +60,22 @@ int countFactors(int num) {
       count += factorGroups
         .zip(mask)
         .filter!(a => a[1])
-        .map!(a => a[0])
-        .map!(a => a[1])
+        .map!(a => a[0][1])
         .reduce!((a, b) => a * b)();
     } while (mask.nextPermutation());
   }
-
-  facCounts[num] = count;
 
   return count;
 }
 
 int countFactors1(int num) {
-  static int[int] facCounts;
   int count;
   int max = num;
   int fac = 1;
 
   if (num == 1)
     return 1;
-  else if (num in facCounts)
-    return facCounts[num];
-
+  
   while (fac < max) {
     if (num % fac == 0) {
       count += 2;
@@ -94,8 +85,6 @@ int countFactors1(int num) {
     }
     fac++;
   }
-
-  facCounts[num] = count;
 
   return count;
 }

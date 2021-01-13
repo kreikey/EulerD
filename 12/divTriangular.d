@@ -2,6 +2,14 @@
 import std.stdio;
 import std.datetime.stopwatch;
 import std.conv;
+import std.functional;
+import std.range;
+import std.algorithm;
+import std.traits;
+import kreikey.intmath;
+import kreikey.combinatorics;
+
+alias nextPermutation = kreikey.combinatorics.nextPermutation;
 
 void main(string[] args) {
   StopWatch timer;
@@ -24,31 +32,34 @@ void main(string[] args) {
 
 }
 
-int triangularize(int n) {
+T triangularize(T)(T n)
+if (isIntegral!T) {
   return n * (n + 1) / 2;
 }
 
-int countTrianFactors(int n) {
-  int count;
+T countTrianFactors(T)(T n)
+if (isIntegral!T) {
+  T count;
+
+  alias countFactorsFast = memoize!(countFactors1!T);
 
   if (n % 2 == 0)
-    count = countFactors(n / 2) * countFactors(n + 1);
+    count = countFactorsFast(n / 2) * countFactorsFast(n + 1);
   else
-    count = countFactors(n) * countFactors((n + 1)/2);
+    count = countFactorsFast(n) * countFactorsFast((n + 1)/2);
 
   return count;
 }
 
-int countFactors(int num) {
-  static int[int] facCounts;
-  int count;
-  int max = num;
-  int fac = 1;
+/*
+T countFactors1(T = int)(T num)
+if (isIntegral!T) {
+  T count;
+  T max = num;
+  T fac = 1;
 
   if (num == 1)
     return 1;
-  else if (num in facCounts)
-    return facCounts[num];
 
   while (fac < max) {
     if (num % fac == 0) {
@@ -60,8 +71,28 @@ int countFactors(int num) {
     fac++;
   }
 
-  facCounts[num] = count;
-
   return count;
 }
 
+T countFactors2(T = int)(T num) 
+if (isIntegral!T) {
+  T count = 1;
+  auto factorGroups = getPrimeFactorGroups(num);
+  bool[] mask = new bool[factorGroups.length];
+
+  foreach (k; 1 .. mask.length + 1) {
+    mask[] = true;
+    mask[0 .. $ - k] = false;
+
+    do {
+      count += factorGroups
+        .zip(mask)
+        .filter!(a => a[1])
+        .map!(a => a[0][1])
+        .reduce!((a, b) => a * b)();
+    } while (mask.nextPermutation());
+  }
+
+  return count;
+}
+*/
