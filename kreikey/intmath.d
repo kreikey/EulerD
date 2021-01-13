@@ -19,19 +19,15 @@ import kreikey.combinatorics;
 alias nextPermutation = kreikey.combinatorics.nextPermutation;
 //alias nextPermutation = std.algorithm.nextPermutation;
 
-auto getProperDivisors(ulong number) {
-  return getAllFactors(number)[0 .. $ - 1];
-}
-
-ulong[] getAllFactors(ulong number) {
+T[] getAllFactorsSlow(T = int)(T number) if (isIntegral!T) {
   auto factorGroups = getPrimeFactorGroups(number);
   bool[] mask = new bool[factorGroups.length];
-  Tuple!(ulong, ulong)[] chosenFactorGroups;
-  ulong[] result;
+  Tuple!(T, T)[] chosenFactorGroups;
+  T[] result = [T(1)];
 
-  ulong[] inner(Tuple!(ulong, ulong)[] myFactorGroups) {
-    ulong product = 1;
-    ulong[] result;
+  T[] inner(Tuple!(T, T)[] myFactorGroups) {
+    T product = 1;
+    T[] result;
 
     if (myFactorGroups.length == 0)
       return [1];
@@ -46,9 +42,9 @@ ulong[] getAllFactors(ulong number) {
     return result;
   }
 
-  for (ulong k = mask.length - 1; k < ulong.max; k--) {
-    mask[] = false;
-    mask[k .. $] = true;
+  foreach (k; 1 .. mask.length + 1) {
+    mask[] = true;
+    mask[0 .. $ - k] = false;
 
     do {
       chosenFactorGroups = factorGroups
@@ -61,16 +57,20 @@ ulong[] getAllFactors(ulong number) {
     } while (mask.nextPermutation());
   }
 
-  return [1uL] ~ result;
+  return result;
 }
 
-long[] properDivisorsOld(long number) {
-  static long[][long] factorsCache;
-  long[] factors;
-  long[] factorsBig;
-  long big = number;
-  long fac = 1;
-  long temp;
+long[] getAllFactors(long number) {
+  return getProperDivisors(number) ~ number;
+}
+
+T[] getProperDivisors(T = int)(T number) if (isIntegral!T) {
+  static T[][T] factorsCache;
+  T[] factors;
+  T[] factorsBig;
+  T big = number;
+  T fac = 1;
+  T temp;
 
   if (number in factorsCache)
     return factorsCache[number];
@@ -95,8 +95,7 @@ long[] properDivisorsOld(long number) {
   return factors;
 }
 
-T countFactors1(T = int)(T num)
-if (isIntegral!T) {
+T countFactors1(T = int)(T num) if (isIntegral!T) {
   T count;
   T max = num;
   T fac = 1;
@@ -431,8 +430,7 @@ Tuple!(ulong, ulong) reduceFrac(ulong numerator, ulong denominator) {
   return tuple(numerator/divisor, denominator/divisor);
 }
 
-T isqrt(T)(T n, out T remainder)
-if (isIntegral!T || is(T == BigInt)) {
+T isqrt(T)(T n, out T remainder) if (isIntegral!T || is(T == BigInt)) {
   if (n == 0 || n == 1)
     return n;
 
@@ -461,15 +459,13 @@ if (isIntegral!T || is(T == BigInt)) {
   return minRoot;
 }
 
-T isqrt(T)(T n)
-if (isIntegral!T || is(T == BigInt)) {
+T isqrt(T)(T n) if (isIntegral!T || is(T == BigInt)) {
   T remainder;
   T root = isqrt(n, remainder);
   return root;
 }
 
-bool isSquare(T)(T n)
-if (isIntegral!T || is(T == BigInt)) {
+bool isSquare(T)(T n) if (isIntegral!T || is(T == BigInt)) {
   T remainder;
   T root;
 
@@ -477,8 +473,7 @@ if (isIntegral!T || is(T == BigInt)) {
   return remainder == 0;
 }
 
-auto squareRootSequence(T)(T number)
-if (isIntegral!T || is(T == BigInt)) {
+auto squareRootSequence(T)(T number) if (isIntegral!T || is(T == BigInt)) {
   T a0 = cast(T)sqrt(cast(real)number);
   T[] result;
   T a;
@@ -504,18 +499,15 @@ if (isIntegral!T || is(T == BigInt)) {
   return result;
 }
 
-auto continuedFraction(T, R)(R terms)
-if (isInputRange!(Unqual!R) && isIntegral!(ElementType!R) && (isIntegral!T || is(T == BigInt))) {
+auto continuedFraction(T, R)(R terms) if (isInputRange!(Unqual!R) && isIntegral!(ElementType!R) && (isIntegral!T || is(T == BigInt))) {
   return ContinuedFraction!(R, T)(terms);
 }
 
-auto continuedFraction(R)(R terms)
-if (isInputRange!(Unqual!R) && isIntegral!(ElementType!R)) {
+auto continuedFraction(R)(R terms) if (isInputRange!(Unqual!R) && isIntegral!(ElementType!R)) {
   return ContinuedFraction!(R)(terms);
 }
 
-struct ContinuedFraction(R, T = ElementType!R)
-if (isInputRange!(Unqual!R) && isIntegral!(ElementType!R) && (isIntegral!T || is(T == BigInt))) {
+struct ContinuedFraction(R, T = ElementType!R) if (isInputRange!(Unqual!R) && isIntegral!(ElementType!R) && (isIntegral!T || is(T == BigInt))) {
   alias E = ElementType!R;
   E first;
   R range;
@@ -578,6 +570,7 @@ ulong getNonCoprimeCount(ulong[] factors) {
 
     do {
       product = zip(factors, mask).fold!((a, b) => tuple(b[1] ? a[0] * b[0] : a[0], true))(tuple(1uL, true))[0];
+      //product = zip(factors, mask).filter!(a => a[1]).map!(a => a[0]).fold!((a, b) => a * b)();
       innerSum += product;
     } while (nextPermutation(mask));
 
@@ -595,6 +588,7 @@ ulong getNonCoprimeCount(ulong[] factors) {
 ulong getTotient(ulong number) {
   auto factorGroups = getPrimeFactorGroups(number);
   auto duplicateFactorProduct = factorGroups.fold!((a, b) => tuple(a[0] * b[0] ^^ (b[1] - 1), 1))(tuple(1uL, 1u))[0];
+  //auto duplicateFactorProduct = factorGroups.map!(a => a[0] ^^ (a[1] - 1)).fold!((a, b) => a * b);
   auto factors = factorGroups.map!(a => a[0]).array();
   ulong nonCoprimes = memoize!getNonCoprimeCount(factors);
   nonCoprimes *= duplicateFactorProduct;

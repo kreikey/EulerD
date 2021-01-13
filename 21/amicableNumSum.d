@@ -17,16 +17,21 @@ void main(string[] args) {
 
   timer.start();
 
-  amicableSum = iota(1, topNum).filter!(isAmicable).sum();
+  writeln("Amicable numbers");
+
+  amicableSum = iota(2, topNum)
+    .filter!isAmicable
+    .tee!writeln
+    .sum();
 
   timer.stop();
   writefln("The sum of amicable numbers below %s is %s", topNum, amicableSum);
   writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
 }
 
-long isAmicable(long number) {
-  static long[long] amicableCache;
-  long isAmicable;
+bool isAmicable(long number) {
+  static bool[long] amicableCache;
+  bool isAmicable;
   long sumFactors;
   long sumFactorsSumFactors;
 
@@ -36,12 +41,13 @@ long isAmicable(long number) {
   if (number in amicableCache)
     return amicableCache[number];
 
-  sumFactors = number.properDivisors.reduce!((a, b) => a + b);
-  sumFactorsSumFactors = sumFactors.properDivisors.reduce!((a, b) => a + b);
+  sumFactors = number.getProperDivisors.reduce!((a, b) => a + b);
+  sumFactorsSumFactors = sumFactors.getProperDivisors.reduce!((a, b) => a + b);
 
   if (sumFactorsSumFactors == number && sumFactors != number) {
-    isAmicable = sumFactors;
-    amicableCache[isAmicable] = number;
+    isAmicable = true;
+    amicableCache[number] = true;
+    amicableCache[sumFactors] = true;
   }
 
   return isAmicable;
