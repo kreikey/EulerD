@@ -5,9 +5,10 @@ import std.range;
 import std.algorithm;
 import kreikey.intmath;
 
-alias primeFactors = primeFactors1;
-
 void main() {
-  writeln(properDivisors(5487478));
-  writeln(primeFactors(5487478));
+  writeln(getProperDivisors(5487478));
+  writeln(getProperDivisors2(5487478));
+  writeln(getPrimeFactors(5487478));
+  writeln(getAllFactors(5487478));
+  writeln(getAllFactors2(5487478));
 }

@@ -19,7 +19,7 @@ import kreikey.combinatorics;
 alias nextPermutation = kreikey.combinatorics.nextPermutation;
 //alias nextPermutation = std.algorithm.nextPermutation;
 
-T[] getAllFactorsSlow(T = int)(T number) if (isIntegral!T) {
+T[] getAllFactors2(T = int)(T number) if (isIntegral!T) {
   auto factorGroups = getPrimeFactorGroups(number);
   bool[] mask = new bool[factorGroups.length];
   Tuple!(T, T)[] chosenFactorGroups;
@@ -28,15 +28,16 @@ T[] getAllFactorsSlow(T = int)(T number) if (isIntegral!T) {
   T[] inner(Tuple!(T, T)[] myFactorGroups) {
     T product = 1;
     T[] result;
+    T[] temp;
 
     if (myFactorGroups.length == 0)
       return [1];
 
     foreach (e; 1 .. myFactorGroups[0][1] + 1) {
       product *= myFactorGroups[0][0];
-      result ~= memoize!inner(myFactorGroups[1 .. $])
-        .map!(a => a * product)
-        .array();
+      temp = memoize!inner(myFactorGroups[1 .. $]).dup;
+      temp[] *= product;
+      result ~= temp;
     }
 
     return result;
@@ -60,11 +61,11 @@ T[] getAllFactorsSlow(T = int)(T number) if (isIntegral!T) {
   return result;
 }
 
-long[] getAllFactors(long number) {
-  return getProperDivisors(number) ~ number;
+T[] getProperDivisors2(T = int)(T number) if (isIntegral!T) {
+  return getAllFactors2(number)[0 .. $-1];
 }
 
-T[] getProperDivisors(T = int)(T number) if (isIntegral!T) {
+T[] getAllFactors(T = int)(T number) if (isIntegral!T) {
   static T[][T] factorsCache;
   T[] factors;
   T[] factorsBig;
@@ -76,7 +77,6 @@ T[] getProperDivisors(T = int)(T number) if (isIntegral!T) {
     return factorsCache[number];
 
   factors ~= fac;
-  fac++;
 
   while (fac < big) {
     if (number % fac == 0) {
@@ -93,6 +93,10 @@ T[] getProperDivisors(T = int)(T number) if (isIntegral!T) {
   factorsCache[number] = factors;
 
   return factors;
+}
+
+T[] getProperDivisors(T = int)(T number) if (isIntegral!T) {
+  return getAllFactors(number)[0 .. $-1];
 }
 
 T countFactors1(T = int)(T num) if (isIntegral!T) {
@@ -242,43 +246,28 @@ template getPrimeFactorGroups(T) if (isIntegral!T) {
         count++;
       }
 
-      auto temp = memoize!inner(num);
-      return [tuple(n, count)] ~ temp;
+      return [tuple(n, count)] ~ memoize!inner(num);
     }
 
+    assert(num != 0);
     return memoize!inner(num);
   }
 }
 
-//Tuple!(ulong, ulong)[] primeFactorGroups1(ulong num, ulong n) {
-  //ulong count = 0;
-
-  //if (num == 1)
-    //return [];
-
-  //while (num % n != 0)
-    //n++;
-
-  //while (num % n == 0) {
-    //num /= n;
-    //count++;
-  //}
-
-  //return [tuple(n, count)] ~ memoize!primeFactorGroups1(num, n);
-//}
-
 ulong[] getPrimeFactors(ulong num) {
-  ulong[] inner(ulong num, ulong n) {
+  ulong[] inner(ulong num) {
+    ulong n = 2;
+
     if (num == 1)
       return [];
 
     while (num % n != 0)
       n++;
 
-    return [n] ~ memoize!inner(num / n, n);
+    return [n] ~ memoize!inner(num / n);
   }
 
-  return inner(num, 2);
+  return memoize!inner(num);
 }
 
 ulong[] primeFactors1(ulong num) {
