@@ -35,9 +35,15 @@ T[] getAllFactors2(T = int)(T number) if (isIntegral!T) {
 
     foreach (e; 1 .. myFactorGroups[0][1] + 1) {
       product *= myFactorGroups[0][0];
+
+      // speed vs elegance
       temp = memoize!inner(myFactorGroups[1 .. $]).dup;
       temp[] *= product;
       result ~= temp;
+
+      //result ~= memoize!inner(myFactorGroups[1 .. $])
+        //.map!(a => a * product)
+        //.array();
     }
 
     return result;
@@ -48,11 +54,17 @@ T[] getAllFactors2(T = int)(T number) if (isIntegral!T) {
     mask[0 .. $ - k] = false;
 
     do {
-      chosenFactorGroups = factorGroups
-        .zip(mask)
-        .filter!(a => a[1])
-        .map!(a => a[0])
-        .array();
+      //chosenFactorGroups = factorGroups
+        //.zip(mask)
+        //.filter!(a => a[1])
+        //.map!(a => a[0])
+        //.array();
+
+      // speed vs elegance
+      chosenFactorGroups = [];
+      for (int i = 0; i < factorGroups.length; i++)
+        if (mask[i])
+          chosenFactorGroups ~= factorGroups[i];
 
       result ~= memoize!inner(chosenFactorGroups);
     } while (mask.nextPermutation());
@@ -76,9 +88,7 @@ T[] getAllFactors(T = int)(T number) if (isIntegral!T) {
   if (number in factorsCache)
     return factorsCache[number];
 
-  factors ~= fac;
-
-  while (fac < big) {
+  do {
     if (number % fac == 0) {
       factors ~= fac;
       big = number / fac;
@@ -86,7 +96,7 @@ T[] getAllFactors(T = int)(T number) if (isIntegral!T) {
         factorsBig ~= big;
     }
     fac++;
-  }
+  } while (fac < big);
 
   std.algorithm.reverse(factorsBig);
   factors ~= factorsBig;
@@ -142,8 +152,8 @@ if (isIntegral!T) {
   return count;
 }
 
-ulong mulOrder(ulong a, ulong n) {
-  ulong order = 1;
+T mulOrder(T = int)(T a, T n) if (isIntegral!T) {
+  T order = 1;
   auto product = BigInt(a);
   auto one = BigInt(1);
   auto y = BigInt(a);
@@ -157,10 +167,10 @@ ulong mulOrder(ulong a, ulong n) {
   return order;
 }
 
-ulong carmichael(ulong n) {
-  ulong a = 2;
-  ulong order = 1;
-  ulong bigOrder = 1;
+T carmichael(T = int)(T n) if (isIntegral!T) {
+  T a = 2;
+  T order = 1;
+  T bigOrder = 1;
 
   while (a < n) {
     if (areCoprime(a, n)) {
@@ -176,14 +186,12 @@ ulong carmichael(ulong n) {
   return bigOrder;
 }
 
-bool areCoprime(ulong a, ulong b) {
+bool areCoprime(T = int)(T a, T b) if (isIntegral!T) {
   return gcd(a, b) == 1;
 }
 
 // gcd with subtraction is about twice as fast as gcd with modulo
-ulong gcd(ulong a, ulong b) {
-  ulong t;
-
+T gcd(T = int)(T a, T b) if (isIntegral!T) {
   while (b != a) {
     if (a > b)
       a -= b;
@@ -194,9 +202,9 @@ ulong gcd(ulong a, ulong b) {
   return b;
 }
 
-ulong lcm(ulong a, ulong b) {
-  ulong amul = a;
-  ulong bmul = b;
+T lcm(T a, T b) {
+  T amul = a;
+  T bmul = b;
 
   while (amul != bmul) {
     if (amul < bmul)
@@ -558,8 +566,8 @@ ulong getNonCoprimeCount(ulong[] factors) {
     innerSum = 0;
 
     do {
-      product = zip(factors, mask).fold!((a, b) => tuple(b[1] ? a[0] * b[0] : a[0], true))(tuple(1uL, true))[0];
-      //product = zip(factors, mask).filter!(a => a[1]).map!(a => a[0]).fold!((a, b) => a * b)();
+      //product = zip(factors, mask).fold!((a, b) => tuple(b[1] ? a[0] * b[0] : a[0], true))(tuple(1uL, true))[0];
+      product = zip(factors, mask).filter!(a => a[1]).map!(a => a[0]).fold!((a, b) => a * b)();
       innerSum += product;
     } while (nextPermutation(mask));
 
@@ -576,8 +584,8 @@ ulong getNonCoprimeCount(ulong[] factors) {
 
 ulong getTotient(ulong number) {
   auto factorGroups = getPrimeFactorGroups(number);
-  auto duplicateFactorProduct = factorGroups.fold!((a, b) => tuple(a[0] * b[0] ^^ (b[1] - 1), 1))(tuple(1uL, 1u))[0];
-  //auto duplicateFactorProduct = factorGroups.map!(a => a[0] ^^ (a[1] - 1)).fold!((a, b) => a * b);
+  //auto duplicateFactorProduct = factorGroups.fold!((a, b) => tuple(a[0] * b[0] ^^ (b[1] - 1), 1))(tuple(1uL, 1u))[0];
+  auto duplicateFactorProduct = factorGroups.map!(a => a[0] ^^ (a[1] - 1)).fold!((a, b) => a * b);
   auto factors = factorGroups.map!(a => a[0]).array();
   ulong nonCoprimes = memoize!getNonCoprimeCount(factors);
   nonCoprimes *= duplicateFactorProduct;
