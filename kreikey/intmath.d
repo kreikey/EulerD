@@ -19,7 +19,7 @@ import kreikey.combinatorics;
 alias nextPermutation = kreikey.combinatorics.nextPermutation;
 //alias nextPermutation = std.algorithm.nextPermutation;
 
-T[] getAllFactors2(T)(T number) if (isIntegral!T) {
+T[] getAllFactors2(T)(T number) if (isIntegral!T && !isSigned!T) {
   auto factorGroups = getPrimeFactorGroups(number);
   bool[] mask = new bool[factorGroups.length];
   Tuple!(T, T)[] chosenFactorGroups;
@@ -33,7 +33,7 @@ T[] getAllFactors2(T)(T number) if (isIntegral!T) {
     if (myFactorGroups.length == 0)
       return [1];
 
-    foreach (e; 1 .. myFactorGroups[0][1] + 1) {
+    foreach (e; 1 .. myFactorGroups[0][1]+1) {
       product *= myFactorGroups[0][0];
 
       // speed vs elegance
@@ -49,22 +49,22 @@ T[] getAllFactors2(T)(T number) if (isIntegral!T) {
     return result;
   }
 
-  foreach (k; 1 .. mask.length + 1) {
+  foreach (k; 1 .. mask.length+1) {
     mask[] = true;
-    mask[0 .. $ - k] = false;
+    mask[0 .. $-k] = false;
 
     do {
+      // speed vs elegance
+      chosenFactorGroups = [];
+      for (size_t i = 0; i < factorGroups.length; i++)
+        if (mask[i])
+          chosenFactorGroups ~= factorGroups[i];
+
       //chosenFactorGroups = factorGroups
         //.zip(mask)
         //.filter!(a => a[1])
         //.map!(a => a[0])
         //.array();
-
-      // speed vs elegance
-      chosenFactorGroups = [];
-      for (int i = 0; i < factorGroups.length; i++)
-        if (mask[i])
-          chosenFactorGroups ~= factorGroups[i];
 
       result ~= memoize!inner(chosenFactorGroups);
     } while (mask.nextPermutation());
@@ -136,9 +136,9 @@ if (isIntegral!T) {
   auto factorGroups = getPrimeFactorGroups(num);
   bool[] mask = new bool[factorGroups.length];
 
-  foreach (k; 1 .. mask.length + 1) {
+  foreach (k; 1 .. mask.length+1) {
     mask[] = true;
-    mask[0 .. $ - k] = false;
+    mask[0 .. $-k] = false;
 
     do {
       count += factorGroups
@@ -216,12 +216,12 @@ T lcm(T)(T a, T b) if (isIntegral!T && !isSigned!T) {
   return amul;
 }
 
-T[] recipDigits(T = uint, U)(U divisor, size_t length) if (isIntegral!T && isIntegral!U && !isSigned!U) {
-  U dividend = 10;
-  U quotient = 0;
-  U remainder = 0;
-  U digitCount = 0;
-  T[] digits;
+uint[] recipDigits(T)(T divisor, size_t length) if (isIntegral!T && !isSigned!T) {
+  T dividend = 10;
+  T quotient = 0;
+  T remainder = 0;
+  T digitCount = 0;
+  uint[] digits;
 
   assert(divisor != 0);
 
@@ -232,7 +232,7 @@ T[] recipDigits(T = uint, U)(U divisor, size_t length) if (isIntegral!T && isInt
     quotient = dividend / divisor;
     remainder = dividend % divisor;
     dividend = remainder * 10;
-    digits ~= cast(T)quotient;
+    digits ~= cast(uint)quotient;
     digitCount++;
   } while (remainder != 0 && digitCount != length);
 
@@ -538,14 +538,14 @@ struct ContinuedFraction(R, T = ElementType!R) if (isInputRange!(Unqual!R) && is
   }
 }
 
-ulong getNonCoprimeCount(ulong[] factors) {
+T getNonCoprimeCount(T)(T[] factors) if (isIntegral!T && !isSigned!T) {
   bool[] mask = new bool[factors.length];
-  ulong product = 0;
-  ulong nonCoprimes = 0;
-  ulong innerSum = 0;
+  T product = 0;
+  T nonCoprimes = 0;
+  T innerSum = 0;
   bool subtract = false;
 
-  for (ulong k = 1; k <= mask.length; k++) {
+  for (T k = 1; k <= mask.length; k++) {
     mask[] = false;
     mask[k .. $] = true;
     innerSum = 0;
@@ -567,29 +567,29 @@ ulong getNonCoprimeCount(ulong[] factors) {
   return nonCoprimes;
 }
 
-ulong getTotient(ulong number) {
+T getTotient(T)(T number) if (isIntegral!T && !isSigned!T) {
   auto factorGroups = getPrimeFactorGroups(number);
   //auto duplicateFactorProduct = factorGroups.fold!((a, b) => tuple(a[0] * b[0] ^^ (b[1] - 1), 1))(tuple(1uL, 1u))[0];
   auto duplicateFactorProduct = factorGroups.map!(a => a[0] ^^ (a[1] - 1)).fold!((a, b) => a * b);
   auto factors = factorGroups.map!(a => a[0]).array();
-  ulong nonCoprimes = memoize!getNonCoprimeCount(factors);
+  T nonCoprimes = memoize!getNonCoprimeCount(factors);
   nonCoprimes *= duplicateFactorProduct;
 
   return number == 1 ? 1 : number - nonCoprimes;
 }
 
-ulong getTotientOld(ulong number) {
-  ulong[] factors = getDistinctPrimeFactors(number);
+T getTotientOld(T)(T number) if (isIntegral!T && !isSigned!T) {
+  T[] factors = getDistinctPrimeFactors(number);
 
-  ulong exclusiveMultiples(ulong factor, ulong[] moreFactors) {
-    ulong multiples = (number - 1) / factor;
-    ulong[] mask = new ulong[moreFactors.length];
-    ulong mainFactor;
-    ulong[] chosenFactors;
-    ulong[] remainingFactors;
+  T exclusiveMultiples(T factor, T[] moreFactors) {
+    T multiples = (number - 1) / factor;
+    T[] mask = new T[moreFactors.length];
+    T mainFactor;
+    T[] chosenFactors;
+    T[] remainingFactors;
 
-    void separate(out ulong[] chosenFactors, out ulong[] remainingFactors) {
-      for (ulong i = 0; i < moreFactors.length; i++) {
+    void separate(out T[] chosenFactors, out T[] remainingFactors) {
+      for (T i = 0; i < moreFactors.length; i++) {
         if (mask[i])
           chosenFactors ~= moreFactors[i];
         else
@@ -599,7 +599,7 @@ ulong getTotientOld(ulong number) {
 
     foreach (k; iota(0, mask.length).retro()) {
       mask[] = 0;
-      mask[k..$] = 1;
+      mask[k .. $] = 1;
       do {
         separate(chosenFactors, remainingFactors);
         mainFactor = only(factor).chain(chosenFactors).fold!((a, b) => a * b)();
@@ -616,15 +616,15 @@ ulong getTotientOld(ulong number) {
   return exclusiveMultiples(1, factors);
 }
 
-ulong[] getCoprimes(ulong number) {
-  ulong[] result;
-  ulong[] factors = makePrimes
+T[] getCoprimes(T)(T number) if (isIntegral!T && !isSigned!T) {
+  T[] result;
+  T[] factors = makePrimes
     .until!((a, b) => a >= b)(number)
     .setDifference(getDistinctPrimeFactors(number))
     .array();
 
-  void inner(ulong product, ulong[] someFactors) {
-    ulong nextProduct;
+  void inner(T product, T[] someFactors) {
+    T nextProduct;
 
     result ~= product;
 
@@ -643,16 +643,16 @@ ulong[] getCoprimes(ulong number) {
   return result;
 }
 
-auto getMultiTotientsInit(ulong topNumber) {
+auto getMultiTotientsInit(T)(T topNumber) if (isIntegral!T && !isSigned!T) {
   void getMultiTotients() {
-    ulong[] factors = makePrimes
+    T[] factors = makePrimes
       .until!((a, b) => a >= b)(topNumber)
       .array();
 
-    void inner(ulong baseNumber, ulong multiplier, ulong[] someFactors, ulong[] distinctFactors) {
-      ulong totient = multiplier * (baseNumber - memoize!getNonCoprimeCount(distinctFactors[1..$]));
+    void inner(T baseNumber, T multiplier, T[] someFactors, T[] distinctFactors) {
+      T totient = multiplier * (baseNumber - memoize!getNonCoprimeCount(distinctFactors[1 .. $]));
 
-      yield(tuple(ulong(baseNumber * multiplier), ulong(totient)));
+      yield(tuple(T(baseNumber * multiplier), T(totient)));
 
       foreach (i, f; someFactors) {
         if (baseNumber * multiplier * f > topNumber)
@@ -671,11 +671,11 @@ auto getMultiTotientsInit(ulong topNumber) {
   return &getMultiTotients;
 }
 
-auto getSortedDigitsInit(ulong lowerUpper) {
+auto getSortedDigitsInit(T)(T lowerUpper) if (isIntegral!T && !isSigned!T) {
   return getSortedDigitsInit(lowerUpper, lowerUpper);
 }
 
-auto getSortedDigitsInit(ulong lower, ulong upper) {
+auto getSortedDigitsInit(T)(T lower, T upper) if (isIntegral!T && !isSigned!T) {
   assert(lower <= upper);
   uint[] digits;
 
@@ -691,7 +691,7 @@ auto getSortedDigitsInit(ulong lower, ulong upper) {
       }
     }
 
-    foreach (ulong s; lower .. upper + 1) {
+    foreach (T s; lower .. upper+1) {
       digits = new uint[s];
       digits[] = 0;
       inner(0, 1);
