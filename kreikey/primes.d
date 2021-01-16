@@ -3,6 +3,9 @@ import std.traits;
 import std.stdio;
 import std.stdio;
 import std.format;
+import std.math;
+import std.algorithm;
+import std.conv;
 
 auto makePrimes(T = ulong)()
 if (isIntegral!T) {
@@ -114,4 +117,22 @@ public:
   override string toString() {
     return format("%s\t%s\t%s", ndx, root, nextSquare);
   }
+}
+
+auto isPrimeInit() {
+  Primes!ulong primes = new Primes!ulong();
+
+  bool isPrime(ulong number) {
+    auto primesCopy = primes.save;
+
+    if (number <= primesCopy.topPrime)
+      return number in primesCopy.cache ? true : false;
+
+    auto root = std.math.sqrt(real(number)).to!ulong();
+    auto found = primesCopy.find!(p => number % p == 0 || p > root)().front;
+
+    return found > root;
+  }
+
+  return &isPrime;
 }

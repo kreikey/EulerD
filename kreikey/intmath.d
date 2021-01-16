@@ -19,7 +19,7 @@ import kreikey.combinatorics;
 alias nextPermutation = kreikey.combinatorics.nextPermutation;
 //alias nextPermutation = std.algorithm.nextPermutation;
 
-T[] getAllFactors2(T = int)(T number) if (isIntegral!T) {
+T[] getAllFactors2(T)(T number) if (isIntegral!T) {
   auto factorGroups = getPrimeFactorGroups(number);
   bool[] mask = new bool[factorGroups.length];
   Tuple!(T, T)[] chosenFactorGroups;
@@ -73,11 +73,11 @@ T[] getAllFactors2(T = int)(T number) if (isIntegral!T) {
   return result;
 }
 
-T[] getProperDivisors2(T = int)(T number) if (isIntegral!T) {
+T[] getProperDivisors2(T)(T number) if (isIntegral!T) {
   return getAllFactors2(number)[0 .. $-1];
 }
 
-T[] getAllFactors(T = int)(T number) if (isIntegral!T) {
+T[] getAllFactors(T)(T number) if (isIntegral!T) {
   static T[][T] factorsCache;
   T[] factors;
   T[] factorsBig;
@@ -105,11 +105,11 @@ T[] getAllFactors(T = int)(T number) if (isIntegral!T) {
   return factors;
 }
 
-T[] getProperDivisors(T = int)(T number) if (isIntegral!T) {
+T[] getProperDivisors(T)(T number) if (isIntegral!T) {
   return getAllFactors(number)[0 .. $-1];
 }
 
-T countFactors1(T = int)(T num) if (isIntegral!T) {
+T countFactors1(T)(T num) if (isIntegral!T) {
   T count;
   T max = num;
   T fac = 1;
@@ -130,7 +130,7 @@ T countFactors1(T = int)(T num) if (isIntegral!T) {
   return count;
 }
 
-T countFactors2(T = int)(T num) 
+T countFactors2(T)(T num) 
 if (isIntegral!T) {
   T count = 1;
   auto factorGroups = getPrimeFactorGroups(num);
@@ -152,7 +152,7 @@ if (isIntegral!T) {
   return count;
 }
 
-T mulOrder(T = int)(T a, T n) if (isIntegral!T) {
+T mulOrder(T)(T a, T n) if (isIntegral!T) {
   T order = 1;
   auto product = BigInt(a);
   auto one = BigInt(1);
@@ -167,7 +167,7 @@ T mulOrder(T = int)(T a, T n) if (isIntegral!T) {
   return order;
 }
 
-T carmichael(T = int)(T n) if (isIntegral!T) {
+T carmichael(T)(T n) if (isIntegral!T) {
   T a = 2;
   T order = 1;
   T bigOrder = 1;
@@ -186,12 +186,12 @@ T carmichael(T = int)(T n) if (isIntegral!T) {
   return bigOrder;
 }
 
-bool areCoprime(T = int)(T a, T b) if (isIntegral!T) {
+bool areCoprime(T)(T a, T b) if (isIntegral!T && !isSigned!T) {
   return gcd(a, b) == 1;
 }
 
 // gcd with subtraction is about twice as fast as gcd with modulo
-T gcd(T = int)(T a, T b) if (isIntegral!T) {
+T gcd(T)(T a, T b) if (isIntegral!T && !isSigned!T) {
   while (b != a) {
     if (a > b)
       a -= b;
@@ -202,7 +202,7 @@ T gcd(T = int)(T a, T b) if (isIntegral!T) {
   return b;
 }
 
-T lcm(T a, T b) {
+T lcm(T)(T a, T b) if (isIntegral!T && !isSigned!T) {
   T amul = a;
   T bmul = b;
 
@@ -216,27 +216,30 @@ T lcm(T a, T b) {
   return amul;
 }
 
-string recipDigits(int divisor, int length) {
-  int dividend = 10;
-  int quotient = 0;
-  int remainder = 0;
-  int digitCount = 0;
-  ubyte[] digits;
+T[] recipDigits(T = uint, U)(U divisor, size_t length) if (isIntegral!T && isIntegral!U && !isSigned!U) {
+  U dividend = 10;
+  U quotient = 0;
+  U remainder = 0;
+  U digitCount = 0;
+  T[] digits;
+
+  assert(divisor != 0);
+
+  if (divisor == 1)
+    return [];
 
   do {
     quotient = dividend / divisor;
     remainder = dividend % divisor;
     dividend = remainder * 10;
-    digits ~= cast(ubyte)quotient;
+    digits ~= cast(T)quotient;
     digitCount++;
   } while (remainder != 0 && digitCount != length);
 
-  digits[] += '0';
-
-  return cast(string)digits;
+  return digits;
 }
 
-template getPrimeFactorGroups(T) if (isIntegral!T) {
+template getPrimeFactorGroups(T) if (isIntegral!T && !isSigned!T) {
   Tuple!(T, T)[] getPrimeFactorGroups(T num) {
     Tuple!(T, T)[] inner(T num) {
       T n = 2;
@@ -262,9 +265,9 @@ template getPrimeFactorGroups(T) if (isIntegral!T) {
   }
 }
 
-ulong[] getPrimeFactors(ulong num) {
-  ulong[] inner(ulong num) {
-    ulong n = 2;
+T[] getPrimeFactors(T)(T num) if (isIntegral!T && !isSigned!T) {
+  T[] inner(T num) {
+    T n = 2;
 
     if (num == 1)
       return [];
@@ -278,9 +281,9 @@ ulong[] getPrimeFactors(ulong num) {
   return memoize!inner(num);
 }
 
-ulong[] primeFactors1(ulong num) {
-  ulong[] factors;
-  ulong n = 2;
+T[] primeFactors1(T)(T num) if (isIntegral!T && !isSigned!T) {
+  T[] factors;
+  T n = 2;
 
   while (num > 1) {
     while (num % n == 0) {
@@ -293,9 +296,9 @@ ulong[] primeFactors1(ulong num) {
   return factors;
 }
 
-ulong[] getDistinctPrimeFactors(ulong num) {
-  ulong[] inner(ulong num) {
-    ulong n = 2;
+T[] getDistinctPrimeFactors(T)(T num) if (isIntegral!T && !isSigned!T) {
+  T[] inner(T num) {
+    T n = 2;
 
     if (num == 1)
       return [];
@@ -313,9 +316,9 @@ ulong[] getDistinctPrimeFactors(ulong num) {
 }
 
 
-ulong[] distinctPrimeFactors1(ulong num) {
-  ulong[] factors;
-  ulong n = 2;
+T[] distinctPrimeFactors1(T)(T num) if (isIntegral!T && !isSigned!T) {
+  T[] factors;
+  T n = 2;
 
   while (num > 1) {
     while (num % n != 0)
@@ -330,35 +333,17 @@ ulong[] distinctPrimeFactors1(ulong num) {
   return factors;
 }
 
-struct Factor {
-  int factor;
-  int multiplicity;
-}
+//struct Factor {
+  //int factor;
+  //int multiplicity;
+//}
 
-Factor maxMultiplicity(Factor a, Factor b) {
-  return a.multiplicity > b.multiplicity ? a : b;
-}
+//Factor maxMultiplicity(Factor a, Factor b) {
+  //return a.multiplicity > b.multiplicity ? a : b;
+//}
 
-auto isPrimeInit() {
-  Primes!ulong primes = new Primes!ulong();
-
-  bool isPrime(ulong number) {
-    auto primesCopy = primes.save;
-
-    if (number <= primesCopy.topPrime)
-      return number in primesCopy.cache ? true : false;
-
-    auto root = std.math.sqrt(real(number)).to!ulong();
-    auto found = primesCopy.find!(p => number % p == 0 || p > root)().front;
-
-    return found > root;
-  }
-
-  return &isPrime;
-}
-
-ulong factorial(ulong number) {
-  ulong result = 1;
+T factorial(T)(T number) if (isIntegral!T && isUnsigned!T) {
+  T result = 1;
 
   if (number == 0)
     return result;
@@ -369,14 +354,14 @@ ulong factorial(ulong number) {
   return result;
 }
 
-auto getTriplets(ulong perimeter) {
+auto getTriplets(T)(T perimeter) if (isIntegral!T && !isSigned!T) {
   enum real pdiv = sqrt(real(2)) + 1;
-  Tuple!(ulong, ulong, ulong)[] triplets = [];
-  ulong c = ceil(perimeter / pdiv).to!ulong();
-  ulong b = ceil(real(perimeter - c) / 2).to!ulong();
-  ulong a = perimeter - c - b;
-  ulong csq = c ^^ 2;
-  ulong absq = a ^^ 2 + b ^^ 2;
+  Tuple!(T, T, T)[] triplets = [];
+  T c = ceil(perimeter / pdiv).to!T();
+  T b = ceil(real(perimeter - c) / 2).to!T();
+  T a = perimeter - c - b;
+  T csq = c ^^ 2;
+  T absq = a ^^ 2 + b ^^ 2;
 
   do {
     if (absq == csq) {
@@ -394,15 +379,15 @@ auto getTriplets(ulong perimeter) {
   return triplets;
 }
 
-auto maximizePower(Tuple!(ulong, ulong) source) {
-  Tuple!(ulong, ulong) result;
+auto maximizePower(T)(Tuple!(T, T) source) if (isIntegral!T && !isSigned!T) {
+  Tuple!(T, T) result;
   auto perfectPower = classifyPerfectPower(source[0]);
   result = tuple(perfectPower[0], perfectPower[1] * source[1]);
   return result;
 }
 
-auto classifyPerfectPower(ulong source) {
-  Tuple!(ulong, ulong) result;
+auto classifyPerfectPower(T)(T source) if (isIntegral!T && !isSigned!T) {
+  Tuple!(T, T) result;
 
   if (source == 1) {
     result[0] = 1;
@@ -422,8 +407,8 @@ auto classifyPerfectPower(ulong source) {
   return result;
 }
 
-Tuple!(ulong, ulong) reduceFrac(ulong numerator, ulong denominator) {
-  ulong divisor = gcd(numerator, denominator);
+auto reduceFrac(T)(T numerator, T denominator) if (isIntegral!T && !isSigned!T) {
+  T divisor = gcd(numerator, denominator);
   return tuple(numerator/divisor, denominator/divisor);
 }
 
