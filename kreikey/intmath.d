@@ -18,8 +18,14 @@ import kreikey.combinatorics;
 
 alias nextPermutation = kreikey.combinatorics.nextPermutation;
 //alias nextPermutation = std.algorithm.nextPermutation;
+alias getPrimeFactors = getPrimeFactors2;
+alias getDistinctPrimeFactors = getDistinctPrimeFactors2;
+alias getFactors = getFactors2;
+alias getProperDivisors = getProperDivisors2;
+alias countFactors = countFactors2;
+alias getPrimeFactorGroups = getPrimeFactorGroups2;
 
-T[] getAllFactors2(T)(T number) if (isIntegral!T && !isSigned!T) {
+T[] getFactors2(T)(T number) if (isIntegral!T) {
   auto factorGroups = getPrimeFactorGroups(number);
   bool[] mask = new bool[factorGroups.length];
   Tuple!(T, T)[] chosenFactorGroups;
@@ -73,11 +79,7 @@ T[] getAllFactors2(T)(T number) if (isIntegral!T && !isSigned!T) {
   return result;
 }
 
-T[] getProperDivisors2(T)(T number) if (isIntegral!T) {
-  return getAllFactors2(number)[0 .. $-1];
-}
-
-T[] getAllFactors(T)(T number) if (isIntegral!T) {
+T[] getFactors1(T)(T number) if (isIntegral!T) {
   static T[][T] factorsCache;
   T[] factors;
   T[] factorsBig;
@@ -105,29 +107,12 @@ T[] getAllFactors(T)(T number) if (isIntegral!T) {
   return factors;
 }
 
-T[] getProperDivisors(T)(T number) if (isIntegral!T) {
-  return getAllFactors(number)[0 .. $-1];
+T[] getProperDivisors2(T)(T number) if (isIntegral!T) {
+  return getFactors2(number)[0 .. $-1];
 }
 
-T countFactors1(T)(T num) if (isIntegral!T) {
-  T count;
-  T max = num;
-  T fac = 1;
-
-  if (num == 1)
-    return 1;
-
-  while (fac < max) {
-    if (num % fac == 0) {
-      count += 2;
-      max = num / fac;
-      if (fac == max)
-        count--;
-    }
-    fac++;
-  }
-
-  return count;
+T[] getProperDivisors1(T)(T number) if (isIntegral!T) {
+  return getFactors(number)[0 .. $-1];
 }
 
 T countFactors2(T)(T num) 
@@ -147,6 +132,27 @@ if (isIntegral!T) {
         .map!(a => a[0][1])
         .reduce!((a, b) => a * b)();
     } while (mask.nextPermutation());
+  }
+
+  return count;
+}
+
+T countFactors1(T)(T num) if (isIntegral!T) {
+  T count;
+  T max = num;
+  T fac = 1;
+
+  if (num == 1)
+    return 1;
+
+  while (fac < max) {
+    if (num % fac == 0) {
+      count += 2;
+      max = num / fac;
+      if (fac == max)
+        count--;
+    }
+    fac++;
   }
 
   return count;
@@ -186,12 +192,12 @@ T carmichael(T)(T n) if (isIntegral!T) {
   return bigOrder;
 }
 
-bool areCoprime(T)(T a, T b) if (isIntegral!T && !isSigned!T) {
+bool areCoprime(T)(T a, T b) if (isIntegral!T) {
   return gcd(a, b) == 1;
 }
 
 // gcd with subtraction is about twice as fast as gcd with modulo
-T gcd(T)(T a, T b) if (isIntegral!T && !isSigned!T) {
+T gcd(T)(T a, T b) if (isIntegral!T) {
   while (b != a) {
     if (a > b)
       a -= b;
@@ -202,7 +208,7 @@ T gcd(T)(T a, T b) if (isIntegral!T && !isSigned!T) {
   return b;
 }
 
-T lcm(T)(T a, T b) if (isIntegral!T && !isSigned!T) {
+T lcm(T)(T a, T b) if (isIntegral!T) {
   T amul = a;
   T bmul = b;
 
@@ -216,14 +222,14 @@ T lcm(T)(T a, T b) if (isIntegral!T && !isSigned!T) {
   return amul;
 }
 
-uint[] recipDigits(T)(T divisor, size_t length) if (isIntegral!T && !isSigned!T) {
+int[] recipDigits(T)(T divisor, size_t length) if (isIntegral!T) {
   T dividend = 10;
   T quotient = 0;
   T remainder = 0;
   T digitCount = 0;
-  uint[] digits;
+  int[] digits;
 
-  assert(divisor != 0);
+  assert (divisor != 0);
 
   if (divisor == 1)
     return [];
@@ -232,58 +238,75 @@ uint[] recipDigits(T)(T divisor, size_t length) if (isIntegral!T && !isSigned!T)
     quotient = dividend / divisor;
     remainder = dividend % divisor;
     dividend = remainder * 10;
-    digits ~= cast(uint)quotient;
+    digits ~= cast(int)quotient;
     digitCount++;
   } while (remainder != 0 && digitCount != length);
 
   return digits;
 }
 
-template getPrimeFactorGroups(T) if (isIntegral!T && !isSigned!T) {
-  Tuple!(T, T)[] getPrimeFactorGroups(T num) {
-    Tuple!(T, T)[] inner(T num) {
-      T n = 2;
-      T count = 0;
-      Tuple!(T, T)[] result;
+Tuple!(T, T)[] getPrimeFactorGroups2(T)(T num) if (isIntegral!T) {
+  T n = 2;
+  T count = 0;
+  Tuple!(T, T)[] result;
 
-      if (num == 1)
-        return result;
+  assert (num != 0);
 
-      while (num % n != 0)
-        n++;
+  if (num == 1)
+    return result;
 
-      while (num % n == 0) {
-        num /= n;
-        count++;
-      }
+  while (num % n != 0)
+    n++;
 
-      return [tuple(n, count)] ~ memoize!inner(num);
-    }
-
-    assert(num != 0);
-    return memoize!inner(num);
+  while (num % n == 0) {
+    num /= n;
+    count++;
   }
+
+  return [tuple(n, count)] ~ memoize!(getPrimeFactorGroups2!T)(num);
 }
 
-T[] getPrimeFactors(T)(T num) if (isIntegral!T && !isSigned!T) {
-  T[] inner(T num) {
-    T n = 2;
+Tuple!(T, T)[] getPrimeFactorGroups1(T)(T num) if (isIntegral!T) {
+  T n = 2;
+  T count = 0;
+  Tuple!(T, T)[] result;
 
-    if (num == 1)
-      return [];
+  assert (num != 0);
 
-    while (num % n != 0)
+  while (num > 1) {
+    while (num % n != 0) {
       n++;
-
-    return [n] ~ memoize!inner(num / n);
+    }
+    while (num % n == 0) {
+      num /= n;
+      count++;
+    }
+    result ~= tuple(n, count);
+    count = 0;
   }
 
-  return memoize!inner(num);
+  return result;
 }
 
-T[] primeFactors1(T)(T num) if (isIntegral!T && !isSigned!T) {
+T[] getPrimeFactors2(T)(T num) if (isIntegral!T) {
+  T n = 2;
+
+  assert (num != 0);
+
+  if (num == 1)
+    return [];
+
+  while (num % n != 0)
+    n++;
+
+  return [n] ~ memoize!(getPrimeFactors2!T)(num / n);
+}
+
+T[] getPrimeFactors1(T)(T num) if (isIntegral!T) {
   T[] factors;
   T n = 2;
+
+  assert (num != 0);
 
   while (num > 1) {
     while (num % n == 0) {
@@ -296,7 +319,7 @@ T[] primeFactors1(T)(T num) if (isIntegral!T && !isSigned!T) {
   return factors;
 }
 
-T[] getDistinctPrimeFactors(T)(T num) if (isIntegral!T && !isSigned!T) {
+T[] getDistinctPrimeFactors2(T)(T num) if (isIntegral!T) {
   T[] inner(T num) {
     T n = 2;
 
@@ -316,7 +339,7 @@ T[] getDistinctPrimeFactors(T)(T num) if (isIntegral!T && !isSigned!T) {
 }
 
 
-T[] distinctPrimeFactors1(T)(T num) if (isIntegral!T && !isSigned!T) {
+T[] distinctPrimeFactors1(T)(T num) if (isIntegral!T) {
   T[] factors;
   T n = 2;
 
@@ -342,7 +365,7 @@ T[] distinctPrimeFactors1(T)(T num) if (isIntegral!T && !isSigned!T) {
   //return a.multiplicity > b.multiplicity ? a : b;
 //}
 
-T factorial(T)(T number) if (isIntegral!T && isUnsigned!T) {
+T factorial(T)(T number) if (isIntegral!T) {
   T result = 1;
 
   if (number == 0)
@@ -354,7 +377,7 @@ T factorial(T)(T number) if (isIntegral!T && isUnsigned!T) {
   return result;
 }
 
-auto getTriplets(T)(T perimeter) if (isIntegral!T && !isSigned!T) {
+auto getTriplets(T)(T perimeter) if (isIntegral!T) {
   enum real pdiv = sqrt(real(2)) + 1;
   Tuple!(T, T, T)[] triplets = [];
   T c = ceil(perimeter / pdiv).to!T();
@@ -379,14 +402,14 @@ auto getTriplets(T)(T perimeter) if (isIntegral!T && !isSigned!T) {
   return triplets;
 }
 
-auto maximizePower(T)(Tuple!(T, T) source) if (isIntegral!T && !isSigned!T) {
+auto maximizePower(T)(Tuple!(T, T) source) if (isIntegral!T) {
   Tuple!(T, T) result;
   auto perfectPower = classifyPerfectPower(source[0]);
   result = tuple(perfectPower[0], perfectPower[1] * source[1]);
   return result;
 }
 
-auto classifyPerfectPower(T)(T source) if (isIntegral!T && !isSigned!T) {
+auto classifyPerfectPower(T)(T source) if (isIntegral!T) {
   Tuple!(T, T) result;
 
   if (source == 1) {
@@ -407,7 +430,7 @@ auto classifyPerfectPower(T)(T source) if (isIntegral!T && !isSigned!T) {
   return result;
 }
 
-auto reduceFrac(T)(T numerator, T denominator) if (isIntegral!T && !isSigned!T) {
+auto reduceFrac(T)(T numerator, T denominator) if (isIntegral!T) {
   T divisor = gcd(numerator, denominator);
   return tuple(numerator/divisor, denominator/divisor);
 }
@@ -538,7 +561,7 @@ struct ContinuedFraction(R, T = ElementType!R) if (isInputRange!(Unqual!R) && is
   }
 }
 
-T getNonCoprimeCount(T)(T[] factors) if (isIntegral!T && !isSigned!T) {
+T getNonCoprimeCount(T)(T[] factors) if (isIntegral!T) {
   bool[] mask = new bool[factors.length];
   T product = 0;
   T nonCoprimes = 0;
@@ -567,7 +590,7 @@ T getNonCoprimeCount(T)(T[] factors) if (isIntegral!T && !isSigned!T) {
   return nonCoprimes;
 }
 
-T getTotient(T)(T number) if (isIntegral!T && !isSigned!T) {
+T getTotient(T)(T number) if (isIntegral!T) {
   auto factorGroups = getPrimeFactorGroups(number);
   //auto duplicateFactorProduct = factorGroups.fold!((a, b) => tuple(a[0] * b[0] ^^ (b[1] - 1), 1))(tuple(1uL, 1u))[0];
   auto duplicateFactorProduct = factorGroups.map!(a => a[0] ^^ (a[1] - 1)).fold!((a, b) => a * b);
@@ -578,7 +601,7 @@ T getTotient(T)(T number) if (isIntegral!T && !isSigned!T) {
   return number == 1 ? 1 : number - nonCoprimes;
 }
 
-T getTotientOld(T)(T number) if (isIntegral!T && !isSigned!T) {
+T getTotientOld(T)(T number) if (isIntegral!T) {
   T[] factors = getDistinctPrimeFactors(number);
 
   T exclusiveMultiples(T factor, T[] moreFactors) {
@@ -616,7 +639,7 @@ T getTotientOld(T)(T number) if (isIntegral!T && !isSigned!T) {
   return exclusiveMultiples(1, factors);
 }
 
-T[] getCoprimes(T)(T number) if (isIntegral!T && !isSigned!T) {
+T[] getCoprimes(T)(T number) if (isIntegral!T) {
   T[] result;
   T[] factors = makePrimes
     .until!((a, b) => a >= b)(number)
@@ -643,7 +666,7 @@ T[] getCoprimes(T)(T number) if (isIntegral!T && !isSigned!T) {
   return result;
 }
 
-auto getMultiTotientsInit(T)(T topNumber) if (isIntegral!T && !isSigned!T) {
+auto getMultiTotientsInit(T)(T topNumber) if (isIntegral!T) {
   void getMultiTotients() {
     T[] factors = makePrimes
       .until!((a, b) => a >= b)(topNumber)
@@ -671,16 +694,16 @@ auto getMultiTotientsInit(T)(T topNumber) if (isIntegral!T && !isSigned!T) {
   return &getMultiTotients;
 }
 
-auto getSortedDigitsInit(T)(T lowerUpper) if (isIntegral!T && !isSigned!T) {
+auto getSortedDigitsInit(T)(T lowerUpper) if (isIntegral!T) {
   return getSortedDigitsInit(lowerUpper, lowerUpper);
 }
 
-auto getSortedDigitsInit(T)(T lower, T upper) if (isIntegral!T && !isSigned!T) {
-  assert(lower <= upper);
-  uint[] digits;
+auto getSortedDigitsInit(T)(T lower, T upper) if (isIntegral!T) {
+  assert (lower <= upper);
+  int[] digits;
 
   void getSortedDigits() {
-    void inner(size_t index, uint start) {
+    void inner(size_t index, int start) {
       if (index == digits.length)
         return;
 
@@ -692,7 +715,7 @@ auto getSortedDigitsInit(T)(T lower, T upper) if (isIntegral!T && !isSigned!T) {
     }
 
     foreach (T s; lower .. upper+1) {
-      digits = new uint[s];
+      digits = new int[s];
       digits[] = 0;
       inner(0, 1);
     }
