@@ -41,8 +41,8 @@ bool isAmicable(long number) {
   if (number in amicableCache)
     return amicableCache[number];
 
-  sumFactors = number.getProperDivisors.reduce!((a, b) => a + b);
-  sumFactorsSumFactors = sumFactors.getProperDivisors.reduce!((a, b) => a + b);
+  sumFactors = number.getProperDivisors.sum();
+  sumFactorsSumFactors = sumFactors.getProperDivisors.sum();
 
   if (sumFactorsSumFactors == number && sumFactors != number) {
     isAmicable = true;

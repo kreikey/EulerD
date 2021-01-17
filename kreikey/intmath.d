@@ -139,7 +139,7 @@ T countFactors2(T)(T number) if (isIntegral!T) {
         .zip(mask)
         .filter!(a => a[1])
         .map!(a => a[0][1])
-        .reduce!((a, b) => a * b)();
+        .fold!((a, b) => a * b)();
     } while (mask.nextPermutation());
   }
 
