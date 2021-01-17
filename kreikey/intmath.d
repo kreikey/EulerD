@@ -26,6 +26,8 @@ alias countFactors = countFactors2;
 alias getPrimeFactorGroups = getPrimeFactorGroups2;
 
 T[] getFactors2(T)(T number) if (isIntegral!T) {
+  assert (number > 0);
+
   auto factorGroups = getPrimeFactorGroups(number);
   bool[] mask = new bool[factorGroups.length];
   Tuple!(T, T)[] chosenFactorGroups;
@@ -80,6 +82,8 @@ T[] getFactors2(T)(T number) if (isIntegral!T) {
 }
 
 T[] getFactors1(T)(T number) if (isIntegral!T) {
+  assert (number > 0);
+
   static T[][T] factorsCache;
   T[] factors;
   T[] factorsBig;
@@ -108,17 +112,22 @@ T[] getFactors1(T)(T number) if (isIntegral!T) {
 }
 
 T[] getProperDivisors2(T)(T number) if (isIntegral!T) {
+  assert (number > 0);
+
   return getFactors2(number)[0 .. $-1];
 }
 
 T[] getProperDivisors1(T)(T number) if (isIntegral!T) {
+  assert (number > 0);
+
   return getFactors(number)[0 .. $-1];
 }
 
-T countFactors2(T)(T num) 
-if (isIntegral!T) {
+T countFactors2(T)(T number) if (isIntegral!T) {
+  assert (number > 0);
+
   T count = 1;
-  auto factorGroups = getPrimeFactorGroups(num);
+  auto factorGroups = getPrimeFactorGroups(number);
   bool[] mask = new bool[factorGroups.length];
 
   foreach (k; 1 .. mask.length+1) {
@@ -137,18 +146,20 @@ if (isIntegral!T) {
   return count;
 }
 
-T countFactors1(T)(T num) if (isIntegral!T) {
+T countFactors1(T)(T number) if (isIntegral!T) {
+  assert (number > 0);
+
   T count;
-  T max = num;
+  T max = number;
   T fac = 1;
 
-  if (num == 1)
+  if (number == 1)
     return 1;
 
   while (fac < max) {
-    if (num % fac == 0) {
+    if (number % fac == 0) {
       count += 2;
-      max = num / fac;
+      max = number / fac;
       if (fac == max)
         count--;
     }
@@ -159,6 +170,8 @@ T countFactors1(T)(T num) if (isIntegral!T) {
 }
 
 T mulOrder(T)(T a, T n) if (isIntegral!T) {
+  assert (a > 0 && n > 0);
+
   T order = 1;
   auto product = BigInt(a);
   auto one = BigInt(1);
@@ -173,14 +186,16 @@ T mulOrder(T)(T a, T n) if (isIntegral!T) {
   return order;
 }
 
-T carmichael(T)(T n) if (isIntegral!T) {
+T carmichael(T)(T number) if (isIntegral!T) {
+  assert (number > 0);
+
   T a = 2;
   T order = 1;
   T bigOrder = 1;
 
-  while (a < n) {
-    if (areCoprime(a, n)) {
-      order = mulOrder(a, n);
+  while (a < number) {
+    if (areCoprime(a, number)) {
+      order = mulOrder(a, number);
 
       if (order > bigOrder)
         bigOrder = order;
@@ -193,11 +208,15 @@ T carmichael(T)(T n) if (isIntegral!T) {
 }
 
 bool areCoprime(T)(T a, T b) if (isIntegral!T) {
+  assert (a > 0 && b > 0);
+
   return gcd(a, b) == 1;
 }
 
 // gcd with subtraction is about twice as fast as gcd with modulo
 T gcd(T)(T a, T b) if (isIntegral!T) {
+  assert (a > 0 && b > 0);
+
   while (b != a) {
     if (a > b)
       a -= b;
@@ -209,6 +228,8 @@ T gcd(T)(T a, T b) if (isIntegral!T) {
 }
 
 T lcm(T)(T a, T b) if (isIntegral!T) {
+  assert (a > 0 && b > 0);
+
   T amul = a;
   T bmul = b;
 
@@ -223,13 +244,13 @@ T lcm(T)(T a, T b) if (isIntegral!T) {
 }
 
 int[] recipDigits(T)(T divisor, size_t length) if (isIntegral!T) {
+  assert (divisor > 0);
+
   T dividend = 10;
   T quotient = 0;
   T remainder = 0;
   T digitCount = 0;
   int[] digits;
-
-  assert (divisor != 0);
 
   if (divisor == 1)
     return [];
@@ -245,40 +266,40 @@ int[] recipDigits(T)(T divisor, size_t length) if (isIntegral!T) {
   return digits;
 }
 
-Tuple!(T, T)[] getPrimeFactorGroups2(T)(T num) if (isIntegral!T) {
+Tuple!(T, T)[] getPrimeFactorGroups2(T)(T number) if (isIntegral!T) {
+  assert (number > 0);
+
   T n = 2;
   T count = 0;
   Tuple!(T, T)[] result;
 
-  assert (num != 0);
-
-  if (num == 1)
+  if (number == 1)
     return result;
 
-  while (num % n != 0)
+  while (number % n != 0)
     n++;
 
-  while (num % n == 0) {
-    num /= n;
+  while (number % n == 0) {
+    number /= n;
     count++;
   }
 
-  return [tuple(n, count)] ~ memoize!(getPrimeFactorGroups2!T)(num);
+  return [tuple(n, count)] ~ memoize!(getPrimeFactorGroups2!T)(number);
 }
 
-Tuple!(T, T)[] getPrimeFactorGroups1(T)(T num) if (isIntegral!T) {
+Tuple!(T, T)[] getPrimeFactorGroups1(T)(T number) if (isIntegral!T) {
+  assert (number > 0);
+
   T n = 2;
   T count = 0;
   Tuple!(T, T)[] result;
 
-  assert (num != 0);
-
-  while (num > 1) {
-    while (num % n != 0) {
+  while (number > 1) {
+    while (number % n != 0) {
       n++;
     }
-    while (num % n == 0) {
-      num /= n;
+    while (number % n == 0) {
+      number /= n;
       count++;
     }
     result ~= tuple(n, count);
@@ -288,30 +309,30 @@ Tuple!(T, T)[] getPrimeFactorGroups1(T)(T num) if (isIntegral!T) {
   return result;
 }
 
-T[] getPrimeFactors2(T)(T num) if (isIntegral!T) {
+T[] getPrimeFactors2(T)(T number) if (isIntegral!T) {
+  assert (number > 0);
+
   T n = 2;
 
-  assert (num != 0);
-
-  if (num == 1)
+  if (number == 1)
     return [];
 
-  while (num % n != 0)
+  while (number % n != 0)
     n++;
 
-  return [n] ~ memoize!(getPrimeFactors2!T)(num / n);
+  return [n] ~ memoize!(getPrimeFactors2!T)(number / n);
 }
 
-T[] getPrimeFactors1(T)(T num) if (isIntegral!T) {
+T[] getPrimeFactors1(T)(T number) if (isIntegral!T) {
+  assert (number > 0);
+
   T[] factors;
   T n = 2;
 
-  assert (num != 0);
-
-  while (num > 1) {
-    while (num % n == 0) {
+  while (number > 1) {
+    while (number % n == 0) {
       factors ~= n;
-      num /= n;
+      number /= n;
     }
     n++;
   }
@@ -319,38 +340,38 @@ T[] getPrimeFactors1(T)(T num) if (isIntegral!T) {
   return factors;
 }
 
-T[] getDistinctPrimeFactors2(T)(T num) if (isIntegral!T) {
-  T[] inner(T num) {
-    T n = 2;
+T[] getDistinctPrimeFactors2(T)(T number) if (isIntegral!T) {
+  assert (number > 0);
 
-    if (num == 1)
-      return [];
+  T n = 2;
 
-    while (num % n != 0)
-      n++;
+  if (number == 1)
+    return [];
 
-    while (num % n == 0)
-      num /= n;
+  while (number % n != 0)
+    n++;
 
-    return [n] ~ memoize!inner(num);
-  }
+  while (number % n == 0)
+    number /= n;
 
-  return memoize!inner(num);
+  return [n] ~ memoize!(getDistinctPrimeFactors2!T)(number);
 }
 
 
-T[] distinctPrimeFactors1(T)(T num) if (isIntegral!T) {
+T[] distinctPrimeFactors1(T)(T number) if (isIntegral!T) {
+  assert (number > 0);
+
   T[] factors;
   T n = 2;
 
-  while (num > 1) {
-    while (num % n != 0)
+  while (number > 1) {
+    while (number % n != 0)
       n++;
 
     factors ~= n;
 
-    while (num % n == 0)
-      num /= n;
+    while (number % n == 0)
+      number /= n;
   }
 
   return factors;
@@ -366,6 +387,8 @@ T[] distinctPrimeFactors1(T)(T num) if (isIntegral!T) {
 //}
 
 T factorial(T)(T number) if (isIntegral!T) {
+  assert (number >= 0);
+
   T result = 1;
 
   if (number == 0)
@@ -378,6 +401,8 @@ T factorial(T)(T number) if (isIntegral!T) {
 }
 
 auto getTriplets(T)(T perimeter) if (isIntegral!T) {
+  assert (perimeter > 0);
+
   enum real pdiv = sqrt(real(2)) + 1;
   Tuple!(T, T, T)[] triplets = [];
   T c = ceil(perimeter / pdiv).to!T();
@@ -402,24 +427,28 @@ auto getTriplets(T)(T perimeter) if (isIntegral!T) {
   return triplets;
 }
 
-auto maximizePower(T)(Tuple!(T, T) source) if (isIntegral!T) {
+auto maximizePower(T)(Tuple!(T, T) number) if (isIntegral!T) {
+  assert (number > 0);
+
   Tuple!(T, T) result;
-  auto perfectPower = classifyPerfectPower(source[0]);
-  result = tuple(perfectPower[0], perfectPower[1] * source[1]);
+  auto perfectPower = classifyPerfectPower(number[0]);
+  result = tuple(perfectPower[0], perfectPower[1] * number[1]);
   return result;
 }
 
-auto classifyPerfectPower(T)(T source) if (isIntegral!T) {
+auto classifyPerfectPower(T)(T number) if (isIntegral!T) {
+  assert (number > 0);
+
   Tuple!(T, T) result;
 
-  if (source == 1) {
+  if (number == 1) {
     result[0] = 1;
     result[1] = 1;
     return result;
   }
 
-  //auto primeFactorGroups = source.getPrimeFactors.group.array();
-  auto primeFactorGroups = source.getPrimeFactorGroups();
+  //auto primeFactorGroups = number.getPrimeFactors.group.array();
+  auto primeFactorGroups = number.getPrimeFactorGroups();
   auto divisor = primeFactorGroups.map!(a => a[1]).fold!gcd();
   primeFactorGroups.each!((ref g) => g[1] /= divisor)();
   result[0] = primeFactorGroups
@@ -431,17 +460,21 @@ auto classifyPerfectPower(T)(T source) if (isIntegral!T) {
 }
 
 auto reduceFrac(T)(T numerator, T denominator) if (isIntegral!T) {
+  assert (numerator >= 0 && denominator > 0);
+
   T divisor = gcd(numerator, denominator);
   return tuple(numerator/divisor, denominator/divisor);
 }
 
-T isqrt(T)(T n, out T remainder) if (isIntegral!T || is(T == BigInt)) {
-  if (n == 0 || n == 1)
-    return n;
+T isqrt(T)(T number, out T remainder) if (isIntegral!T || is(T == BigInt)) {
+  assert (number >= 0);
 
-  T minRoot = cast(T)pow(10, (countDigits(n) - 1) / 2);
-  T minSq = n;
-  T upperBound = n / 2 + 1;
+  if (number == 0 || number == 1)
+    return number;
+
+  T minRoot = cast(T)pow(10, (countDigits(number) - 1) / 2);
+  T minSq = number;
+  T upperBound = number / 2 + 1;
   T delta = upperBound - minRoot;
   T halfDelta;
   T candidate;
@@ -451,7 +484,7 @@ T isqrt(T)(T n, out T remainder) if (isIntegral!T || is(T == BigInt)) {
     halfDelta = delta / 2 + delta % 2;
     candidate = minRoot + halfDelta;
     candidateSq = candidate ^^ 2;
-    if (candidateSq > n) {
+    if (candidateSq > number) {
       upperBound = candidate;
     } else {
       minRoot = candidate;
@@ -460,25 +493,31 @@ T isqrt(T)(T n, out T remainder) if (isIntegral!T || is(T == BigInt)) {
     delta = upperBound - minRoot;
   } while (delta > 1);
 
-  remainder = n - minSq;
+  remainder = number - minSq;
   return minRoot;
 }
 
-T isqrt(T)(T n) if (isIntegral!T || is(T == BigInt)) {
+T isqrt(T)(T number) if (isIntegral!T || is(T == BigInt)) {
+  assert (number > 0);
+
   T remainder;
-  T root = isqrt(n, remainder);
+  T root = isqrt(number, remainder);
+
   return root;
 }
 
-bool isSquare(T)(T n) if (isIntegral!T || is(T == BigInt)) {
-  T remainder;
-  T root;
+bool isSquare(T)(T number) if (isIntegral!T || is(T == BigInt)) {
+  assert (number > 0);
 
-  root = sqrtInt(n, remainder);
+  T remainder;
+  T root = sqrtInt(number, remainder);
+
   return remainder == 0;
 }
 
 auto squareRootSequence(T)(T number) if (isIntegral!T || is(T == BigInt)) {
+  assert (number > 0);
+
   T a0 = cast(T)sqrt(cast(real)number);
   T[] result;
   T a;
@@ -591,17 +630,21 @@ T getNonCoprimeCount(T)(T[] factors) if (isIntegral!T) {
 }
 
 T getTotient(T)(T number) if (isIntegral!T) {
+  assert (number > 0);
+
   auto factorGroups = getPrimeFactorGroups(number);
   //auto duplicateFactorProduct = factorGroups.fold!((a, b) => tuple(a[0] * b[0] ^^ (b[1] - 1), 1))(tuple(1uL, 1u))[0];
   auto duplicateFactorProduct = factorGroups.map!(a => a[0] ^^ (a[1] - 1)).fold!((a, b) => a * b);
   auto factors = factorGroups.map!(a => a[0]).array();
-  T nonCoprimes = memoize!getNonCoprimeCount(factors);
+  T nonCoprimes = memoize!(getNonCoprimeCount!T)(factors);
   nonCoprimes *= duplicateFactorProduct;
 
   return number == 1 ? 1 : number - nonCoprimes;
 }
 
 T getTotientOld(T)(T number) if (isIntegral!T) {
+  assert (number > 0);
+
   T[] factors = getDistinctPrimeFactors(number);
 
   T exclusiveMultiples(T factor, T[] moreFactors) {
@@ -661,6 +704,8 @@ T[] getCoprimes(T)(T number) if (isIntegral!T) {
     }
   }
 
+  assert (number > 0);
+
   inner(1, factors);
 
   return result;
@@ -673,7 +718,7 @@ auto getMultiTotientsInit(T)(T topNumber) if (isIntegral!T) {
       .array();
 
     void inner(T baseNumber, T multiplier, T[] someFactors, T[] distinctFactors) {
-      T totient = multiplier * (baseNumber - memoize!getNonCoprimeCount(distinctFactors[1 .. $]));
+      T totient = multiplier * (baseNumber - memoize!(getNonCoprimeCount!T)(distinctFactors[1 .. $]));
 
       yield(tuple(T(baseNumber * multiplier), T(totient)));
 
@@ -691,6 +736,8 @@ auto getMultiTotientsInit(T)(T topNumber) if (isIntegral!T) {
     inner(1, 1, factors, [1]);
   }
 
+  assert (topNumber > 0);
+
   return &getMultiTotients;
 }
 
@@ -699,6 +746,7 @@ auto getSortedDigitsInit(T)(T lowerUpper) if (isIntegral!T) {
 }
 
 auto getSortedDigitsInit(T)(T lower, T upper) if (isIntegral!T) {
+  assert (lower > 0);
   assert (lower <= upper);
   int[] digits;
 
