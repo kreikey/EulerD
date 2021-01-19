@@ -751,7 +751,7 @@ auto getSortedDigitsInit(T)(T lower, T upper) if (isIntegral!T) {
   T[] digits;
 
   void getSortedDigits() {
-    void inner(size_t index, int start) {
+    void inner(size_t index, T start) {
       if (index == digits.length)
         return;
 
