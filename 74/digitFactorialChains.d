@@ -12,16 +12,17 @@ import kreikey.util;
 void main() {
   StopWatch timer;
   ulong limit = 1000000;
+  int chainLength = 4;
 
   timer.start();
 
   writeln("Digit factorial chains");
   writefln("The number of digit factorial chains below %s", limit);
-  writeln("with 60 non-repeating terms is:");
+  writefln("with %s non-repeating terms is:", chainLength);
 
   iota(1, limit)
     .map!factorialDigitChainLength
-    .filter!(a => a == 60)
+    .filter!(a => a == chainLength)
     .count()
     .writeln();
 

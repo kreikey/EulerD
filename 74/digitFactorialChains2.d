@@ -22,6 +22,8 @@ void main() {
   writefln("The number of digit factorial chains below %s", limit);
   writeln("with 60 non-repeating terms is:");
 
+  // Correct for chain length 60, but not in the general case
+
   iota(1, limit)
     .map!(a => a.toDigits.asort())
     .array

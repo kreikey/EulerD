@@ -49,16 +49,18 @@ ulong countFactorialDigitChainsWithLength(int maxDigs, int length) {
 
   auto sortedDigits = new Generator!(uint[])(getSortedDigitsInit!uint(1, maxDigs));
 
+  //writeln("normal matches");
+  writeln(cycles);
+
   number = sortedDigits
     .filter!(a => a !in cycleMembers)
     .map!(a => a, factorialDigitChainLength)
     .filter!(a => a[1] == length)
-    .map!(a => a[0].permutations())
-    .join
-    .sort
-    .uniq
-    .filter!(a => a[0] != 0)
-    .count();
+    //.tee!writeln
+    .map!(a => countNumberPermutations(a[0]))
+    .sum();
+
+  //writeln("special matches");
 
   auto cycleDigitsLengths = cycles
     .join
@@ -66,16 +68,27 @@ ulong countFactorialDigitChainsWithLength(int maxDigs, int length) {
     .map!(a => a, a => a.factorialDigitChainLength())
     .array();
 
-  number += cycleDigitsLengths
-    .filter!(a => a[1] == length)
-    .count();
+  writeln(cycleDigitsLengths);
 
   number += cycleDigitsLengths
-    .map!(a => zip(a[0].permutations.dropOne(), repeat(a[1] + 1)))
-    .join
-    //.filter!(a => a[0][0] != 0)
-    .filter!(a => a[1] == length && a[0][0] != 0)
+    .filter!(a => a[1] == length)
+    //.tee!writeln
     .count();
+
+  writeln();
+
+  number += cycleDigitsLengths
+    //.map!(a => zip(a[0].permutations.dropOne(), repeat(a[1] + 1)))
+    .map!(a => a[0].countNumberPermutations() - 1, a => a[1] + 1)
+    //.join
+    //.filter!(a => a[0][0] != 0)
+    //.tee!writeln
+    //.filter!(a => a[1] == length && a[0][0] != 0)
+    //.count();
+    .filter!(a => a[1] == length)
+    .map!(a => a[0])
+    .sum();
+    //.fold!((a, b) => a[0] + b[0])(tuple(0, 0));
 
   return number;
 }
@@ -120,4 +133,16 @@ uint[] factDigSumDigs(uint[] source) {
 
 int factDigSum(int source) {
   return source.toDigits.map!factorial.sum();
+}
+
+int countNumberPermutations(uint[] source) {
+  auto groups = source.group.array();
+  int nonZeroCount = cast(int)source.filter!(a => a != 0).count();
+
+  int numerator = (cast(int)source.length).factorial();
+  int denominator = groups.map!(a => a[1].factorial()).fold!((a, b) => a * b);
+  int basicCount = numerator / denominator;
+  //int leadingZeroRatio = numerator / zeroCount.factorial();
+
+  return basicCount * nonZeroCount / cast(int)source.length;
 }
