@@ -748,14 +748,14 @@ auto getSortedDigitsInit(T)(T lowerUpper) if (isIntegral!T) {
 auto getSortedDigitsInit(T)(T lower, T upper) if (isIntegral!T) {
   assert (lower > 0);
   assert (lower <= upper);
-  int[] digits;
+  T[] digits;
 
   void getSortedDigits() {
     void inner(size_t index, int start) {
       if (index == digits.length)
         return;
 
-      foreach (d; start .. 10u) {
+      foreach (d; start .. T(10)) {
         inner(index + 1, d);
         digits[index .. $] = d;
         yield(digits.dup);
@@ -763,7 +763,7 @@ auto getSortedDigitsInit(T)(T lower, T upper) if (isIntegral!T) {
     }
 
     foreach (T s; lower .. upper+1) {
-      digits = new int[s];
+      digits = new T[s];
       digits[] = 0;
       inner(0, 1);
     }

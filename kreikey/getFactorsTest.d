@@ -12,15 +12,17 @@ void main() {
 
   timer.start();
 
-  foreach (n; 1 .. 1000001) {
+  for (int n = 1; n < 1000001; n++) {
     //writeln(n);
-    //memoize!(getPrimeFactors!uint)(n).writeln();
-    //memoize!(getPrimeFactorGroups!uint)(n).writefln!"[%(%(%s:%s%), %)]"();
-    //memoize!(getDistinctPrimeFactors!uint)(n).writeln();
-    //memoize!(getFactors!uint)(n).writeln();
-    //memoize!(getProperDivisors!uint)(n).writeln();
-    //writeln("factor count: ", memoize!(countFactors!uint)(n));
-    getFactors(n);
+    //memoize!(getPrimeFactors!(typeof(n)))(n).writeln();
+    //memoize!(getPrimeFactorGroups!(typeof(n)))(n).writefln!"[%(%(%s:%s%), %)]"();
+    //memoize!(getDistinctPrimeFactors!(typeof(n)))(n).writeln();
+    //memoize!(getFactors!(typeof(n)))(n).writeln();
+    //memoize!(getProperDivisors!(typeof(n)))(n).writeln();
+    //writeln("factor count: ", memoize!(countFactors!(typeof(n)))(n));
+    //getFactors(n);
+    //memoize!(getPrimeFactors2!(typeof(n)))(n);
+    memoize!(getFactors2!(typeof(n)))(n);
 
     if (n % 10000 == 0)
       writeln(n / 10000, "%");
@@ -28,5 +30,5 @@ void main() {
 
   timer.stop();
 
-  writefln("finished in %s seconds", timer.peek.total!"seconds"());
+  writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
 }

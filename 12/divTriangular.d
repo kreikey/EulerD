@@ -52,19 +52,24 @@ if (isIntegral!T) {
 }
 
 /*
-T countFactors1(T = int)(T num)
-if (isIntegral!T) {
+import std.traits;
+import kreikey.combinatorics;
+alias nextPermutation = kreikey.combinatorics.nextPermutation;
+
+T countFactors1(T)(T number) if (isIntegral!T) {
+  assert (number > 0);
+
   T count;
-  T max = num;
+  T max = number;
   T fac = 1;
 
-  if (num == 1)
+  if (number == 1)
     return 1;
 
   while (fac < max) {
-    if (num % fac == 0) {
+    if (number % fac == 0) {
       count += 2;
-      max = num / fac;
+      max = number / fac;
       if (fac == max)
         count--;
     }
@@ -74,22 +79,23 @@ if (isIntegral!T) {
   return count;
 }
 
-T countFactors2(T = int)(T num) 
-if (isIntegral!T) {
+T countFactors2(T)(T number) if (isIntegral!T) {
+  assert (number > 0);
+
   T count = 1;
-  auto factorGroups = getPrimeFactorGroups(num);
+  auto factorGroups = getPrimeFactorGroups(number);
   bool[] mask = new bool[factorGroups.length];
 
-  foreach (k; 1 .. mask.length + 1) {
+  foreach (k; 1 .. mask.length+1) {
     mask[] = true;
-    mask[0 .. $ - k] = false;
+    mask[0 .. $-k] = false;
 
     do {
       count += factorGroups
         .zip(mask)
         .filter!(a => a[1])
         .map!(a => a[0][1])
-        .reduce!((a, b) => a * b)();
+        .fold!((a, b) => a * b)();
     } while (mask.nextPermutation());
   }
 

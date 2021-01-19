@@ -14,11 +14,11 @@ import kreikey.util;
 import kreikey.combinatorics;
 
 alias permutations = kreikey.combinatorics.permutations;
-ulong[] cycleRoots = [169, 871, 872];
+int[] cycleRoots = [169, 871, 872];
 
 void main() {
   StopWatch timer;
-  ulong maxDigs = 6;
+  int maxDigs = 6;
 
   timer.start();
 
@@ -33,25 +33,25 @@ void main() {
   writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
 }
 
-ulong countFactorialDigitChainsWithLength(ulong maxDigs, ulong length) {
+ulong countFactorialDigitChainsWithLength(int maxDigs, int length) {
   ulong number = 0;
-  ulong[][] cycles = cycleRoots
+
+  int[][] cycles = cycleRoots
     .map!factorialDigitChain
     .array();
+
   bool[uint[]] cycleMembers = cycles
     .join
-    .map!(a => a.toDigits.asort())
-    .map!(a => cast(const(uint)[])a)
+    .map!(a => cast(const)a.toDigits.asort())
     .zip(repeat(true))
-    //.tee!writeln
     .assocArray();
-  auto sortedDigits = new Generator!(uint[])(getSortedDigitsInit(1, maxDigs));
+
+  auto sortedDigits = new Generator!(uint[])(getSortedDigitsInit!uint(1, maxDigs));
 
   number = sortedDigits
     .filter!(a => a !in cycleMembers)
     .map!(a => a, factorialDigitChainLength)
     .filter!(a => a[1] == length)
-    //.tee!(a => writefln("%(%s %s%)", a))
     .map!(a => a[0].permutations())
     .join
     .sort
@@ -61,9 +61,8 @@ ulong countFactorialDigitChainsWithLength(ulong maxDigs, ulong length) {
 
   auto cycleDigitsLengths = cycles
     .join
-    .map!toDigits
+    .map!(a => a.toDigits)
     .map!(a => a, a => a.factorialDigitChainLength())
-    //.tee!(a => writefln("%(%s, %s%)", a))
     .array();
 
   number += cycleDigitsLengths
@@ -73,25 +72,24 @@ ulong countFactorialDigitChainsWithLength(ulong maxDigs, ulong length) {
   number += cycleDigitsLengths
     .map!(a => zip(a[0].permutations.dropOne(), repeat(a[1] + 1)))
     .join
-    //.tee!(a => writefln("%(%s, %s%)", a))
     .filter!(a => a[1] == length)
     .count();
 
   return number;
 }
 
-ulong[] factorialDigitChain(ulong source) {
-  ulong[] chain;
-  ulong index = 0;
-  ulong[ulong] factorialSumIndex = [source:index];
-  ulong sum = source.factDigSum();
+int[] factorialDigitChain(int source) {
+  int[] chain;
+  int index = 0;
+  int[int] factorialSumIndex = [source:index];
+  int sum = source.factDigSum();
   index++;
 
   chain ~= source;
 
   while (sum !in factorialSumIndex) {
     chain ~= sum;
-    factorialSumIndex[cast(immutable)sum] = index;
+    factorialSumIndex[cast(const)sum] = index;
     sum = sum.factDigSum();
     index++;
   }
@@ -99,14 +97,14 @@ ulong[] factorialDigitChain(ulong source) {
   return chain;
 }
 
-ulong factorialDigitChainLength(uint[] source) {
-  ulong index = 0;
-  ulong[uint[]] factorialSumIndex = [source:index];
+int factorialDigitChainLength(uint[] source) {
+  int index = 0;
+  int[uint[]] factorialSumIndex = [source:index];
   uint[] sumDigs = source.factDigSumDigs();
   index++;
 
   while (sumDigs !in factorialSumIndex) {
-    factorialSumIndex[cast(immutable)sumDigs] = index;
+    factorialSumIndex[cast(const)sumDigs] = index;
     sumDigs = sumDigs.factDigSumDigs();
     index++;
   }
@@ -118,6 +116,6 @@ uint[] factDigSumDigs(uint[] source) {
   return source.map!factorial.sum.toDigits();
 }
 
-ulong factDigSum(ulong source) {
+int factDigSum(int source) {
   return source.toDigits.map!factorial.sum();
 }
