@@ -16,10 +16,19 @@ import kreikey.combinatorics;
 alias permutations = kreikey.combinatorics.permutations;
 int[] cycleRoots = [169, 871, 872];
 
-void main() {
+void main(string[] args) {
   StopWatch timer;
   int maxDigs = 6;
-  int chainLength = 4;
+  int chainLength = 60;
+
+  try {
+    if (args.length > 1) {
+      chainLength = args[1].parse!int();
+    }
+  } catch (Exception e) {
+    writeln(e.msg);
+    writeln("Can't parse that argument! Falling back to default.");
+  }
 
   timer.start();
 

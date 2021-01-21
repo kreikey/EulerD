@@ -9,20 +9,29 @@ import kreikey.digits;
 import kreikey.intmath;
 import kreikey.util;
 
-void main() {
+void main(string[] args) {
   StopWatch timer;
   ulong limit = 1000000;
-  int chainLength = 4;
+  int chainLength = 60;
 
-  timer.start();
+  try {
+    if (args.length > 1) {
+      chainLength = args[1].parse!int();
+    }
+  } catch (Exception e) {
+    writeln(e.msg);
+    writeln("Can't parse that argument! Falling back to default.");
+  }
 
   writeln("Digit factorial chains");
   writefln("The number of digit factorial chains below %s", limit);
   writefln("with %s non-repeating terms is:", chainLength);
 
+  timer.start();
+
   iota(1, limit)
-    .map!factorialDigitChainLength
-    .filter!(a => a == chainLength)
+    .map!(a => a, factorialDigitChainLength)
+    .filter!(a => a[1] == chainLength)
     .count()
     .writeln();
 

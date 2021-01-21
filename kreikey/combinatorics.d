@@ -139,3 +139,20 @@ if (isIntegral!T || is(T == BigInt)) {
   else
     return sum.get;
 }
+
+int countDistinctPermutations(uint[] source) {
+  import kreikey.intmath : factorial;
+
+  auto groups = source.group.array();
+  int numerator = (cast(int)source.length).factorial();
+  int denominator = groups.map!(a => a[1].factorial()).fold!((a, b) => a * b);
+  int basicCount = numerator / denominator;
+
+  return basicCount;
+}
+
+int countDistinctNumberPermutations(uint[] source) {
+  int nonZeroCount = cast(int)source.filter!(a => a != 0).count();
+
+  return source.countDistinctPermutations() * nonZeroCount / cast(int)source.length;
+}
