@@ -8,13 +8,13 @@ import std.range;
 import std.functional;
 import std.concurrency;
 import std.typecons;
+import std.functional;
 import kreikey.digits;
 import kreikey.intmath;
 import kreikey.util;
 import kreikey.combinatorics;
 
 alias permutations = kreikey.combinatorics.permutations;
-
 immutable int[] cycleRoots = [169, 871, 872];
 immutable int[][] cycleMembersArray = cycleRoots.map!factorialDigitChain.array();
 int[const(uint)[]] cycleMembers;
@@ -35,6 +35,7 @@ void main(string[] args) {
   StopWatch timer;
   int maxDigs = 6;
   int chainLength = 60;
+  ulong limit = 1000000;
 
   if (args.length > 1) {
     try {
@@ -49,6 +50,7 @@ void main(string[] args) {
 
   writeln("Digit factorial chains");
   writefln("The number of digit factorial chains below %s", repeat(9u).take(maxDigs).array.toNumber() + 1);
+  //writefln("The number of digit factorial chains below %s", limit);
   writefln("with %s non-repeating terms is:", chainLength);
 
   auto sortedDigits = new Generator!(uint[])(getSortedDigitsInit!uint(1, maxDigs));
@@ -60,6 +62,12 @@ void main(string[] args) {
     .filter!(a => a[0] == chainLength)
     .map!(a => a[1])
     .sum();
+
+  //ulong number = iota(1, limit)
+    //.map!toDigits
+    ////.tee!writeln()
+    //.filter!(a => a.factorialDigitChainLength() == chainLength)
+    //.count();
 
   writeln(number);
   timer.stop();
@@ -86,15 +94,6 @@ int[] factorialDigitChain(int source) {
   return chain;
 }
 
-auto factorialDigitChainLengthInit() {
-  int[] cycleRoots = [169, 871, 872];
-  uint[][] cycleMembersArray = cycleRoots
-    .map!factorialDigitChain
-    .join
-    .map!toDigits
-    .array();
-}
-
 int factorialDigitChainLength(uint[] source) {
   if (source in cycleMembers)
     return cycleMembers[source];
@@ -105,21 +104,6 @@ int factorialDigitChainLength(uint[] source) {
     return 1;
 
   return 1 + memoize!factorialDigitChainLength(sumDigs);
-}
-
-int factorialDigitChainLength1(uint[] source) {
-  int index = 0;
-  int[uint[]] factorialSumIndex = [source:index];
-  uint[] sumDigs = source.factDigSumDigs();
-  index++;
-
-  while (sumDigs !in factorialSumIndex) {
-    factorialSumIndex[cast(const)sumDigs] = index;
-    sumDigs = sumDigs.factDigSumDigs();
-    index++;
-  }
-
-  return index;
 }
 
 uint[] factDigSumDigs(uint[] source) {

@@ -21,13 +21,13 @@ void main(string[] args) {
   int maxDigs = 6;
   int chainLength = 60;
 
-  try {
-    if (args.length > 1) {
+  if (args.length > 1) {
+    try {
       chainLength = args[1].parse!int();
+    } catch (Exception e) {
+      writeln(e.msg);
+      writeln("Can't parse that argument! Falling back to default.");
     }
-  } catch (Exception e) {
-    writeln(e.msg);
-    writeln("Can't parse that argument! Falling back to default.");
   }
 
   timer.start();
@@ -36,7 +36,7 @@ void main(string[] args) {
   writefln("The number of digit factorial chains below %s", repeat(9u).take(maxDigs).array.toNumber() + 1);
   writeln("with 60 non-repeating terms is:");
 
-  writeln(countFactorialDigitChainsWithLength(maxDigs, chainLength));
+  writeln(countFactorialDigitChainsWithLength2(maxDigs, chainLength));
 
   timer.stop();
 
@@ -44,8 +44,6 @@ void main(string[] args) {
 }
 
 ulong countFactorialDigitChainsWithLength(int maxDigs, int chainLength) {
-  ulong number = 0;
-
   uint[][] cycleMembersArray = cycleRoots
     .map!factorialDigitChain
     .join
@@ -64,67 +62,97 @@ ulong countFactorialDigitChainsWithLength(int maxDigs, int chainLength) {
 
   auto sortedDigits = new Generator!(uint[])(getSortedDigitsInit!uint(1, maxDigs));
   uint[][] specialDigits;
+  ulong number = 0;
 
   foreach (digits; sortedDigits) {
-    if (digits in cycleMembers || digits in sortedCycleMembers) {
+    if (digits in sortedCycleMembers) {
       specialDigits ~= digits;
       continue;
     }
 
     if (digits.factorialDigitChainLength() == chainLength) {
-      number += digits.permutations.array.sort.uniq.filter!(a => a[0] != 0).count();
+      number += digits.countValidPermutations();
     }
   }
-
-  //number = sortedDigits
-    //.filter!(a => a !in cycleMembers)
-    //.map!(a => a, factorialDigitChainLength)
-    //.filter!(a => a[1] == length)
-    //.map!(a => a[0].permutations())
-    //.join
-    //.sort
-    //.uniq
-    //.filter!(a => a[0] != 0)
-    //.count();
 
   auto localChainLength = 0;
 
   foreach (digits; specialDigits) {
     localChainLength = digits.factorialDigitChainLength();
-    writeln(digits, " ", localChainLength);
     if (digits in cycleMembers) {
       if (localChainLength == chainLength - 1) {
-        number += digits.permutations.filter!(a => a[0] != 0).count() - 1;
+        number += digits.countValidPermutations() - 1;
       } else if (localChainLength == chainLength) {
         number++;
       }
     } else if (digits in sortedCycleMembers) {
       if (localChainLength == chainLength) {
-        number += digits.permutations.filter!(a => a[0] != 0).count() - 1;
+        number += digits.countValidPermutations() - 1;
       } else if (localChainLength == chainLength + 1) {
         number++;
       }
     }
   }
 
-  //auto cycleDigitsLengths = cycles
-    //.join
-    //.map!(a => a.toDigits)
-    //.map!(a => a, a => a.factorialDigitChainLength())
-    //.array();
+  return number;
+}
 
-  //number += cycleDigitsLengths
-    //.filter!(a => a[1] == length)
-    //.count();
+ulong countFactorialDigitChainsWithLength2(int maxDigs, int chainLength) {
+  uint[][] cycleMembersArray = cycleRoots
+    .map!factorialDigitChain
+    .join
+    .map!toDigits
+    .array();
 
-  //number += cycleDigitsLengths
-    //.map!(a => zip(a[0].permutations.dropOne(), repeat(a[1] + 1)))
-    //.join
-    ////.filter!(a => a[0][0] != 0)
-    //.filter!(a => a[1] == length && a[0][0] != 0)
-    //.count();
+  auto cycleMembers = cycleMembersArray
+    .map!(a => cast(const)a)
+    .zip(repeat(true))
+    .assocArray();
+
+  auto sortedCycleMembers = cycleMembersArray
+    .map!(a => cast(const)a.asort())
+    .zip(repeat(true))
+    .assocArray();
+
+  auto sortedDigits = new Generator!(uint[])(getSortedDigitsInit!uint(1, maxDigs));
+  uint[][] specialDigits;
+  auto localChainLength = 0;
+
+  ulong number = sortedDigits
+    .tee!((a) {
+        if (a in sortedCycleMembers)
+          specialDigits ~= a;
+          })
+    .filter!(a => a !in sortedCycleMembers && a.factorialDigitChainLength() == chainLength)
+    .map!countValidPermutations
+    .sum();
+
+  number += specialDigits
+    .filter!(a => a !in cycleMembers && a.factorialDigitChainLength() == chainLength)
+    .map!(a => a.countValidPermutations() - 1)
+    .sum();
+
+  number += specialDigits
+    .filter!(a => a !in cycleMembers && a.factorialDigitChainLength() == chainLength + 1)
+    .map!(a => 1)
+    .sum();
+
+  number += specialDigits
+    .filter!(a => a in cycleMembers && a.factorialDigitChainLength() == chainLength - 1)
+    .map!(a => a.countValidPermutations() - 1)
+    .sum();
+
+  number += specialDigits
+    .filter!(a => a in cycleMembers && a.factorialDigitChainLength() == chainLength)
+    .map!(a => 1)
+    .sum();
 
   return number;
+}
+
+
+ulong countValidPermutations(uint[] digits) {
+  return digits.permutations.array.sort.uniq.filter!(a => a[0] != 0).count();
 }
 
 int[] factorialDigitChain(int source) {
