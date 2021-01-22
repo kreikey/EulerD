@@ -43,48 +43,86 @@ void main(string[] args) {
   writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
 }
 
-ulong countFactorialDigitChainsWithLength(int maxDigs, int length) {
+ulong countFactorialDigitChainsWithLength(int maxDigs, int chainLength) {
   ulong number = 0;
 
-  int[][] cycles = cycleRoots
+  uint[][] cycleMembersArray = cycleRoots
     .map!factorialDigitChain
+    .join
+    .map!toDigits
     .array();
 
-  bool[uint[]] cycleMembers = cycles
-    .join
-    .map!(a => cast(const)a.toDigits.asort())
+  auto cycleMembers = cycleMembersArray
+    .map!(a => cast(const)a)
+    .zip(repeat(true))
+    .assocArray();
+
+  auto sortedCycleMembers = cycleMembersArray
+    .map!(a => cast(const)a.asort())
     .zip(repeat(true))
     .assocArray();
 
   auto sortedDigits = new Generator!(uint[])(getSortedDigitsInit!uint(1, maxDigs));
+  uint[][] specialDigits;
 
-  number = sortedDigits
-    .filter!(a => a !in cycleMembers)
-    .map!(a => a, factorialDigitChainLength)
-    .filter!(a => a[1] == length)
-    .map!(a => a[0].permutations())
-    .join
-    .sort
-    .uniq
-    .filter!(a => a[0] != 0)
-    .count();
+  foreach (digits; sortedDigits) {
+    if (digits in cycleMembers || digits in sortedCycleMembers) {
+      specialDigits ~= digits;
+      continue;
+    }
 
-  auto cycleDigitsLengths = cycles
-    .join
-    .map!(a => a.toDigits)
-    .map!(a => a, a => a.factorialDigitChainLength())
-    .array();
+    if (digits.factorialDigitChainLength() == chainLength) {
+      number += digits.permutations.array.sort.uniq.filter!(a => a[0] != 0).count();
+    }
+  }
 
-  number += cycleDigitsLengths
-    .filter!(a => a[1] == length)
-    .count();
+  //number = sortedDigits
+    //.filter!(a => a !in cycleMembers)
+    //.map!(a => a, factorialDigitChainLength)
+    //.filter!(a => a[1] == length)
+    //.map!(a => a[0].permutations())
+    //.join
+    //.sort
+    //.uniq
+    //.filter!(a => a[0] != 0)
+    //.count();
 
-  number += cycleDigitsLengths
-    .map!(a => zip(a[0].permutations.dropOne(), repeat(a[1] + 1)))
-    .join
-    //.filter!(a => a[0][0] != 0)
-    .filter!(a => a[1] == length && a[0][0] != 0)
-    .count();
+  auto localChainLength = 0;
+
+  foreach (digits; specialDigits) {
+    localChainLength = digits.factorialDigitChainLength();
+    writeln(digits, " ", localChainLength);
+    if (digits in cycleMembers) {
+      if (localChainLength == chainLength - 1) {
+        number += digits.permutations.filter!(a => a[0] != 0).count() - 1;
+      } else if (localChainLength == chainLength) {
+        number++;
+      }
+    } else if (digits in sortedCycleMembers) {
+      if (localChainLength == chainLength) {
+        number += digits.permutations.filter!(a => a[0] != 0).count() - 1;
+      } else if (localChainLength == chainLength + 1) {
+        number++;
+      }
+    }
+  }
+
+  //auto cycleDigitsLengths = cycles
+    //.join
+    //.map!(a => a.toDigits)
+    //.map!(a => a, a => a.factorialDigitChainLength())
+    //.array();
+
+  //number += cycleDigitsLengths
+    //.filter!(a => a[1] == length)
+    //.count();
+
+  //number += cycleDigitsLengths
+    //.map!(a => zip(a[0].permutations.dropOne(), repeat(a[1] + 1)))
+    //.join
+    ////.filter!(a => a[0][0] != 0)
+    //.filter!(a => a[1] == length && a[0][0] != 0)
+    //.count();
 
   return number;
 }
