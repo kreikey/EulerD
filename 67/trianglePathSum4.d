@@ -23,26 +23,20 @@ void main(string[] args) {
   inFile = File(fileName);
   triangle = inFile.byLine.map!(line => line.split(" ").map!(numstr => numstr.parse!(int)).array).array();
 
-  sums = getPathSums(triangle);
-  sum = sums[0];
+  sum = getPathSums(triangle, 0);
 
   writeln(sum);
   timer.stop();
   writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
 }
 
-int[] getPathSums(int[][] triangle) {
-  int[] sums;
-  int[] nextSums;
+int getPathSums(int[][] triangle, ulong topIndex) {
+  if (triangle.length == 0)
+    return 0;
 
-  if (triangle.length == 1)
-    return triangle[0];
+  int topNum = triangle[0][topIndex];
+  int left = memoize!getPathSums(triangle[1 .. $], topIndex);
+  int right = memoize!getPathSums(triangle[1 .. $], topIndex + 1);
 
-  sums = getPathSums(triangle[1 .. $]);
-
-  foreach (cell, items; lockstep(triangle[0], sums.slide(2))) {
-    nextSums ~= cell + (items[0] > items[1] ? items[0] : items[1]);
-  }
-
-  return nextSums;
+  return topNum + (left > right ? left : right);
 }
