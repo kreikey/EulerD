@@ -20,15 +20,11 @@ immutable int[][] cycleMembersArray = cycleRoots.map!factorialDigitChain.array()
 int[const(uint)[]] cycleMembers;
 
 static this() {
-  //cycleMembersArray.each!writeln();
-
   cycleMembers = cycleMembersArray
     .map!(a => zip(a, repeat(cast(int)a.length)))
     .join
     .map!(a => cast(const)a[0].toDigits(), a => a[1])
     .assocArray();
-
-  //writeln(cycleMembers);
 }
 
 void main(string[] args) {
@@ -86,15 +82,6 @@ int[] factorialDigitChain(int source) {
   return chain;
 }
 
-auto factorialDigitChainLengthInit() {
-  int[] cycleRoots = [169, 871, 872];
-  uint[][] cycleMembersArray = cycleRoots
-    .map!factorialDigitChain
-    .join
-    .map!toDigits
-    .array();
-}
-
 int factorialDigitChainLength(uint[] source) {
   if (source in cycleMembers)
     return cycleMembers[source];
@@ -105,21 +92,6 @@ int factorialDigitChainLength(uint[] source) {
     return 1;
 
   return 1 + memoize!factorialDigitChainLength(sumDigs);
-}
-
-int factorialDigitChainLength1(uint[] source) {
-  int index = 0;
-  int[uint[]] factorialSumIndex = [source:index];
-  uint[] sumDigs = source.factDigSumDigs();
-  index++;
-
-  while (sumDigs !in factorialSumIndex) {
-    factorialSumIndex[cast(const)sumDigs] = index;
-    sumDigs = sumDigs.factDigSumDigs();
-    index++;
-  }
-
-  return index;
 }
 
 uint[] factDigSumDigs(uint[] source) {
@@ -188,5 +160,9 @@ int countDistinctNumberPermutations(uint[] source) {
   int nonZeroCount = cast(int)source.filter!(a => a != 0).count();
 
   return source.countDistinctPermutations() * nonZeroCount / cast(int)source.length;
+}
+
+ulong countDistinctNumberPermutations(uint[] digits) {
+  return digits.permutations.array.sort.uniq.filter!(a => a[0] != 0).count();
 }
 */

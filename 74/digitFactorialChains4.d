@@ -14,8 +14,20 @@ import kreikey.util;
 import kreikey.combinatorics;
 
 alias permutations = kreikey.combinatorics.permutations;
-int[] cycleRoots = [169, 871, 872];
 
+immutable int[] cycleRoots = [169, 871, 872];
+immutable int[][] cycleMembersArray = cycleRoots.map!factorialDigitChain.array();
+int[const(uint)[]] cycleMembers;
+
+static this() {
+  cycleMembers = cycleMembersArray
+    .map!(a => zip(a, repeat(cast(int)a.length)))
+    .join
+    .map!(a => cast(const)a[0].toDigits(), a => a[1])
+    .assocArray();
+}
+
+// This solution is correct in general. It generates and counts permutations to determine the solution.
 void main(string[] args) {
   StopWatch timer;
   int maxDigs = 6;
@@ -36,7 +48,7 @@ void main(string[] args) {
   writefln("The number of digit factorial chains below %s", repeat(9u).take(maxDigs).array.toNumber() + 1);
   writeln("with 60 non-repeating terms is:");
 
-  writeln(countFactorialDigitChainsWithLength2(maxDigs, chainLength));
+  writeln(countFactorialDigitChainsWithLength(maxDigs, chainLength));
 
   timer.stop();
 
@@ -71,7 +83,7 @@ ulong countFactorialDigitChainsWithLength(int maxDigs, int chainLength) {
     }
 
     if (digits.factorialDigitChainLength() == chainLength) {
-      number += digits.countValidPermutations();
+      number += digits.countDistinctNumberPermutations();
     }
   }
 
@@ -81,13 +93,13 @@ ulong countFactorialDigitChainsWithLength(int maxDigs, int chainLength) {
     localChainLength = digits.factorialDigitChainLength();
     if (digits in cycleMembers) {
       if (localChainLength == chainLength - 1) {
-        number += digits.countValidPermutations() - 1;
+        number += digits.countDistinctNumberPermutations() - 1;
       } else if (localChainLength == chainLength) {
         number++;
       }
     } else if (digits in sortedCycleMembers) {
       if (localChainLength == chainLength) {
-        number += digits.countValidPermutations() - 1;
+        number += digits.countDistinctNumberPermutations() - 1;
       } else if (localChainLength == chainLength + 1) {
         number++;
       }
@@ -124,12 +136,12 @@ ulong countFactorialDigitChainsWithLength2(int maxDigs, int chainLength) {
           specialDigits ~= a;
           })
     .filter!(a => a !in sortedCycleMembers && a.factorialDigitChainLength() == chainLength)
-    .map!countValidPermutations
+    .map!countDistinctNumberPermutations
     .sum();
 
   number += specialDigits
     .filter!(a => a !in cycleMembers && a.factorialDigitChainLength() == chainLength)
-    .map!(a => a.countValidPermutations() - 1)
+    .map!(a => a.countDistinctNumberPermutations() - 1)
     .sum();
 
   number += specialDigits
@@ -139,7 +151,7 @@ ulong countFactorialDigitChainsWithLength2(int maxDigs, int chainLength) {
 
   number += specialDigits
     .filter!(a => a in cycleMembers && a.factorialDigitChainLength() == chainLength - 1)
-    .map!(a => a.countValidPermutations() - 1)
+    .map!(a => a.countDistinctNumberPermutations() - 1)
     .sum();
 
   number += specialDigits
@@ -148,11 +160,6 @@ ulong countFactorialDigitChainsWithLength2(int maxDigs, int chainLength) {
     .sum();
 
   return number;
-}
-
-
-ulong countValidPermutations(uint[] digits) {
-  return digits.permutations.array.sort.uniq.filter!(a => a[0] != 0).count();
 }
 
 int[] factorialDigitChain(int source) {
@@ -175,18 +182,15 @@ int[] factorialDigitChain(int source) {
 }
 
 int factorialDigitChainLength(uint[] source) {
-  int index = 0;
-  int[uint[]] factorialSumIndex = [source:index];
+  if (source in cycleMembers)
+    return cycleMembers[source];
+
   uint[] sumDigs = source.factDigSumDigs();
-  index++;
 
-  while (sumDigs !in factorialSumIndex) {
-    factorialSumIndex[cast(const)sumDigs] = index;
-    sumDigs = sumDigs.factDigSumDigs();
-    index++;
-  }
+  if (sumDigs == source)
+    return 1;
 
-  return index;
+  return 1 + memoize!factorialDigitChainLength(sumDigs);
 }
 
 uint[] factDigSumDigs(uint[] source) {
@@ -196,3 +200,26 @@ uint[] factDigSumDigs(uint[] source) {
 int factDigSum(int source) {
   return source.toDigits.map!factorial.sum();
 }
+
+/*
+int countDistinctPermutations(uint[] source) {
+  import kreikey.intmath : factorial;
+
+  auto groups = source.group.array();
+  int numerator = (cast(int)source.length).factorial();
+  int denominator = groups.map!(a => a[1].factorial()).fold!((a, b) => a * b);
+  int basicCount = numerator / denominator;
+
+  return basicCount;
+}
+
+int countDistinctNumberPermutations(uint[] source) {
+  int nonZeroCount = cast(int)source.filter!(a => a != 0).count();
+
+  return source.countDistinctPermutations() * nonZeroCount / cast(int)source.length;
+}
+
+ulong countDistinctNumberPermutations(uint[] digits) {
+  return digits.permutations.array.sort.uniq.filter!(a => a[0] != 0).count();
+}
+/*

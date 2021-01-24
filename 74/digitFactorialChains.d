@@ -14,13 +14,13 @@ void main(string[] args) {
   ulong limit = 1000000;
   int chainLength = 60;
 
-  try {
-    if (args.length > 1) {
+  if (args.length > 1) {
+    try {
       chainLength = args[1].parse!int();
+    } catch (Exception e) {
+      writeln(e.msg);
+      writeln("Can't parse that argument! Falling back to default.");
     }
-  } catch (Exception e) {
-    writeln(e.msg);
-    writeln("Can't parse that argument! Falling back to default.");
   }
 
   writeln("Digit factorial chains");

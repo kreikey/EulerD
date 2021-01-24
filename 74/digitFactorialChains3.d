@@ -13,7 +13,7 @@ import kreikey.util;
 void main() {
   StopWatch timer;
   ulong limit = 1000000;
-  int chainLength = 4;
+  int chainLength = 60;
 
   timer.start();
 

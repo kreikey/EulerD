@@ -140,6 +140,18 @@ if (isIntegral!T || is(T == BigInt)) {
     return sum.get;
 }
 
+int countPermutations(uint[] source) {
+  import kreikey.intmath : factorial;
+
+  return (cast(int)source.length).factorial();
+}
+
+int countNumberPermutations(uint[] source) {
+  int nonZeroCount = cast(int)source.filter!(a => a != 0).count();
+
+  return source.countPermutations() * nonZeroCount / cast(int)source.length;
+}
+
 int countDistinctPermutations(uint[] source) {
   import kreikey.intmath : factorial;
 

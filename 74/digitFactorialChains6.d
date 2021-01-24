@@ -17,25 +17,21 @@ import kreikey.combinatorics;
 alias permutations = kreikey.combinatorics.permutations;
 immutable int[] cycleRoots = [169, 871, 872];
 immutable int[][] cycleMembersArray = cycleRoots.map!factorialDigitChain.array();
-int[const(uint)[]] cycleMembers;
+int[immutable(int)] cycleMembers;
 
 static this() {
-  //cycleMembersArray.each!writeln();
-
   cycleMembers = cycleMembersArray
     .map!(a => zip(a, repeat(cast(int)a.length)))
     .join
-    .map!(a => cast(const)a[0].toDigits(), a => a[1])
     .assocArray();
-
-  //writeln(cycleMembers);
 }
+
+// This is a generally correct and fast variation of solution 1
 
 void main(string[] args) {
   StopWatch timer;
-  int maxDigs = 6;
   int chainLength = 60;
-  ulong limit = 1000000;
+  int limit = 1000000;
 
   if (args.length > 1) {
     try {
@@ -49,25 +45,12 @@ void main(string[] args) {
   timer.start();
 
   writeln("Digit factorial chains");
-  writefln("The number of digit factorial chains below %s", repeat(9u).take(maxDigs).array.toNumber() + 1);
-  //writefln("The number of digit factorial chains below %s", limit);
+  writefln("The number of digit factorial chains below %s", limit);
   writefln("with %s non-repeating terms is:", chainLength);
 
-  auto sortedDigits = new Generator!(uint[])(getSortedDigitsInit!uint(1, maxDigs));
-  auto chainLengthGroups = factDigChainLenGroupsInit();
-
-  ulong number = sortedDigits
-    .map!chainLengthGroups
-    .join
-    .filter!(a => a[0] == chainLength)
-    .map!(a => a[1])
-    .sum();
-
-  //ulong number = iota(1, limit)
-    //.map!toDigits
-    ////.tee!writeln()
-    //.filter!(a => a.factorialDigitChainLength() == chainLength)
-    //.count();
+  ulong number = iota!int(1, limit)
+    .filter!(a => a.factorialDigitChainLength() == chainLength)
+    .count();
 
   writeln(number);
   timer.stop();
@@ -94,11 +77,11 @@ int[] factorialDigitChain(int source) {
   return chain;
 }
 
-int factorialDigitChainLength(uint[] source) {
+int factorialDigitChainLength(int source) {
   if (source in cycleMembers)
     return cycleMembers[source];
 
-  uint[] sumDigs = source.factDigSumDigs();
+  int sumDigs = source.factDigSum();
 
   if (sumDigs == source)
     return 1;
@@ -106,71 +89,6 @@ int factorialDigitChainLength(uint[] source) {
   return 1 + memoize!factorialDigitChainLength(sumDigs);
 }
 
-uint[] factDigSumDigs(uint[] source) {
-  return source.map!factorial.sum.toDigits();
-}
-
 int factDigSum(int source) {
   return source.toDigits.map!factorial.sum();
 }
-
-auto factDigChainLenGroupsInit() {
-  int[] cycleRoots = [169, 871, 872];
-  uint[][] cycleMembersArray = cycleRoots
-    .map!factorialDigitChain
-    .join
-    .map!toDigits
-    .array();
-
-  auto cycleMembers = cycleMembersArray
-    .map!(a => cast(const)a)
-    .zip(repeat(true))
-    .assocArray();
-
-  auto sortedCycleMembers = cycleMembersArray
-    .map!(a => cast(const)a.asort())
-    .zip(repeat(true))
-    .assocArray();
-
-  auto factDigChainLenGroups(uint[] source) {
-    Tuple!(int, int)[] chainLengthGroups;
-    int chainLength = source.factorialDigitChainLength();
-    int permCount = source.countDistinctNumberPermutations();
-
-    if (source in cycleMembers) {
-      // The number is a certain chain length and all its permutations are one greater
-      chainLengthGroups ~= tuple(chainLength, 1);
-      chainLengthGroups ~= tuple(chainLength + 1, permCount - 1);
-    } else if (source in sortedCycleMembers) {
-      // All permutations are a certain chain length except the one permutation in the chain
-      chainLengthGroups ~= tuple(chainLength - 1, 1);
-      chainLengthGroups ~= tuple(chainLength, permCount - 1);
-    } else {
-      // The number and all its permutations share the same chain length
-      chainLengthGroups ~= tuple(chainLength, permCount);
-    }
-
-    return chainLengthGroups;
-  }
-
-  return &factDigChainLenGroups;
-}
-
-/*
-int countDistinctPermutations(uint[] source) {
-  import kreikey.intmath : factorial;
-
-  auto groups = source.group.array();
-  int numerator = (cast(int)source.length).factorial();
-  int denominator = groups.map!(a => a[1].factorial()).fold!((a, b) => a * b);
-  int basicCount = numerator / denominator;
-
-  return basicCount;
-}
-
-int countDistinctNumberPermutations(uint[] source) {
-  int nonZeroCount = cast(int)source.filter!(a => a != 0).count();
-
-  return source.countDistinctPermutations() * nonZeroCount / cast(int)source.length;
-}
-*/
