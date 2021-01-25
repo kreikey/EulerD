@@ -7,13 +7,10 @@ import std.algorithm;
 import std.traits;
 import std.parallelism;
 import std.typecons;
+import kreikey.figurates;
 
-alias Pentagonals = sequence!((a, n) => n * (3 * n - 1) / 2);
-ReturnType!isPentagonalInit isPentagonal;
-
-static this() {
-  isPentagonal = isPentagonalInit();
-}
+//from kreikey.figurates:
+//alias Pentagonals = FigGen!(Figurates.pentagonal);
 
 void main() {
   StopWatch timer;
@@ -24,7 +21,7 @@ void main() {
 
   writeln("Please wait for about a minute...");
 
-  auto pentagonals = Pentagonals.dropOne();
+  auto pentagonals = Pentagonals(1);
 
   auto diffDiffGen = recurrence!((a, n) => (n - 2)%3==0 ? 0 : a[n-1]+1)(0, 0, 0, 2, 2);
   auto diffGen = diffDiffGen.cumulativeFold!((a, b) => a + b)(0);
@@ -45,6 +42,7 @@ void main() {
   writefln("Finished in %s milliseconds", timer.peek.total!"msecs"());
 }
 
+/*
 auto isPentagonalInit() {
   auto temp = Pentagonals();
   bool[long] cache = null;
@@ -58,3 +56,4 @@ auto isPentagonalInit() {
     return number in cache ? true : false;
   };
 }
+*/

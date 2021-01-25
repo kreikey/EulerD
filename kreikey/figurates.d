@@ -5,8 +5,14 @@ import std.range;
 import std.algorithm;
 import std.functional;
 
-enum Figurate {triangular = 1, square, pentagonal, hexagonal, heptagonal, octagonal}
+enum Figurates {triangular = 1, square, pentagonal, hexagonal, heptagonal, octagonal}
 
+alias Triangulars = FigGen!(Figurates.triangular);
+alias Squares = FigGen!(Figurates.square);
+alias Pentagonals = FigGen!(Figurates.pentagonal);
+alias Hexagonal = FigGen!(Figurates.hexagonal);
+alias Heptagonal = FigGen!(Figurates.heptagonal);
+alias Octagonal = FigGen!(Figurates.octagonal);
 bool delegate(ulong num) isTriangular;
 bool delegate(ulong num) isSquare;
 bool delegate(ulong num) isPentagonal;
@@ -15,12 +21,12 @@ bool delegate(ulong num) isHeptagonal;
 bool delegate(ulong num) isOctagonal;
 
 static this() {
-  isTriangular = isFigurateInit!(FigGen!(Figurate.triangular));
-  isSquare = isFigurateInit!(FigGen!(Figurate.square));
-  isPentagonal = isFigurateInit!(FigGen!(Figurate.pentagonal));
-  isHexagonal = isFigurateInit!(FigGen!(Figurate.hexagonal));
-  isHeptagonal = isFigurateInit!(FigGen!(Figurate.heptagonal));
-  isOctagonal = isFigurateInit!(FigGen!(Figurate.octagonal));
+  isTriangular = isFigurateInit!Triangulars;
+  isSquare = isFigurateInit!Squares;
+  isPentagonal = isFigurateInit!Pentagonals;
+  isHexagonal = isFigurateInit!Hexagonal;
+  isHeptagonal = isFigurateInit!Heptagonal;
+  isOctagonal = isFigurateInit!Octagonal;
 }
 
 string genFigurateLambda(int shape) {

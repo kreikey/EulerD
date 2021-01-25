@@ -9,14 +9,11 @@ import std.parallelism;
 import std.typecons;
 import std.functional;
 import std.format;
+import kreikey.figurates;
+import kreikey.util;
 
-alias Pentagonals = sequence!((a, n) => n * (3 * n - 1) / 2);
-alias InfIota = recurrence!((a, n) => a[n-1]+1, ulong);
-bool delegate(ulong num) isPentagonal;
-
-static this() {
-  isPentagonal = isFigurateInit!(Pentagonals);
-}
+//from kreikey.figurates:
+//alias Pentagonals = FigGen!(Figurates.pentagonal);
 
 void main() {
   StopWatch timer;
@@ -27,10 +24,10 @@ void main() {
 
   writeln("Please wait for about a minute...");
 
-  auto pentagonals = Pentagonals.dropOne();
+  auto pentagonals = Pentagonals(1);
 
-  auto found = InfIota(1)
-    .map!(a => InfIota(a+1)
+  auto found = InfiniteIota(1)
+    .map!(a => InfiniteIota(a+1)
         .until!(b => pentagonals[a] + pentagonals[b] <= pentagonals[b+1])(OpenRight.no)
         .map!(b => pentagonals[a], b => pentagonals[b]))
     .joiner
@@ -46,6 +43,7 @@ void main() {
   writefln("Finished in %s milliseconds", timer.peek.total!"msecs"());
 }
 
+/*
 auto isFigurateInit(alias generator)() {
   auto temp = generator();
   bool[ulong] cache = null;
@@ -59,3 +57,4 @@ auto isFigurateInit(alias generator)() {
     return num in cache ? true : false;
   };
 }
+*/

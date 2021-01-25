@@ -7,14 +7,10 @@ import std.algorithm;
 import std.traits;
 import std.parallelism;
 import std.typecons;
+import kreikey.figurates;
 
-alias PentagonalGenerator = (a, n) => n * (3 * n - 1) / 2;
-alias Pentagonals = ReturnType!(sequence!(PentagonalGenerator));
-ReturnType!isPentagonalInit isPentagonal;
-
-static this() {
-  isPentagonal = isPentagonalInit();
-}
+//from kreikey.figurates:
+//alias Pentagonals = FigGen!(Figurates.pentagonal);
 
 void main() {
   StopWatch timer;
@@ -35,22 +31,8 @@ void main() {
   writefln("Finished in %s milliseconds", timer.peek.total!"msecs"());
 }
 
-auto isPentagonalInit() {
-  auto temp = Pentagonals();
-  bool[long] cache = null;
-
-  return delegate(long number) {
-    auto pentagonals = refRange(&temp);
-    if (pentagonals.front <= number)
-      pentagonals.until!(a => a > number)
-        .each!(a => cache[a] = true);
-        
-    return number in cache ? true : false;
-  };
-}
-
 Tuple!(long, long) findSpecialPentagonals() {
-  auto pentagonals = sequence!PentagonalGenerator().dropOne();
+  auto pentagonals = Pentagonals(1);
   long sum;
   ulong j=0;
 
@@ -67,3 +49,19 @@ Tuple!(long, long) findSpecialPentagonals() {
   }
   return tuple(-1L, -1L);
 }
+
+/*
+auto isFigurateInit(alias generator)() {
+  auto temp = generator();
+  bool[ulong] cache = null;
+
+  return delegate(ulong num) {
+    auto figurates = refRange(&temp);
+    if (figurates.front <= num)
+      figurates.until!(a => a > num)
+        .each!(a => cache[a] = true)();
+
+    return num in cache ? true : false;
+  };
+}
+*/

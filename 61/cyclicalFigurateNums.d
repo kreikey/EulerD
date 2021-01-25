@@ -48,7 +48,7 @@ bool cyclesWith(ulong a, ulong b) {
   return a % 100 == b / 100;
 }
 
-auto allUniqFigurates(ulong[] numbers) {
+bool allUniqFigurates(ulong[] numbers) {
   Figurate[] singularFiguratesFound;
   Figurate[] multiFiguratesFound;
   Figurate[] figuratesPerNumber;
