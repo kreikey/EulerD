@@ -36,7 +36,7 @@ Tuple!(long, long) findSpecialPentagonals() {
   long sum;
   ulong j=0;
 
-  for (ulong i = 0; i < short.max; i++) {
+  for (ulong i = 0; ; i++) {
     j = i+1;
     do  {
       sum = pentagonals[i] + pentagonals[j];
