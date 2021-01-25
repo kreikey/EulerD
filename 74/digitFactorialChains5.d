@@ -103,20 +103,9 @@ int factDigSum(int source) {
 }
 
 auto factDigChainLenGroupsInit() {
-  int[] cycleRoots = [169, 871, 872];
-  uint[][] cycleMembersArray = cycleRoots
-    .map!factorialDigitChain
-    .join
-    .map!toDigits
-    .array();
-
-  auto cycleMembers = cycleMembersArray
-    .map!(a => cast(const)a)
-    .zip(repeat(true))
-    .assocArray();
-
   auto sortedCycleMembers = cycleMembersArray
-    .map!(a => cast(const)a.asort())
+    .join
+    .map!(a => cast(const)a.toDigits.asort())
     .zip(repeat(true))
     .assocArray();
 
