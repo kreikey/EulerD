@@ -21,12 +21,12 @@ bool delegate(ulong num) isHeptagonal;
 bool delegate(ulong num) isOctagonal;
 
 static this() {
-  isTriangular = isFigurateInit!Triangulars;
-  isSquare = isFigurateInit!Squares;
-  isPentagonal = isFigurateInit!Pentagonals;
-  isHexagonal = isFigurateInit!Hexagonal;
-  isHeptagonal = isFigurateInit!Heptagonal;
-  isOctagonal = isFigurateInit!Octagonal;
+  isTriangular = isFigurateInit!Triangulars();
+  isSquare = isFigurateInit!Squares();
+  isPentagonal = isFigurateInit!Pentagonals();
+  isHexagonal = isFigurateInit!Hexagonal();
+  isHeptagonal = isFigurateInit!Heptagonal();
+  isOctagonal = isFigurateInit!Octagonal();
 }
 
 string genFigurateLambda(int shape) {

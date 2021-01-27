@@ -14,11 +14,11 @@ import kreikey.figurates;
 
 void main() {
   StopWatch timer;
-  timer.start();
-  writeln("Pentagon Numbers");
   long pj = 0;
   long pk = 0;
 
+  timer.start();
+  writeln("Pentagon Numbers");
   writeln("Please wait for about a minute...");
   auto found = findSpecialPentagonals();
 
