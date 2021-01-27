@@ -8,16 +8,12 @@ import std.algorithm;
 import std.functional;
 import std.traits;
 import std.format;
+import kreikey.figurates;
 
-enum Figurate {triangular = 1, square, pentagonal, hexagonal, heptagonal, octagonal}
 bool delegate(ulong num)[] figurateCheckers;
 
-template FigGen(Figurate mul) {
-  alias FigGen = partial!(recurrence!(mixin(genFigurateLambda(mul)), ulong), 1uL);
-}
-
 static this() {
-  foreach (f; EnumMembers!Figurate)
+  foreach (f; EnumMembers!Figurates)
     figurateCheckers ~= isFigurateInit!(FigGen!f)();
 }
 
@@ -49,12 +45,12 @@ bool cyclesWith(ulong a, ulong b) {
 }
 
 bool allUniqFigurates(ulong[] numbers) {
-  Figurate[] singularFiguratesFound;
-  Figurate[] multiFiguratesFound;
-  Figurate[] figuratesPerNumber;
+  Figurates[] singularFiguratesFound;
+  Figurates[] multiFiguratesFound;
+  Figurates[] figuratesPerNumber;
 
   foreach (number; numbers) {
-    foreach (isFigurate, f; lockstep(figurateCheckers, [EnumMembers!Figurate])) {
+    foreach (isFigurate, f; lockstep(figurateCheckers, [EnumMembers!Figurates])) {
       if (isFigurate(number))
         figuratesPerNumber ~= f;
     }
@@ -112,7 +108,7 @@ ulong[] findSixCyclableFigurates() {
 ulong[] getCyclable4DFigurates() {
   ulong[][] fourDigFigurates;
 
-  foreach (f; EnumMembers!Figurate)
+  foreach (f; EnumMembers!Figurates)
     fourDigFigurates ~= FigGen!f
       .find!(a => a > 999)
       .until!(a => a >= 10000)
@@ -131,16 +127,16 @@ ulong[][ulong] getCyclablesByDigits(ulong[] fourDigitNumbers) {
     .assocArray();
 }
 
-auto isFigurateInit(alias generator)() {
-  auto temp = generator();
-  bool[ulong] cache = null;
+//auto isFigurateInit(alias generator)() {
+  //auto temp = generator();
+  //bool[ulong] cache = null;
 
-  return delegate(ulong num) {
-    auto figurates = refRange(&temp);
-    if (figurates.front <= num)
-      figurates.until!(a => a > num)
-        .each!(a => cache[a] = true)();
+  //return delegate(ulong num) {
+    //auto figurates = refRange(&temp);
+    //if (figurates.front <= num)
+      //figurates.until!(a => a > num)
+        //.each!(a => cache[a] = true)();
 
-    return num in cache ? true : false;
-  };
-}
+    //return num in cache ? true : false;
+  //};
+//}

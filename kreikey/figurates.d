@@ -10,9 +10,9 @@ enum Figurates {triangular = 1, square, pentagonal, hexagonal, heptagonal, octag
 alias Triangulars = FigGen!(Figurates.triangular);
 alias Squares = FigGen!(Figurates.square);
 alias Pentagonals = FigGen!(Figurates.pentagonal);
-alias Hexagonal = FigGen!(Figurates.hexagonal);
-alias Heptagonal = FigGen!(Figurates.heptagonal);
-alias Octagonal = FigGen!(Figurates.octagonal);
+alias Hexagonals = FigGen!(Figurates.hexagonal);
+alias Heptagonals = FigGen!(Figurates.heptagonal);
+alias Octagonals = FigGen!(Figurates.octagonal);
 bool delegate(ulong num) isTriangular;
 bool delegate(ulong num) isSquare;
 bool delegate(ulong num) isPentagonal;
@@ -24,9 +24,9 @@ static this() {
   isTriangular = isFigurateInit!Triangulars();
   isSquare = isFigurateInit!Squares();
   isPentagonal = isFigurateInit!Pentagonals();
-  isHexagonal = isFigurateInit!Hexagonal();
-  isHeptagonal = isFigurateInit!Heptagonal();
-  isOctagonal = isFigurateInit!Octagonal();
+  isHexagonal = isFigurateInit!Hexagonals();
+  isHeptagonal = isFigurateInit!Heptagonals();
+  isOctagonal = isFigurateInit!Octagonals();
 }
 
 string genFigurateLambda(int shape) {

@@ -7,15 +7,16 @@ import std.algorithm;
 import std.traits;
 import std.parallelism;
 import std.typecons;
+import kreikey.figurates;
 
 void main() {
   StopWatch timer;
   timer.start();
   writeln("Triangular, pentagonal, and hexagonal numbers");
 
-  auto triangulars = recurrence!((a, n) => a[n-1] + n + 1)(1);
-  auto pentagonals = recurrence!((a, n) => a[n-1] + 3*n + 1)(1);
-  auto hexagonals = recurrence!((a, n) => a[n-1] + 4*n + 1)(1);
+  auto triangulars = Triangulars(1);
+  auto pentagonals = Pentagonals(1);
+  auto hexagonals = Hexagonals(1);
 
   auto found = merge(triangulars, pentagonals, hexagonals)
     .group
