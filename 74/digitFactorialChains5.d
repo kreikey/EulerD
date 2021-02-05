@@ -83,8 +83,9 @@ int[] factorialDigitChain(int source) {
 }
 
 int factorialDigitChainLength(uint[] source) {
-  if (source in cycleMembers)
-    return cycleMembers[source];
+  auto temp = source in cycleMembers;
+  if (temp !is null)
+    return *temp;
 
   uint[] sumDigs = source.factDigSumDigs();
 

@@ -391,9 +391,6 @@ T factorial(T)(T number) if (isIntegral!T) {
 
   T result = 1;
 
-  if (number == 0)
-    return result;
-
   for (size_t n = 1; n < number + 1; n++)
     result *= n;
 

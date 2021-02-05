@@ -182,8 +182,9 @@ int[] factorialDigitChain(int source) {
 }
 
 int factorialDigitChainLength(uint[] source) {
-  if (source in cycleMembers)
-    return cycleMembers[source];
+  auto temp = source in cycleMembers;
+  if (temp !is null)
+    return *temp;
 
   uint[] sumDigs = source.factDigSumDigs();
 
@@ -222,4 +223,4 @@ int countDistinctNumberPermutations(uint[] source) {
 ulong countDistinctNumberPermutations(uint[] digits) {
   return digits.permutations.array.sort.uniq.filter!(a => a[0] != 0).count();
 }
-/*
+*/
