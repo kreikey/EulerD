@@ -13,25 +13,31 @@ import kreikey.intmath;
 import kreikey.util;
 
 void main() {
-  StopWatch timer;
+  //StopWatch timer;
   int a, b, c, p;
-  Tuple!(int, int, int, int)[] triangles;
+  //Tuple!(int, int, int, int)[] triangles;
 
-  timer.start();
+  //timer.start();
 
-  foreach (l; File("triangles3.txt").byLine()) {
-    l.formattedRead!"%d^2 + %d^2 = %d^2 p = %s"(a, b, c, p);
-    triangles ~= tuple(a, b, c, p);
-  }
-  
+  //foreach (l; File("numbers8.txt").byLine()) {
+    //l.formattedRead!"%d %d %d %d"(a, b, c, p);
+    //triangles ~= tuple(a, b, c, p);
+  //}
+  auto triangles = File("numbers9.txt")
+    .byLine()
+    .map!(a => a.split(" ").map!(to!int))
+    .map!(a => a[0], a => a[1], a => a[2], a => a[3])
+    .array();
+
   triangles.sort!((a, b) => a[3] < b[3])();
-  auto count = triangles
+
+  auto groups = triangles
     .group!((a, b) => a[3] == b[3])
-    .filter!(a => a[1] == 1)
-    .count();
+    .each!(a => writefln("%(%(%s %s %s %s%) %s%)", a))();
 
-  writeln(count);
+  //groups.sort();
+  //groups.each!(a => writefln("%(%(%s %s %s %s%) %s%)", a))();
 
-  timer.stop();
-  writefln("finished in %s milliseconds.", timer.peek.total!"msecs"());
+  //timer.stop();
+  //writefln("finished in %s milliseconds.", timer.peek.total!"msecs"());
 }

@@ -13,8 +13,8 @@ import kreikey.util;
 
 void main() {
   int maxLength = 1500000;
-  int i = 1;
-  int j = 0;
+  int a = 1;
+  int b = 0;
   ulong count = 0;
   long sum = 0;
   long p = 0;
@@ -24,22 +24,22 @@ void main() {
     .map!(a => a^^2)
     .array();
 
-  for (int k = 3; k < squares.length; k++) {
-    j = k - 1;
-    i = 1;
-    while (i <= j) {
-      sum = squares[i] + squares[j];
-      if (sum == squares[k]) {
-        //writefln("%s^2 + %s^2 = %s^2 p = %s", i, j, k, p);
-        writeln(i, "^2 + ", j, "^2 = ", k, "^2 p = ", i + j + k);
-        i++;
-        j--;
-      } else if (sum < squares[k]) {
-        i++;
-        if (i + j + k > maxLength)
-          j--;
-      } else if (sum > squares[k]) {
-        j--;
+  for (int c = 3; c < squares.length; c++) {
+    b = c - 1;
+    a = 1;
+    while (a <= b) {
+      sum = squares[a] + squares[b];
+      if (sum == squares[c]) {
+        //writefln("%s^2 + %s^2 = %s^2 p = %s", a, b, c, p);
+        writeln(a, " ", b, " ", c, " ", a + b + c);
+        a++;
+        b--;
+      } else if (sum < squares[c]) {
+        a++;
+        if (a + b + c > maxLength)
+          b--;
+      } else if (sum > squares[c]) {
+        b--;
       }
     }
   }
