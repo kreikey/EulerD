@@ -451,30 +451,6 @@ auto getPythagoreanTriples(T)(T perimeter) if (isIntegral!T) {
   return triples;
 }
 
-auto getPythagoreanTriple(T)(T j, T k) if (isIntegral!T) {
-  assert (j > k && k > 0);
-
-  T m1, m2, a, b, c, l;
-  T jkdiff = j - k;
-
-  if (jkdiff % 2 == 0) {
-    m1 = jkdiff / 2;
-    m2 = 1;
-    c = (j^^2 + k^^2) / 2;
-  } else {
-    m1 = jkdiff;
-    m2 = 2;
-    c = j^^2 + k^^2;
-  }
-
-  a = m1*(j+k);
-  b = m2*j*k;
-  //c = cast(ulong)sqrt(real(a ^^ 2 + b^^2));
-  l = a + b + c;
-
-  return tuple(a, b, c, l);
-}
-
 auto countPythagoreanTriples(T)(T perimeter) if (isIntegral!T) {
   assert (perimeter > 0);
 
@@ -500,6 +476,30 @@ auto countPythagoreanTriples(T)(T perimeter) if (isIntegral!T) {
   } while (a > 0 && a < T.max);
 
   return count;
+}
+
+auto getPythagoreanTriple(T)(T j, T k) if (isIntegral!T) {
+  assert (j > k && k > 0);
+
+  T m1, m2, a, b, c, l;
+  T jkdiff = j - k;
+
+  if (jkdiff % 2 == 0) {
+    m1 = jkdiff / 2;
+    m2 = 1;
+    c = (j^^2 + k^^2) / 2;
+  } else {
+    m1 = jkdiff;
+    m2 = 2;
+    c = j^^2 + k^^2;
+  }
+
+  a = m1*(j+k);
+  b = m2*j*k;
+  //c = cast(ulong)sqrt(real(a ^^ 2 + b^^2));
+  l = a + b + c;
+
+  return tuple(a, b, c, l);
 }
 
 auto maximizePower(T)(Tuple!(T, T) number) if (isIntegral!T) {

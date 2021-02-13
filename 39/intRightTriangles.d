@@ -25,7 +25,7 @@ void main(string[] args) {
   writeln("integer right triangles");
 
   auto result = iota!ulong(4, pmax + 1, 2)
-    .map!(a => a, getTriplets)
+    .map!(a => a, getPythagoreanTriples)
     .map!(a => a[1].length, a => a[0], a => a[1])
     .fold!max();
 
@@ -40,3 +40,31 @@ void main(string[] args) {
   writefln("finished in %s milliseconds.", timer.peek().total!"msecs");
 }
 
+/*
+auto getPythagoreanTriples(T)(T perimeter) if (isIntegral!T) {
+  assert (perimeter > 0);
+
+  enum real pdiv = sqrt(real(2)) + 1;
+  Tuple!(T, T, T)[] triples = [];
+  T c = ceil(perimeter / pdiv).to!T();
+  T b = ceil(real(perimeter - c) / 2).to!T();
+  T a = perimeter - c - b;
+  T csq = c ^^ 2;
+  T absq = a ^^ 2 + b ^^ 2;
+
+  do {
+    if (absq == csq) {
+      triples ~= tuple(a, b, c);
+    } else if (absq > csq) {
+      c++;
+      a--;
+      csq = c ^^ 2;
+    }
+    b++;
+    a--;
+    absq = a ^^ 2 + b ^^ 2;
+  } while (a > 0 && a < T.max);
+
+  return triples;
+}
+*/
