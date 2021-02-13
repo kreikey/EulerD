@@ -52,6 +52,7 @@ void main() {
   }
 }
 
+/*
 auto getPythagoreanTriple(ulong j, ulong k) {
   ulong m1, m2, a, b, c, l;
   ulong jkdiff = j - k;
@@ -73,3 +74,4 @@ auto getPythagoreanTriple(ulong j, ulong k) {
 
   return tuple(a, b, c, l);
 }
+*/
