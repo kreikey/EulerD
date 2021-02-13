@@ -11,7 +11,6 @@ import kreikey.util;
 
 void main() {
   StopWatch timer;
-  timer.start();
   ulong maxLength = 1500000;
   ulong a = 0;
   ulong b = 0;
@@ -24,6 +23,9 @@ void main() {
   Tuple!(ulong, ulong, ulong, ulong)[] triangles;
   Tuple!(ulong, ulong, ulong, ulong) triangle;
   bool resultFound = true;
+
+  timer.start();
+  writeln("Single integer right triangles");
 
   for (ulong j = 2;; j++) {
     resultFound = false;
@@ -60,7 +62,6 @@ void main() {
     .writeln();
 
   timer.stop();
-
   writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
 }
 

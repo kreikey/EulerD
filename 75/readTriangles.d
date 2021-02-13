@@ -12,18 +12,27 @@ import std.format;
 import kreikey.intmath;
 import kreikey.util;
 
-void main() {
-  //StopWatch timer;
-  int a, b, c, p;
-  //Tuple!(int, int, int, int)[] triangles;
+void main(string[] args) {
+  StopWatch timer;
+  File inFile;
+  Tuple!(int, int, int, int)[] triangles;
 
-  //timer.start();
+  if (args.length > 1) {
+    try {
+      inFile = File(args[1]);
+    } catch (Exception e) {
+      writeln("Something went wrong. Exiting.");
+      writeln(e.msg);
+      return;
+    }
+  } else {
+    writeln("No file name given. Exiting");
+    return;
+  }
 
-  //foreach (l; File("numbers8.txt").byLine()) {
-    //l.formattedRead!"%d %d %d %d"(a, b, c, p);
-    //triangles ~= tuple(a, b, c, p);
-  //}
-  auto triangles = File("numbers9.txt")
+  timer.start();
+
+  triangles = inFile
     .byLine()
     .map!(a => a.split(" ").map!(to!int))
     .map!(a => a[0], a => a[1], a => a[2], a => a[3])
@@ -31,13 +40,12 @@ void main() {
 
   triangles.sort!((a, b) => a[3] < b[3])();
 
-  auto groups = triangles
+  auto count = triangles
     .group!((a, b) => a[3] == b[3])
-    .each!(a => writefln("%(%(%s %s %s %s%) %s%)", a))();
+    .filter!(a => a[1] == 1)
+    .count();
 
-  //groups.sort();
-  //groups.each!(a => writefln("%(%(%s %s %s %s%) %s%)", a))();
-
-  //timer.stop();
-  //writefln("finished in %s milliseconds.", timer.peek.total!"msecs"());
+  writeln(count);
+  timer.stop();
+  writefln("finished in %s milliseconds.", timer.peek.total!"msecs"());
 }
