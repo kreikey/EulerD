@@ -8,6 +8,7 @@ import std.algorithm;
 import std.conv;
 
 auto makePrimes(T = ulong)()
+
 if (isIntegral!T) {
   return new Primes!T();
 }

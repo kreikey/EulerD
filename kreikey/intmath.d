@@ -688,8 +688,7 @@ T getNonCoprimeCount(T)(T[] factors) if (isIntegral!T) {
     innerSum = 0;
 
     do {
-      //product = zip(factors, mask).fold!((a, b) => tuple(b[1] ? a[0] * b[0] : a[0], true))(tuple(1uL, true))[0];
-      product = zip(factors, mask).filter!(a => a[1]).map!(a => a[0]).fold!((a, b) => a * b)();
+      product = zip(factors, mask).filter!(a => a[1]).map!(a => a[0]).fold!((a, b) => a * b)(T(1));
       innerSum += product;
     } while (nextPermutation(mask));
 
@@ -708,8 +707,7 @@ T getTotient(T)(T number) if (isIntegral!T) {
   assert (number > 0);
 
   auto factorGroups = getPrimeFactorGroups(number);
-  //auto duplicateFactorProduct = factorGroups.fold!((a, b) => tuple(a[0] * b[0] ^^ (b[1] - 1), 1))(tuple(1uL, 1u))[0];
-  auto duplicateFactorProduct = factorGroups.map!(a => a[0] ^^ (a[1] - 1)).fold!((a, b) => a * b);
+  auto duplicateFactorProduct = factorGroups.map!(a => a[0] ^^ (a[1] - 1)).fold!((a, b) => a * b)(T(1));
   auto factors = factorGroups.map!(a => a[0]).array();
   T nonCoprimes = memoize!(getNonCoprimeCount!T)(factors);
   nonCoprimes *= duplicateFactorProduct;
@@ -759,7 +757,7 @@ T getTotientOld(T)(T number) if (isIntegral!T) {
 
 T[] getCoprimes(T)(T number) if (isIntegral!T) {
   T[] result;
-  T[] factors = makePrimes
+  T[] factors = makePrimes!T
     .until!((a, b) => a >= b)(number)
     .setDifference(getDistinctPrimeFactors(number))
     .array();
@@ -788,7 +786,7 @@ T[] getCoprimes(T)(T number) if (isIntegral!T) {
 
 auto multiTotientsInit(T)(T topNumber) if (isIntegral!T) {
   void getMultiTotients() {
-    T[] factors = makePrimes
+    T[] factors = makePrimes!T
       .until!((a, b) => a >= b)(topNumber)
       .array();
 

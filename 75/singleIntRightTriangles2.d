@@ -65,9 +65,12 @@ void main() {
   writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
 }
 
-auto getPythagoreanTriple(ulong j, ulong k) {
-  ulong m1, m2, a, b, c, l;
-  ulong jkdiff = j - k;
+/*
+auto getPythagoreanTriple(T)(T j, T k) if (isIntegral!T) {
+  assert (j > k && k > 0);
+
+  T m1, m2, a, b, c, l;
+  T jkdiff = j - k;
 
   if (jkdiff % 2 == 0) {
     m1 = jkdiff / 2;
@@ -86,3 +89,4 @@ auto getPythagoreanTriple(ulong j, ulong k) {
 
   return tuple(a, b, c, l);
 }
+*/

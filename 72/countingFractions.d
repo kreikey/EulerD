@@ -19,7 +19,7 @@ void main() {
 
   writeln("Counting fractions");
 
-  auto fractionCount = iota(2, 1000001)
+  auto fractionCount = iota(2uL, 1000001)
     .map!getTotient
     .sum();
 
@@ -31,20 +31,20 @@ void main() {
 }
 
 /*
-ulong getNonCoprimeCount(ulong[] factors) {
+T getNonCoprimeCount(T)(T[] factors) if (isIntegral!T) {
   bool[] mask = new bool[factors.length];
-  ulong product = 0;
-  ulong nonCoprimes = 0;
-  ulong innerSum = 0;
+  T product = 0;
+  T nonCoprimes = 0;
+  T innerSum = 0;
   bool subtract = false;
 
-  for (ulong k = 1; k <= factors.length; k++) {
+  for (T k = 1; k <= mask.length; k++) {
     mask[] = false;
     mask[k .. $] = true;
     innerSum = 0;
 
     do {
-      product = zip(factors, mask).fold!((a, b) => tuple(b[1] ? a[0] * b[0] : a[0], true))(tuple(1uL, true))[0];
+      product = zip(factors, mask).filter!(a => a[1]).map!(a => a[0]).fold!((a, b) => a * b)(T(1));
       innerSum += product;
     } while (nextPermutation(mask));
 
@@ -59,12 +59,13 @@ ulong getNonCoprimeCount(ulong[] factors) {
   return nonCoprimes;
 }
 
+T getTotient(T)(T number) if (isIntegral!T) {
+  assert (number > 0);
 
-ulong getTotient2(ulong number) {
   auto factorGroups = getPrimeFactorGroups(number);
-  auto duplicateFactorProduct = factorGroups.fold!((a, b) => tuple(a[0] * b[0] ^^ (b[1] - 1), 1))(tuple(1uL, 1u))[0];
+  auto duplicateFactorProduct = factorGroups.map!(a => a[0] ^^ (a[1] - 1)).fold!((a, b) => a * b)(T(1));
   auto factors = factorGroups.map!(a => a[0]).array();
-  ulong nonCoprimes = memoize!getNonCoprimeCount(factors);
+  T nonCoprimes = memoize!(getNonCoprimeCount!T)(factors);
   nonCoprimes *= duplicateFactorProduct;
 
   return number == 1 ? 1 : number - nonCoprimes;

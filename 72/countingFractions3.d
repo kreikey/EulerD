@@ -13,7 +13,7 @@ import kreikey.primes;
 
 void main() {
   StopWatch timer;
-  auto multiTotients = getMultiTotientsInit(1000000);
+  auto multiTotients = multiTotientsInit!ulong(1000000);
   auto totientPairs = new Generator!(Tuple!(ulong, ulong))(multiTotients);
 
   timer.start();
@@ -34,20 +34,50 @@ void main() {
 }
 
 /*
-long getNonCoprimeCount(ulong[] factors) {
+auto multiTotientsInit(T)(T topNumber) if (isIntegral!T) {
+  void getMultiTotients() {
+    T[] factors = makePrimes!T
+      .until!((a, b) => a >= b)(topNumber)
+      .array();
+
+    void inner(T baseNumber, T multiplier, T[] someFactors, T[] distinctFactors) {
+      T totient = multiplier * (baseNumber - memoize!(getNonCoprimeCount!T)(distinctFactors[1 .. $]));
+
+      yield(tuple(T(baseNumber * multiplier), T(totient)));
+
+      foreach (i, f; someFactors) {
+        if (baseNumber * multiplier * f > topNumber)
+          break;
+
+        if (f == distinctFactors[$-1])
+          inner(baseNumber, multiplier * f, someFactors[i .. $], distinctFactors);
+        else
+          inner(baseNumber * f, multiplier, someFactors[i .. $], distinctFactors ~ f);
+      }
+    }
+
+    inner(1, 1, factors, [1]);
+  }
+
+  assert (topNumber > 0);
+
+  return &getMultiTotients;
+}
+
+T getNonCoprimeCount(T)(T[] factors) if (isIntegral!T) {
   bool[] mask = new bool[factors.length];
-  ulong product = 0;
-  ulong nonCoprimes = 0;
-  ulong innerSum = 0;
+  T product = 0;
+  T nonCoprimes = 0;
+  T innerSum = 0;
   bool subtract = false;
 
-  for (ulong k = 1; k <= factors.length; k++) {
+  for (T k = 1; k <= mask.length; k++) {
     mask[] = false;
     mask[k .. $] = true;
     innerSum = 0;
 
     do {
-      product = zip(factors, mask).fold!((a, b) => tuple(b[1] ? a[0] * b[0] : a[0], true))(tuple(1uL, true))[0];
+      product = zip(factors, mask).filter!(a => a[1]).map!(a => a[0]).fold!((a, b) => a * b)(T(1));
       innerSum += product;
     } while (nextPermutation(mask));
 

@@ -30,36 +30,6 @@ void main() {
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }
 
-/*
-ulong getNonCoprimeCount(ulong[] factors) {
-  bool[] mask = new bool[factors.length];
-  ulong product = 0;
-  ulong nonCoprimes = 0;
-  ulong innerSum = 0;
-  bool subtract = false;
-
-  for (ulong k = 1; k <= factors.length; k++) {
-    mask[] = false;
-    mask[k .. $] = true;
-    innerSum = 0;
-
-    do {
-      product = zip(factors, mask).fold!((a, b) => tuple(b[1] ? a[0] * b[0] : a[0], true))(tuple(1uL, true))[0];
-      innerSum += product;
-    } while (nextPermutation(mask));
-
-    if (subtract)
-      nonCoprimes -= innerSum;
-    else
-      nonCoprimes += innerSum;
-
-    subtract = !subtract;
-  }
-
-  return nonCoprimes;
-}
-*/
-
 ulong getTotientsSum(ulong topNumber) {
   ulong sum = 0;
   ulong[] factors = makePrimes
@@ -67,7 +37,7 @@ ulong getTotientsSum(ulong topNumber) {
     .array();
 
   void inner(ulong baseNumber, ulong multiplier, ulong[] someFactors, ulong[] distinctFactors) {
-    ulong totient = baseNumber == 1 ? 1 : multiplier * (baseNumber - memoize!getNonCoprimeCount(distinctFactors[1..$]));
+    ulong totient = baseNumber == 1 ? 1 : multiplier * (baseNumber - memoize!(getNonCoprimeCount!ulong)(distinctFactors[1..$]));
     sum += totient;
 
     foreach (i, f; someFactors) {
@@ -85,3 +55,33 @@ ulong getTotientsSum(ulong topNumber) {
 
   return sum;
 }
+
+/*
+T getNonCoprimeCount(T)(T[] factors) if (isIntegral!T) {
+  bool[] mask = new bool[factors.length];
+  T product = 0;
+  T nonCoprimes = 0;
+  T innerSum = 0;
+  bool subtract = false;
+
+  for (T k = 1; k <= mask.length; k++) {
+    mask[] = false;
+    mask[k .. $] = true;
+    innerSum = 0;
+
+    do {
+      product = zip(factors, mask).filter!(a => a[1]).map!(a => a[0]).fold!((a, b) => a * b)(T(1));
+      innerSum += product;
+    } while (nextPermutation(mask));
+
+    if (subtract)
+      nonCoprimes -= innerSum;
+    else
+      nonCoprimes += innerSum;
+
+    subtract = !subtract;
+  }
+
+  return nonCoprimes;
+}
+*/

@@ -10,15 +10,10 @@ import kreikey.intmath;
 import kreikey.combinatorics;
 
 alias isPermutation = kreikey.combinatorics.isPermutation;
-typeof(isPrimeInit()) isPrime;
-
-static this() {
-  isPrime = isPrimeInit();
-}
 
 void main() {
   StopWatch timer;
-  auto totientPairs = new Generator!(Tuple!(ulong, ulong))(getMultiTotientsInit(10000000));
+  auto totientPairs = new Generator!(Tuple!(ulong, ulong))(multiTotientsInit!ulong(10000000));
 
   timer.start();
   writeln("Totient permutation");
