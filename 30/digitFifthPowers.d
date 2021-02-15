@@ -6,7 +6,8 @@ import std.range;
 import std.algorithm;
 import std.conv;
 import kreikey.intmath;
-import kreikey.bytemath;
+import kreikey.digits;
+import kreikey.util;
 
 enum exponent = 5;
 
@@ -25,7 +26,7 @@ void main() {
 
   do {
     sum = digits.map!(a => a ^^ exponent).sum();
-    sumDigs = sum.toDigits.asortDescending();
+    sumDigs = sum.toDigits.asort!((a, b) => a > b)();
 
     if (sum != 1 && digits == sumDigs)
       sums ~= sum;

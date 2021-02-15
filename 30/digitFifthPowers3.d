@@ -6,7 +6,8 @@ import std.range;
 import std.algorithm;
 import std.conv;
 import kreikey.intmath;
-import kreikey.bytemath;
+import kreikey.digits;
+import kreikey.util;
 
 enum exponent = 5;
 

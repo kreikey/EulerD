@@ -72,7 +72,7 @@ ulong countFactorialDigitChainsWithLength(int maxDigs, int chainLength) {
     .zip(repeat(true))
     .assocArray();
 
-  auto sortedDigits = new Generator!(uint[])(getSortedDigitsInit!uint(1, maxDigs));
+  auto sortedDigits = new Generator!(uint[])(sortedDigitsInit!uint(1, maxDigs));
   uint[][] specialDigits;
   ulong number = 0;
 
@@ -126,7 +126,7 @@ ulong countFactorialDigitChainsWithLength2(int maxDigs, int chainLength) {
     .zip(repeat(true))
     .assocArray();
 
-  auto sortedDigits = new Generator!(uint[])(getSortedDigitsInit!uint(1, maxDigs));
+  auto sortedDigits = new Generator!(uint[])(sortedDigitsInit!uint(1, maxDigs));
   uint[][] specialDigits;
   auto localChainLength = 0;
 

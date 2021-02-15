@@ -47,7 +47,7 @@ void main(string[] args) {
   writefln("The number of digit factorial chains below %s", repeat(9u).take(maxDigs).array.toNumber() + 1);
   writefln("with %s non-repeating terms is:", chainLength);
 
-  auto sortedDigits = new Generator!(uint[])(getSortedDigitsInit!uint(1, maxDigs));
+  auto sortedDigits = new Generator!(uint[])(sortedDigitsInit!uint(1, maxDigs));
   auto chainLengthGroups = factDigChainLenGroupsInit();
 
   ulong number = sortedDigits

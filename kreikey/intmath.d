@@ -816,11 +816,11 @@ auto getMultiTotientsInit(T)(T topNumber) if (isIntegral!T) {
   return &getMultiTotients;
 }
 
-auto getSortedDigitsInit(T)(T lowerUpper) if (isIntegral!T) {
+auto sortedDigitsInit(T)(T lowerUpper) if (isIntegral!T) {
   return getSortedDigitsInit(lowerUpper, lowerUpper);
 }
 
-auto getSortedDigitsInit(T)(T lower, T upper) if (isIntegral!T) {
+auto sortedDigitsInit(T)(T lower, T upper) if (isIntegral!T) {
   assert (lower > 0);
   assert (lower <= upper);
   T[] digits;
