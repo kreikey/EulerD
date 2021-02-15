@@ -786,7 +786,7 @@ T[] getCoprimes(T)(T number) if (isIntegral!T) {
   return result;
 }
 
-auto getMultiTotientsInit(T)(T topNumber) if (isIntegral!T) {
+auto multiTotientsInit(T)(T topNumber) if (isIntegral!T) {
   void getMultiTotients() {
     T[] factors = makePrimes
       .until!((a, b) => a >= b)(topNumber)

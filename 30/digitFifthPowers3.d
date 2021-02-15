@@ -9,8 +9,6 @@ import kreikey.intmath;
 import kreikey.digits;
 import kreikey.util;
 
-enum exponent = 5;
-
 void main() {
   StopWatch timer;
   enum maxDigits = getMaxDigits();
@@ -26,7 +24,7 @@ void main() {
     .array
     .sort
     .uniq
-    .map!((a => a), (a => a.fold!((a, b) => a + b ^^ exponent)(0uL)))
+    .map!(a => a, a => a.fold!((a, b) => a + b ^^ 5)(0uL))
     .filter!(a => a[0] == a[1].toDigits.asort())
     .map!(a => a[1])
     .array();
@@ -46,7 +44,7 @@ ulong getMaxDigits() {
   do {
     sum = 0;
     digits ~= 9;
-    sum = digits.map!(a => a ^^ exponent).sum();
+    sum = digits.map!(a => a ^^ 5).sum();
   } while (digits.length <= sum.toDigits().length);
 
   return digits.length - 1;

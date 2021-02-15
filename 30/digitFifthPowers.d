@@ -9,8 +9,6 @@ import kreikey.intmath;
 import kreikey.digits;
 import kreikey.util;
 
-enum exponent = 5;
-
 void main() {
   StopWatch timer;
   uint[] digits;
@@ -25,7 +23,7 @@ void main() {
   digits ~= 1;
 
   do {
-    sum = digits.map!(a => a ^^ exponent).sum();
+    sum = digits.map!(a => a ^^ 5).sum();
     sumDigs = sum.toDigits.asort!((a, b) => a > b)();
 
     if (sum != 1 && digits == sumDigs)
@@ -52,7 +50,7 @@ ulong getMaxDigits() {
   do {
     sum = 0;
     digits ~= 9;
-    sum = digits.map!(a => a ^^ exponent).sum();
+    sum = digits.map!(a => a ^^ 5).sum();
   } while (digits.length <= sum.toDigits().length);
 
   return digits.length - 1;

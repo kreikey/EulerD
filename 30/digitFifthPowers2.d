@@ -8,8 +8,6 @@ import std.conv;
 import kreikey.intmath;
 import kreikey.digits;
 
-enum exponent = 5;
-
 void main() {
   StopWatch timer;
   enum maxDigits = getMaxDigits();
@@ -20,7 +18,7 @@ void main() {
   timer.start();
 
   sums = iota(2, topNumber)
-    .filter!(x => x.toDigits.fold!((a, b) => a + b ^^ exponent)(0uL) == x)
+    .filter!(x => x.toDigits.fold!((a, b) => a + b ^^ 5)(0uL) == x)
     .array();
 
   writefln("The numbers that can be written as the sum of fifth powers of their digits are:\n%(%s, %)", sums);
@@ -36,7 +34,7 @@ ulong getMaxDigits() {
   do {
     sum = 0;
     digits ~= 9;
-    sum = digits.map!(a => a ^^ exponent).sum();
+    sum = digits.map!(a => a ^^ 5).sum();
   } while (digits.length <= sum.toDigits().length);
 
   return digits.length - 1;
