@@ -35,15 +35,16 @@ void main() {
 }
 
 /*
-ulong[] getCoprimes(ulong number) {
-  ulong[] result;
-  ulong[] factors = makePrimes
+T[] getCoprimes(T)(T number) if (isIntegral!T) {
+  T[] result;
+  assert (number > 0);
+  T[] factors = makePrimes!T
     .until!((a, b) => a >= b)(number)
-    .setDifference(distinctPrimeFactors(number))
+    .setDifference(getDistinctPrimeFactors(number))
     .array();
 
-  void inner(ulong product, ulong[] someFactors) {
-    ulong nextProduct;
+  void inner(T product, T[] someFactors) {
+    T nextProduct;
 
     result ~= product;
 
@@ -56,6 +57,7 @@ ulong[] getCoprimes(ulong number) {
       inner(nextProduct, someFactors[i .. $]);
     }
   }
+
 
   inner(1, factors);
 

@@ -717,7 +717,6 @@ T getTotient(T)(T number) if (isIntegral!T) {
 
 T getTotientOld(T)(T number) if (isIntegral!T) {
   assert (number > 0);
-
   T[] factors = getDistinctPrimeFactors(number);
 
   T exclusiveMultiples(T factor, T[] moreFactors) {
@@ -757,6 +756,7 @@ T getTotientOld(T)(T number) if (isIntegral!T) {
 
 T[] getCoprimes(T)(T number) if (isIntegral!T) {
   T[] result;
+  assert (number > 0);
   T[] factors = makePrimes!T
     .until!((a, b) => a >= b)(number)
     .setDifference(getDistinctPrimeFactors(number))
@@ -777,7 +777,6 @@ T[] getCoprimes(T)(T number) if (isIntegral!T) {
     }
   }
 
-  assert (number > 0);
 
   inner(1, factors);
 
