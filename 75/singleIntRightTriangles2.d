@@ -15,10 +15,7 @@ void main() {
   ulong a = 0;
   ulong b = 0;
   ulong c = 0;
-  ulong m1 = 0;
-  ulong m2 = 0;
-  ulong m3 = 0;
-  ulong jkdiff;
+  ulong m = 0;
   ulong l = 0;
   Tuple!(ulong, ulong, ulong, ulong)[] triangles;
   Tuple!(ulong, ulong, ulong, ulong) triangle;
@@ -42,12 +39,12 @@ void main() {
         continue;
 
       resultFound = true;
-      m3 = 1;
+      m = 1;
 
       do {
-        triangles ~= tuple(a * m3, b * m3, c * m3, l * m3);
-        m3++;
-      } while (l * m3 <= maxLength);
+        triangles ~= tuple(a * m, b * m, c * m, l * m);
+        m++;
+      } while (l * m <= maxLength);
     }
 
     if (!resultFound && j % 2 == 1)

@@ -15,12 +15,8 @@ void main() {
   ulong a = 0;
   ulong b = 0;
   ulong c = 0;
-  ulong m1 = 0;
-  ulong m2 = 0;
-  ulong m3 = 0;
-  ulong jkdiff;
+  ulong m = 0;
   ulong l = 0;
-  Tuple!(ulong, ulong, ulong, ulong)[] triangles;
   Tuple!(ulong, ulong, ulong, ulong) triangle;
   bool resultFound = true;
 
@@ -39,12 +35,12 @@ void main() {
         continue;
 
       resultFound = true;
-      m3 = 1;
+      m = 1;
 
       do {
-        writeln(a * m3, " ", b * m3, " ", c * m3, " ", l * m3);
-        m3++;
-      } while (l * m3 <= maxLength);
+        writeln(a * m, " ", b * m, " ", c * m, " ", l * m);
+        m++;
+      } while (l * m <= maxLength);
     }
 
     if (!resultFound && j % 2 == 1)
@@ -53,9 +49,11 @@ void main() {
 }
 
 /*
-auto getPythagoreanTriple(ulong j, ulong k) {
-  ulong m1, m2, a, b, c, l;
-  ulong jkdiff = j - k;
+auto getPythagoreanTriple(T)(T j, T k) if (isIntegral!T) {
+  assert (j > k && k > 0);
+
+  T m1, m2, a, b, c, l;
+  T jkdiff = j - k;
 
   if (jkdiff % 2 == 0) {
     m1 = jkdiff / 2;
