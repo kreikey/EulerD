@@ -32,10 +32,6 @@ void main() {
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }
 
-string genFigurateLambda(int mul) {
-  return q{(s, n) => s[n-1] + %s * n + 1}.format(mul);
-}
-
 bool mayCycle(ulong number) {
   return number % 100 > 9;
 }
@@ -127,16 +123,18 @@ ulong[][ulong] getCyclablesByDigits(ulong[] fourDigitNumbers) {
     .assocArray();
 }
 
-//auto isFigurateInit(alias generator)() {
-  //auto temp = generator();
-  //bool[ulong] cache = null;
+/*
+auto isFigurateInit(alias generator)() {
+  auto temp = generator();
+  bool[ulong] cache = null;
 
-  //return delegate(ulong num) {
-    //auto figurates = refRange(&temp);
-    //if (figurates.front <= num)
-      //figurates.until!(a => a > num)
-        //.each!(a => cache[a] = true)();
+  return delegate(ulong num) {
+    auto figurates = refRange(&temp);
+    if (figurates.front <= num)
+      figurates.until!(a => a > num)
+        .each!(a => cache[a] = true)();
 
-    //return num in cache ? true : false;
-  //};
-//}
+    return num in cache ? true : false;
+  };
+}
+*/
