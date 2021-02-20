@@ -11,7 +11,6 @@ import std.conv;
 import std.typecons;
 import std.functional;
 import std.concurrency;
-import kreikey.bytemath;
 import kreikey.stack;
 import kreikey.digits;
 import kreikey.combinatorics;
@@ -420,6 +419,33 @@ auto getPythagoreanTriples(T)(T perimeter) if (isIntegral!T) {
     a--;
     absq = a ^^ 2 + b ^^ 2;
   } while (a > 0 && a < T.max);
+
+  return triples;
+}
+
+auto getPythagoreanTriples2(T)(T perimeter) if (isIntegral!T) {
+  assert (perimeter > 0);
+
+  Tuple!(T, T, T)[] triples = [];
+  T c = 0;
+  T b = 0;
+  T a = 0;
+  T divisor = 0;
+  T dividend = 0;
+  //T csq = c ^^ 2;
+  //T absq = a ^^ 2 + b ^^ 2;
+
+
+  for (a = 1; a < perimeter/2; a++) {
+    divisor = perimeter * (perimeter / 2 - a);
+    dividend = (perimeter - a);
+    if (divisor % dividend == 0) {
+      b = divisor / dividend;
+      c = perimeter - a - b;
+      triples ~= tuple(a, b, c);
+      break;
+    }
+  }
 
   return triples;
 }

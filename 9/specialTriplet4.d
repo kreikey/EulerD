@@ -4,18 +4,21 @@ import std.stdio;
 import std.conv;
 import std.math;
 import std.datetime.stopwatch;
-import std.typecons;
-import std.algorithm;
-import std.range;
 import kreikey.intmath;
 
 void main(string[] args) {
-  StopWatch timer;
+  ulong a;
+  ulong b;
+  ulong c;
   ulong p = 1000;
+  ulong divisor;
+  ulong dividend;
 
   if (args.length > 1) {
     p = parse!ulong(args[1]);
   }
+
+  StopWatch timer;
 
   timer.start();
   writeln("special pythagorean triplet");
@@ -25,12 +28,14 @@ void main(string[] args) {
     return;
   }
 
-  auto triplets = getPythagoreanTriples(p);
+  auto triples = getPythagoreanTriples(p);
 
-  if (triplets.length > 0) {
-    ulong tripletProduct = only(triplets[0].expand).fold!((a, b) => a * b)();
-    writefln("%s^2 + %s^2 = %s^2", triplets[0].expand);
-    writefln("%s * %s * %s = %s", triplets[0].expand, tripletProduct);
+  if (triples.length > 0) {
+    a = triples[0][0];
+    b = triples[0][1];
+    c = triples[0][2];
+    writefln("%s^2 + %s^2 = %s^2", a, b, c);
+    writefln("%s * %s * %s = %s", a, b, c, a * b * c);
   } else {
     writeln("no pythagorean triplet found");
   }
@@ -38,4 +43,3 @@ void main(string[] args) {
   timer.stop();
   writefln("finished in %s milliseconds.", timer.peek().total!"msecs");
 }
-

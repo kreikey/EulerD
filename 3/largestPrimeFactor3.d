@@ -8,7 +8,7 @@ import kreikey.primes;
 import kreikey.intmath;
 import std.functional;
 
-alias primeFactors = memoize!(primeFactors2!ulong);
+alias primeFactors = memoize!(getPrimeFactors!ulong);
 
 void main () {
   StopWatch timer;
