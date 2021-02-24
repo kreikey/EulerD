@@ -103,9 +103,9 @@ T nChooseK(T)(T n, T k)
 if (isIntegral!T || is(T == BigInt)) {
   alias NK = Tuple!(T, "n", T, "k");
   static if (is(T == BigInt) || isSigned!T)
-    alias keepSumming = (NK left, NK right) => (left.k >= 0 && right.k <= right.n);
+    alias keepSumming = (NK left, NK right) => left.k >= 0 && right.k <= right.n;
   else
-    alias keepSumming = (NK left, NK right) => (left.k < T.max && right.k <= right.n);
+    alias keepSumming = (NK left, NK right) => left.k < T.max && right.k <= right.n;
 
   assert(k <= n);
 

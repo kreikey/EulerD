@@ -398,43 +398,12 @@ T factorial(T)(T number) if (isIntegral!T) {
 
 auto getPythagoreanTriples(T)(T perimeter) if (isIntegral!T) {
   assert (perimeter > 0);
-
-  enum real pdiv = sqrt(real(2)) + 1;
-  Tuple!(T, T, T)[] triples = [];
-  T c = ceil(perimeter / pdiv).to!T();
-  T b = ceil(real(perimeter - c) / 2).to!T();
-  T a = perimeter - c - b;
-  T csq = c ^^ 2;
-  T absq = a ^^ 2 + b ^^ 2;
-
-  do {
-    if (absq == csq) {
-      triples ~= tuple(a, b, c);
-    } else if (absq > csq) {
-      c++;
-      a--;
-      csq = c ^^ 2;
-    }
-    b++;
-    a--;
-    absq = a ^^ 2 + b ^^ 2;
-  } while (a > 0 && a < T.max);
-
-  return triples;
-}
-
-auto getPythagoreanTriples2(T)(T perimeter) if (isIntegral!T) {
-  assert (perimeter > 0);
-
   Tuple!(T, T, T)[] triples = [];
   T c = 0;
   T b = 0;
   T a = 0;
   T divisor = 0;
   T dividend = 0;
-  //T csq = c ^^ 2;
-  //T absq = a ^^ 2 + b ^^ 2;
-
 
   for (a = 1; a < perimeter/2; a++) {
     divisor = perimeter * (perimeter / 2 - a);
