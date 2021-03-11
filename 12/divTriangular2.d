@@ -11,7 +11,7 @@ import kreikey.intmath;
 void main(string[] args) {
   StopWatch timer;
   int topNum = 500;
-  auto triangulars = FigGen!(Figurate.triangular)(1);
+  auto triangulars = Triangulars(1);
 
   if (args.length > 1)
     topNum = args[1].parse!(int);
