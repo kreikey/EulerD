@@ -23,14 +23,14 @@ ulong countSummations(uint sum) {
   ulong count = 0;
 
   void inner(uint piece, uint runningSum) {
-    if (runningSum >= sum) {
-      if (runningSum == sum)
+    for (uint n = 1; n <= piece; n++) {
+      if (runningSum + n == sum) {
         count++;
-      return;
+        break;
+      } else {
+        inner(n, runningSum + n);
+      }
     }
-
-    for (uint n = 1; n <= piece; n++)
-      inner(n, runningSum + n);
   }
 
   for (uint n = 1; n < sum; n++)
