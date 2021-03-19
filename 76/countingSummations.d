@@ -29,12 +29,12 @@ ulong countSummations(uint sum) {
       return;
     }
 
-    for (uint n = piece; n > 0; n--) {
+    for (uint n = 1; n <= piece; n++)
       inner(n, runningSum + n);
-    }
   }
 
-  inner(sum - 1, 0);
+  for (uint n = 1; n < sum; n++)
+    inner(n, n);
 
   return count;
 }
