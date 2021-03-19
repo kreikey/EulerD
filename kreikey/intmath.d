@@ -401,27 +401,25 @@ auto getPythagoreanTriples(T)(T perimeter) if (isIntegral!T) {
 }
 
 auto countPythagoreanTriples(T)(T perimeter) if (isIntegral!T) {
-  assert (perimeter > 0);
-  enum real pdiv = sqrt(real(2)) + 1;
-  T c = ceil(perimeter / pdiv).to!T();
-  T b = ceil(real(perimeter - c) / 2).to!T();
-  T a = perimeter - c - b;
-  T csq = c ^^ 2;
-  T absq = a ^^ 2 + b ^^ 2;
   T count = 0;
+  assert (perimeter > 0);
+  Tuple!(T, T, T)[] triples = [];
+  T c = 0;
+  T b = 0;
+  T a = 0;
+  T divisor = 0;
+  T dividend = 0;
 
-  do {
-    if (absq == csq) {
+  for (a = 1; a < perimeter/2; a++) {
+    divisor = perimeter * (perimeter / 2 - a);
+    dividend = (perimeter - a);
+    if (divisor % dividend == 0) {
+      b = divisor / dividend;
+      c = perimeter - a - b;
       count++;
-    } else if (absq > csq) {
-      c++;
-      a--;
-      csq = c ^^ 2;
+      break;
     }
-    b++;
-    a--;
-    absq = a ^^ 2 + b ^^ 2;
-  } while (a > 0 && a < T.max);
+  }
 
   return count;
 }
