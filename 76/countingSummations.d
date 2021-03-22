@@ -10,6 +10,8 @@ import kreikey.intmath;
 void main() {
   StopWatch timer;
   
+  writeln("Counting summations");
+
   timer.start();
 
   countSummations(100)
@@ -22,15 +24,18 @@ void main() {
 ulong countSummations(uint sum) {
   ulong count = 0;
 
-  void inner(uint piece, uint runningSum) {
-    for (uint n = 1; n <= piece; n++) {
-      if (runningSum + n == sum) {
-        count++;
-        break;
-      } else {
-        inner(n, runningSum + n);
-      }
+  bool inner(uint piece, uint runningSum) {
+    if (runningSum == sum) {
+      count++;
+      return true;
     }
+
+    for (uint n = 1; n <= piece; n++) {
+      if (inner(n, runningSum + n))
+        break;
+    }
+
+    return false;
   }
 
   for (uint n = 1; n < sum; n++)

@@ -12,10 +12,20 @@ void main() {
   StopWatch timer;
   auto countPrimeSummations = countPrimeSummationsInit();
   
+  writeln("Prime summations");
+
   timer.start();
 
-  countPrimeSummations(10)
-    .writeln();
+  ulong m = 0;
+  uint result = 0;
+  for (uint n = 4;; n++) {
+    m = countPrimeSummations(n);
+    result = n;
+    if (m > 5000)
+      break;
+  }
+
+  writeln(result);
 
   timer.stop();
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
@@ -26,19 +36,24 @@ auto primes = makePrimes!uint();
 ulong countPrimeSummations(uint sum) {
   ulong count = 0;
 
-  void inner(uint piece, uint runningSum) {
-    if (runningSum >= sum) {
-      if (runningSum == sum)
-        count++;
-      return;
+  bool inner(uint piece, uint runningSum) {
+    if (runningSum == sum) {
+      count++;
+      return true;
+    } else if (runningSum > sum) {
+      return true;
     }
 
-    for (uint n = piece; n > 0; n--) {
-      inner(n, runningSum + n);
+    for (uint i = 0; primes[i] <= piece; i++) {
+      if (inner(primes[i], runningSum + primes[i]))
+        break;
     }
+
+    return false;
   }
 
-  inner(sum - 1, 0);
+  for (uint i = 0; primes[i] < sum; i++)
+    inner(primes[i], primes[i]);
 
   return count;
 }
