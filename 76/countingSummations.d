@@ -38,8 +38,7 @@ ulong countSummations(uint sum) {
     return false;
   }
 
-  for (uint n = 1; n < sum; n++)
-    inner(n, n);
+  inner(sum - 1, 0);
 
   return count;
 }
