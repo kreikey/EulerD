@@ -4,7 +4,6 @@ import std.datetime.stopwatch;
 import std.array;
 import std.algorithm;
 import kreikey.bytemath;
-import kreikey.digits;
 
 void main(string[] args) {
   StopWatch timer;

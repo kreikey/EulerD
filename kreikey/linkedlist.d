@@ -36,7 +36,7 @@ template LinkedList(T) {
         item.prev.next = item;
       if (item.next == first)
         first = item;
-      else if (item.prev == last)
+      if (item.prev == last)
         last = item;
 
       length++;
@@ -162,6 +162,10 @@ template LinkedList(T) {
       return ByItemResult(&this);
     }
 
+    auto byNode() @property {
+      return ByNodeResult(&this);
+    }
+
     auto opSlice() {
       return ByItemResult(&this);
     }
@@ -224,6 +228,101 @@ template LinkedList(T) {
         throw new Exception("Attempting to fetch the back of an empty LinkedList range of " ~ T.stringof);
 
       return backNode.payload;
+    }
+
+    void popBack() {
+      if (_empty)
+        return;
+
+      if (frontNode == backNode)
+        _empty = true;
+
+      backNode = backNode.prev;
+
+      if (backNode)
+        myList.cur = backNode;
+    }
+
+    bool empty() @property {
+      return _empty;
+    }
+
+    auto save() @property {
+      auto copy = this;
+      return copy;
+    }
+
+    //T removeFront() {
+      //if (_empty)
+        //throw new Exception("Attempting to removeFront() from an empty LinkedList range of " ~ T.stringof);
+
+      //Node* myNode = myList.remove(frontNode);
+
+      //return myNode.payload;
+    //}
+
+    //T removeBack() {
+      //if (_empty)
+        //throw new Exception("Cannot removeBack() from an empty LinkedList range of " ~ T.stringof);
+
+      //Node* myNode = myList.remove(backNode);
+
+      //return myNode.payload;
+    //}
+
+    //void insertFront(T value) {
+      //Node* item = new Node(value);
+      //Node* temp = frontNode.prev;
+      //myList.insert(item, temp);
+      //frontNode = item;
+    //}
+
+    //void insertBack(T value) {
+      //Node* item = new Node(value);
+      //myList.insert(item, backNode);
+      //backNode = item;
+    //}
+  }
+
+  private struct ByNodeResult {
+    LinkedList* myList;
+    Node* frontNode;
+    Node* backNode;
+    bool _empty;
+
+    this(LinkedList* _myList) {
+      frontNode = _myList.first;
+      backNode = _myList.last;
+      _empty = frontNode == null && backNode == null;
+      myList = _myList;
+      myList.cur = frontNode;
+    }
+
+    Node* front() @property {
+      if (_empty)
+        throw new Exception("Attempting to fetch the front of an empty LinkedList range of " ~ T.stringof);
+
+      return frontNode;
+    }
+
+    void popFront() {
+      if (_empty)
+        return;
+
+      if (frontNode == backNode)
+        _empty = true;
+
+      frontNode = frontNode.next;
+
+      if (frontNode)
+        myList.cur = frontNode;
+    }
+
+    Node* back() @property {
+      if (_empty)
+        throw new Exception("Attempting to fetch the back of an empty LinkedList range of " ~ T.stringof);
+
+      return backNode;
     }
 
     void popBack() {

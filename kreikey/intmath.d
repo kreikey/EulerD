@@ -401,8 +401,8 @@ auto getPythagoreanTriples(T)(T perimeter) if (isIntegral!T) {
 }
 
 auto countPythagoreanTriples(T)(T perimeter) if (isIntegral!T) {
-  T count = 0;
   assert (perimeter > 0);
+  T count = 0;
   Tuple!(T, T, T)[] triples = [];
   T c = 0;
   T b = 0;
