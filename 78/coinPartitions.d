@@ -27,7 +27,7 @@ void main() {
   BigInt x = 1;
 
   do {
-    //writeln(n, " : ", countPartitions2(n));
+    //x = countPartitions2(n);
     x = countPartitions1(n);
     writeln(n, " : ", x);
     n++;
