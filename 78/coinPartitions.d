@@ -31,7 +31,7 @@ void main() {
     x = countPartitions1(n);
     writeln(n, " : ", x);
     n++;
-  } while (n <= 2001);
+  } while (n <= 2000);
 
 
   timer.stop();
@@ -51,9 +51,8 @@ ulong countPartitions2(uint num) {
       return;
     }
 
-    for (uint n = numbers[$-1]; n > 0; n--) {
+    for (uint n = numbers[$-1]; n > 0; n--)
       inner(numbers ~ n, total + n);
-    }
   }
 
   for (uint n = num; n > 0; n--)
@@ -68,16 +67,27 @@ BigInt countPartitions1(uint num) {
 
 BigInt countPartitionsWithSize(uint num, uint size) {
   BigInt count = 0;
+  assert (size <= num);
 
   if (num == 0 || num == 1 || size == 1)
     return BigInt(1);
 
-  if (size > num)
-    size = num;
-
-  foreach (n; num - size .. num) {
-    count += memoize!countPartitionsWithSize(n, num - n);
+  if (size == num) {
+    count += memoize!countPartitionsRange(num / 2);
+    foreach (n; num / 2 + 1 .. num)
+      count += memoize!countPartitionsWithSize(n, num - n);
+    return count;
   }
 
+  foreach (n; num - size .. num)
+    count += memoize!countPartitionsWithSize(n, (num - n) > n ? n : (num - n));
+
   return count;
+}
+
+BigInt countPartitionsRange(uint num) {
+  if (num == 0)
+    return countPartitions1(num);
+
+  return memoize!countPartitionsRange(num - 1) + countPartitions1(num);
 }
