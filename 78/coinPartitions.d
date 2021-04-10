@@ -5,8 +5,10 @@ import std.datetime.stopwatch;
 import std.conv;
 import std.algorithm;
 import std.range;
+import std.experimental.checkedint;
 import kreikey.intmath;
 import kreikey.linkedlist;
+import kreikey.bigint;
 import std.functional;
 
 struct NumSum {
@@ -22,28 +24,28 @@ void main() {
   timer.start();
 
   uint n = 1;
-  ulong x = 1;
+  BigInt x = 1;
 
   do {
-    writeln(n, " : ", countPartitions3(n));
-    //writeln(n, " : ", memoize!countPartitions2(n));
+    //writeln(n, " : ", countPartitions2(n));
+    x = countPartitions1(n);
+    writeln(n, " : ", x);
     n++;
-  } while (x % 1000000 != 0);
+  } while (n <= 2001);
 
-  countPartitions3(5);
 
   timer.stop();
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }
 
-ulong countPartitions3(uint num) {
+ulong countPartitions2(uint num) {
   ulong count = 0;
 
   void inner(uint[] numbers, uint total) {
 
     if (total >= num) {
       if (total == num) {
-        writeln(numbers);
+        //writeln(numbers);
         count++;
       }
       return;
@@ -60,61 +62,21 @@ ulong countPartitions3(uint num) {
   return count;
 }
 
-ulong countPartitions1(uint num) {
-  return countPartitionsWithSize(num, num);
+BigInt countPartitions1(uint num) {
+  return memoize!countPartitionsWithSize(num, num);
 }
 
-ulong countPartitions2(uint num) {
-  ulong count = 0;
-  uint left = num, right = 0;
+BigInt countPartitionsWithSize(uint num, uint size) {
+  BigInt count = 0;
 
-  if (num < 2)
-    return 1;
+  if (num == 0 || num == 1 || size == 1)
+    return BigInt(1);
 
-  do {
-    if (left >= right) {
-      count += memoize!countPartitions1(right);
-    } else {
-      count += memoize!countPartitionsWithSize(right, left);
-    }
-    left--;
-    right++;
-  } while (left > 0);
+  if (size > num)
+    size = num;
 
-  return count;
-}
-
-ulong countPartitionsWithSize(uint num, uint size) {
-  ulong count = 0;
-
-  bool inner(uint piece, uint runningSum) {
-    if (runningSum == num) {
-      count++;
-      return true;
-    }
-
-    for (uint n = 1; n <= piece; n++) {
-      if (inner(n, runningSum + n))
-        break;
-    }
-
-    return false;
-  }
-
-  inner(size, 0);
-
-  return count;
-}
-
-ulong countPartitionsWithPartitions(uint num, uint partitions) {
-  uint count = 0;
-
-  uint first = num - (partitions - 1);
-  uint second = 1;
-  
-  while (first >= second) {
-    second++;
-    first--;
+  foreach (n; num - size .. num) {
+    count += memoize!countPartitionsWithSize(n, num - n);
   }
 
   return count;
