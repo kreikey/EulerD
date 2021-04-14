@@ -6,9 +6,9 @@ import std.conv;
 import std.algorithm;
 import std.range;
 import std.experimental.checkedint;
+import std.functional;
 import kreikey.intmath;
 import kreikey.linkedlist;
-import std.functional;
 
 void main() {
   StopWatch timer;
@@ -25,8 +25,8 @@ void main() {
     x = countPartitions1(n);
     writeln(n, " : ", x);
     n++;
-  } while (x != 0);
-  //} while (n <= 2000);
+  //} while (x != 0);
+  } while (n <= 100);
 
   //countPartitions1(5750);
   //countPartitions1(74);
@@ -38,12 +38,16 @@ void main() {
   //countPartitions(1949);
   //countPartitions(2499);
 
+  //numbers ending in:
+  //99, 76, 49
+  //four zeros at the end
+
   timer.stop();
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }
 
-ulong countPartitions3(uint num) {
-  ulong count = 0;
+uint countPartitions3(uint num) {
+  uint count = 0;
 
   void inner(uint[] numbers, uint total) {
 
@@ -76,8 +80,8 @@ uint countPartitionsWithSize(uint num, uint limit) {
     return 1;
 
   foreach (n; num - limit .. num) {
-    count = (count + memoize!countPartitionsWithSize(n, (num - n) > n ? n : (num - n))) % 1000000;
-    //count += memoize!countPartitionsWithSize(n, (num - n) > n ? n : (num - n));
+    //count = (count + memoize!countPartitionsWithSize(n, (num - n) > n ? n : (num - n))) % 1000000;
+    count += memoize!countPartitionsWithSize(n, (num - n) > n ? n : (num - n));
   }
 
   return count;
