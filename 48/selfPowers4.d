@@ -24,12 +24,10 @@ void main() {
       continue;
 
     foreach (k; 0..n) {
-      product *= n;
-      product %= 10000000000;
+      product = (product * n) % 10000000000;
     }
 
-    sum += product;
-    sum %= 10000000000;
+    sum = (sum + product) % 10000000000;
     product = 1;
   }
 
