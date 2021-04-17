@@ -7,49 +7,72 @@ import std.algorithm;
 import std.range;
 import std.experimental.checkedint;
 import std.functional;
+import std.typecons;
 import kreikey.intmath;
-import kreikey.linkedlist;
+import kreikey.bigint;
 
 void main() {
   StopWatch timer;
   
-  writeln("Counting summations");
+  writeln("Coin partitions");
 
   timer.start();
 
-  uint n = 1;
-  uint x = 1;
+  int n = 0;
+  BigInt x = 0;
 
   do {
-    //writeln(n, " : ", countPartitions3(n));
-    x = countPartitions1(n);
-    writeln(n, " : ", x);
     n++;
-  //} while (x != 0);
-  } while (n <= 100);
+    x = memoize!countPartitions3(n);
+    writeln(n, " : ", x.digitString.tail(10));
+  } while (!(x.length > 6 && x.digitString()[$-6 .. $] == "000000"));
 
-  //countPartitions1(5750);
-  //countPartitions1(74);
-  //countPartitions(359);
-  //countPartitions(449);
-  //countPartitions(518);
-  //countPartitions(599);
-  //countPartitions(776);
-  //countPartitions(1949);
-  //countPartitions(2499);
-
-  //numbers ending in:
-  //99, 76, 49
-  //four zeros at the end
+  writeln("The lowest number of coins that can be separated into a number of piles divisible by one million is:");
+  writeln(n);
 
   timer.stop();
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }
 
-uint countPartitions3(uint num) {
-  uint count = 0;
+BigInt countPartitions3(int num) {
+  BigInt count = 0;
+  auto byOnes = recurrence!((a, n) => a[n-1]+1, int)(1);
+  auto byTwos = recurrence!((a, n) => a[n-1]+2, int)(3);
+  auto termDiffs = only(1).chain(roundRobin(byOnes, byTwos));
+  BigInt psum = 0;
+  BigInt nsum = 0;
 
-  void inner(uint[] numbers, uint total) {
+  if (num == 0 || num == 1)
+    return BigInt(1);
+
+  auto terms = termDiffs
+      .cumulativeFold!((a, b) => a + b)
+      .map!(a => num - a)
+    .until!(a => a < 0)
+    .array();
+
+  foreach (i, t; terms.enumerate(2)) {
+    if ((i / 2) % 2 == 1) {
+      //count += memoize!countPartitions3(t);
+      psum += memoize!countPartitions3(t);
+    } else {
+      //count -= memoize!countPartitions3(t);
+      nsum += memoize!countPartitions3(t);
+    }
+  }
+
+  //if (num == 387)
+  //writeln(psum.digitString.tail(10), "-", nsum.digitString.tail(10));
+
+  count = psum - nsum;
+
+  return count;
+}
+
+long countPartitions1(long num) {
+  long count = 0;
+
+  void inner(long[] numbers, long total) {
 
     if (total >= num) {
       if (total == num) {
@@ -59,22 +82,25 @@ uint countPartitions3(uint num) {
       return;
     }
 
-    for (uint n = numbers[$-1]; n > 0; n--) {
+    for (long n = numbers[$-1]; n > 0; n--) {
       inner(numbers ~ n, total + n);
     }
   }
 
-  for (uint n = num; n > 0; n--)
+  if (num == 0)
+    return 1;
+
+  for (long n = num; n > 0; n--)
     inner([n], n);
 
   return count;
 }
-uint countPartitions1(uint num) {
+ulong countPartitions2(ulong num) {
   return memoize!countPartitionsWithSize(num, num);
 }
 
-uint countPartitionsWithSize(uint num, uint limit) {
-  uint count = 0;
+ulong countPartitionsWithSize(ulong num, ulong limit) {
+  ulong count = 0;
 
   if (num == 0 || num == 1 || limit == 1)
     return 1;
@@ -86,21 +112,3 @@ uint countPartitionsWithSize(uint num, uint limit) {
 
   return count;
 }
-
-// 100 : 190569292
-
-/*
-uint countPartitionsRange(uint num) {
-  if (num == 0)
-    return 1;
-
-  return (memoize!countPartitionsRange(num - 1) + countPartitions1(num)) % 1000000;
-}
-*/
-
-//ulong countPartitionsRange(uint min, uint max) {
-  //if (num == 0)
-    //return countPartitions1(num);
-
-  //return memoize!countPartitionsRange(num - 1) + memoize!countPartitions1(num);
-//}
