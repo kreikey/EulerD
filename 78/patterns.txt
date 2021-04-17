@@ -4,12 +4,22 @@ p(1) = 1
 
 p(2) = p(0) limit 2
   + p(1) limit 1
+  = p0 + p1
+  = p1 + p0
 
 p(3) = p(0) limit 3
   + p(1) limit 2
   + p(2) limit 1 = p(2) - p(0) limit 2
   = p0 + p1 + p2 - p0
   = p2 + p1
+
+p3 = p0 limit 3 = p0
+  + p1 limit 2  = p1
+  + p2 limit 1  = p1
+  = p0 + p1 + p1
+  = (p0 + p1) + p1
+  = p2 + p1
+  = p1 + p1 + p0 
 
 p(4) = p(0) limit 4
   + p(1) limit 3
@@ -18,15 +28,36 @@ p(4) = p(0) limit 4
   = p0 + p1 + p2 + p3 - p0 - p1 
   = p3 + p2
 
+p4 = p0 limit 4 = p0
+  + p1 limit 3  = p1
+  + p2 limit 2  = p2
+  + p3 limit 1  = p1
+  = p0 + p1 + p2 + p1
+  = (p0 + p1) + (p2 + p1)
+  = p2 + p3
+  = p3 + p2
+  = p0 + p1 + p2 + p1
+  = p2 + p2 + p1
+
 p(3) limit 1 = p(2) limit 1 = p(1) limit 1 = p(1)
 
 p(5) = p(0)
- + p(1)
- + p(2)
- + p(3) limit 2   = p(3) - p(0) limit 3 = p(3) - p(0)
- + p(4) limit 1   = p(4) - p(0) limit 4 - p(1) limit 3 - p(2) limit 2 = p(4) - p(0) - p(1) - p(2) 
- = p0 + p1 + p2 + p3 - p0 + p4 - p0 - p1 - p2
- = p4 + p3 - p0
+  + p(1)
+  + p(2)
+  + p(3) limit 2   = p(3) - p(0) limit 3 = p(3) - p(0)
+  + p(4) limit 1   = p(4) - p(0) limit 4 - p(1) limit 3 - p(2) limit 2 = p(4) - p(0) - p(1) - p(2) 
+  = p0 + p1 + p2 + p3 - p0 + p4 - p0 - p1 - p2
+  = p4 + p3 - p0
+
+p5 = p0 limit 5 = p0
+  + p1 limit 4  = p1
+  + p2 limit 3  = p2
+  + p3 limit 2  = p1 + p1
+  + p4 limit 1  = p1
+  = p0 + p1 + p2 + p1 + p1 + p1
+  = p3 + p2 + p1 + p1
+  = p3 + p3 + p1
+  = p4 + p1 + p1
 
 p(3) limit 2 = p(1) limit 2
   + p(2) limit 1
@@ -42,6 +73,19 @@ p(6) = p(0)
   + p(5) limit 1    = p(5) - p(0) limit 5 - p(1) limit 4 - p(2) limit 3 - p(3) limit 2 = p(5) - p(0) - p(1) - p(2) - (p(3) - p(0))
   = p0 + p1 + p2 + p3 p4 - p0 - p1 + p5 - p0 - p1 - p2 - p3 + p0
   = p5 + p4 - p1
+
+p6 = p0 limit 6 = p0
+  + p1 limit 5  = p1
+  + p2 limit 4  = p2
+  + p3 limit 3  = p3
+  + p4 limit 2  = p2 + p1
+  + p5 limit 1  = p1
+  = p0 + p1 + p2 + p3 + p2 + p1 + p1
+  = p3 + p2 + p2 + p1 + p1 + p1 + p0
+  = p3 + p3 + p3 + p2
+  = p4 + p3 + p3
+  = p3 + p2 + p1 + p1 + p2 + p1 + p0
+  = p5 + p2 + p2
 
 p(4) limit 2 = p(2)
   + p(3) limit 1
@@ -60,6 +104,23 @@ p(7) = p(0)
   = p6 + p5 - p2 - p0
   = 11 + 7 - 2 - 1
   = 15
+
+p7 = p0 limit 7 = p0
+  = p1 limit 6  = p1
+  = p2 limit 5  = p2
+  = p3 limit 4  = p3
+  = p4 limit 3  = p1 + p2 + p1
+  = p5 limit 2  = p1 + p1 + p1
+  = p6 limit 1  = p1
+  = p0 + p1 + p2 + p3 + p1 + p2 + p1 + p1 + p1 + p1 + p1
+  = p4 + p1 + p1 + p4 + p1 + p1 + p1
+  = p5 + p5 + p1
+  = p4 + p4 + p1 + p1 + p1 + p1 + p1
+  = p3 + p2 + p3 + p2 + p1 + p1 + p1 + p1 + p1
+  = p3 + p3 + p2 + p2 + p1 + p1 + p1 + p1 + p1
+  = p3 + p3 + p2 + p1 + p2 + p1 + p1 + p1 + p1
+  = p3 + p3 + p3 + p2 + p1 + p1 + p1 + p1
+  = p6 + p1 + p1 + p1 + p1
 
 p(4) limit 3 = p(1) limit 3
   + p(2)
@@ -87,8 +148,17 @@ p(8) = p(0)
   = p0 + p1 + p2 + p3 + p4 + p2 + 3p1 + p2 + 2p1 + p1
   = p0 + 7p1 + 3p2 + p3 + p4
   = 1 + 7 + 6 + 3 + 5
-  = 22
 coefficients: 1, 7, 3, 1, 1
+  = 22
+  = p4 + p3 + p2 + p2 + p2 + p1 + p1 + p1 + p1 + p1 + p1 + p1 + p0
+  = p4 + p1 + p1 + p3 + p3 + p3 + p3 + p3
+  = p4 + p1 + p1 + p3 + p3 + p3 + p3 + p3
+  = p5 + p3 + p3 + p3 + p3 + p3
+  = p4 + p3 + p3 + p3 + p3 + p1 + p1 + p3
+  = p6 + p5 + p3 + p1
+  = p6 + p4 + p1 + p1 + p3 + p1
+  = p6 + p4 + p2 + p1 + p1 + p1 + p1
+  = p7 + p4 + p2
 
 p(5) limit 3 = p(2)
   + p(3) limit 2
@@ -118,6 +188,19 @@ p(9) = p(0)
   = 30
 coefficient: 1, 12, 3, 2, 1
 difference: 0, 5, 0, 1, 0
+  = p8 + 5p1 + p3
+  = p4 + p3 + p3 + p2 + p2 + p2 + p1 + p1 + p1 + p1 + p1 + p1 + p1 + p1 + p1 + p1 + p1 + p1 + p0
+  = p4 + p3 + p3 + p3 + p3 + p3 + p3 + p1 + p1 + p1 + p1 + p1 + p1 + p1
+  = p4 + p1 + p1 + p3 + p3 + p1 + p3 + p3 + p1 + p3 + p3 + p1 + p1 + p1
+  = p5 + p5 + p5 + p5 + p1 + p1
+  = p5 + p5 + p1 + p5 + p5 + p1
+  = p7 + p7
+  = p4 + p1 + p1 + p5 + p1 + p6 + p1 + p1 + p1 + p1
+  = p6 + p5 + p4 + p1 + p1 + p1 + p1 + p1 + p1 + p1
+  = p6 + p5 + p3 + p1 + p2 + p1 + p1 + p1 + p1 + p1 + p1
+  = p8 + p2 + p1 + p1 + p1 + p1 + p1 + p1
+  = p8 + p3 + p1 + p1 + p1 + p1 + p1
+  = p8 + p3 + p1 + p1 + p1 + p1 + p1
 
 p(7) limit 2 = p(5) limit 2
   + p(6) limit 1
@@ -165,6 +248,26 @@ p(10) = p(0) limit 10
   = 42 
 coefficients: 1, 13, 5, 2, 1, 1
 difference: 0, 1, 2, 0, 0, 1
+  = p5 + p4 + p3 + p3 + p2 + p2 + p2 + p2 + p2 + p1 + p1 + p1 + p1 + p1 + p1 + p1 + p1 + p1 + p1 + p1 + p1 + p1 + p0
+  = p5 + p4 + p3 + p3 + p2 + p2 + p2 + p2 + p2 + p1 + p1 + p1 + p1 + p1 + p1 + p1 + p1 + p1 + p1 + p1 + p1 + p2
+  = p5 + p4 + p3 + p3 + p3 + p3 + p3 + p3 + p3 + p3 + p1 + p1 + p1 + p1 + p1 + p1
+  = p5 + p5 + p5 + p5 + p5 + p5
+  = p5 + p5 + p5 + p5 + p5 + p4 + p1 + p1
+  = p5 + p5 + p1 + p5 + p5 + p1 + p5 + p4
+  = p7 + p7 + p5 + p4
+  = p9 + p5 + p4
+  = p9 + p5 + p3 + p2
+  = p7 + p7 + p5 + p3 + p2
+  = p6 + p1 + p1 + p1 + p1 + p7 + p5 + p3 + p2
+  = p6 + p5 + p3 + p1 + p1 + p1 + p1 + p7 + p2
+  = p8 + p7 + p2 + p1 + p1 + p1
+  = p8 + p7 + p3 + p1 + p1
+  = p8 + p6 + p3 + p1 + p1 + p1 + p1 + p1 + p1
+  = p7 + p6 + p5 + p2 + p2 + p1 + p1 + p1 + p1 + p1
+  = p7 + p6 + p5 + p4 + p1 + p1 + p1 + p1
+  = p7 + p6 + p1 + p1 + p1 + p1 + p5 + p4
+  = p7 + p7 + p5 + p4
+  = p7 + p7 + p5 + p3 + p2
 
 p7 limit 3 = p4 limit 3
   + p5 limit 2
