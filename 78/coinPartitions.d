@@ -22,7 +22,7 @@ void main() {
 
   do {
     n++;
-    x = countPartitions3(n, 6);
+    x = memoize!countPartitions3(n, 6);
     //writeln(n, " : ", x);
   } while (x != 0);
 
