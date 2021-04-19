@@ -2,12 +2,6 @@
 
 import std.stdio;
 import std.datetime.stopwatch;
-import std.conv;
-import std.algorithm;
-import std.range;
-import std.experimental.checkedint;
-import kreikey.intmath;
-import kreikey.linkedlist;
 import std.functional;
 
 void main() {
