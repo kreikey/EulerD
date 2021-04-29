@@ -32,30 +32,30 @@ void main() {
 }
 
 auto countPrimeSummationsInit() {
-auto primes = makePrimes!uint();
-ulong countPrimeSummations(uint sum) {
-  ulong count = 0;
+  auto primes = makePrimes!uint();
 
-  bool inner(uint piece, uint runningSum) {
-    if (runningSum == sum) {
-      count++;
-      return true;
-    } else if (runningSum > sum) {
-      return true;
+  ulong countPrimeSummations(uint sum) {
+    ulong count = 0;
+
+    bool inner(uint piece, uint runningSum) {
+      if (runningSum == sum) {
+        count++;
+        return true;
+      } else if (runningSum > sum) {
+        return true;
+      }
+
+      for (uint i = 0; primes[i] <= piece; i++) {
+        if (inner(primes[i], runningSum + primes[i]))
+          break;
+      }
+
+      return false;
     }
 
-    for (uint i = 0; primes[i] <= piece; i++) {
-      if (inner(primes[i], runningSum + primes[i]))
-        break;
-    }
-
-    return false;
+    inner(sum - 1, 0);
+    return count;
   }
 
-  for (uint i = 0; primes[i] < sum; i++)
-    inner(primes[i], primes[i]);
-
-  return count;
-}
-return &countPrimeSummations;
+  return &countPrimeSummations;
 }

@@ -13,18 +13,16 @@ import kreikey.bigint;
 
 void main() {
   StopWatch timer;
-  
-  writeln("Coin partitions");
-
-  timer.start();
-
   int n = 0;
   BigInt x = 0;
+  
+  writeln("Coin partitions");
+  timer.start();
 
   do {
     n++;
     x = memoize!countPartitions3(n);
-    writeln(n, " : ", x.digitString.tail(10));
+    //writeln(n, " : ", x.digitString.tail(10));
   } while (!(x.length > 6 && x.digitString()[$-6 .. $] == "000000"));
 
   writeln("The lowest number of coins that can be separated into a number of piles divisible by one million is:");
@@ -53,16 +51,11 @@ BigInt countPartitions3(int num) {
 
   foreach (i, t; terms.enumerate(2)) {
     if ((i / 2) % 2 == 1) {
-      //count += memoize!countPartitions3(t);
       psum += memoize!countPartitions3(t);
     } else {
-      //count -= memoize!countPartitions3(t);
       nsum += memoize!countPartitions3(t);
     }
   }
-
-  //if (num == 387)
-  //writeln(psum.digitString.tail(10), "-", nsum.digitString.tail(10));
 
   count = psum - nsum;
 
@@ -73,7 +66,6 @@ long countPartitions1(long num) {
   long count = 0;
 
   void inner(long[] numbers, long total) {
-
     if (total >= num) {
       if (total == num) {
         //writeln(numbers);
@@ -90,11 +82,11 @@ long countPartitions1(long num) {
   if (num == 0)
     return 1;
 
-  for (long n = num; n > 0; n--)
-    inner([n], n);
+  inner([num], 0);
 
   return count;
 }
+
 ulong countPartitions2(ulong num) {
   return memoize!countPartitionsWithSize(num, num);
 }

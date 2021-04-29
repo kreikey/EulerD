@@ -14,7 +14,7 @@ void main() {
 
   do {
     n++;
-    x = memoize!countPartitions3(n, 6);
+    x = memoize!countPartitions4(n, 6);
     //writeln(n, " : ", x);
   } while (x != 0);
 
@@ -23,6 +23,33 @@ void main() {
 
   timer.stop();
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
+}
+
+auto countPartitions4Init() {
+  int count = 0;
+  int digitsMod = 10 ^^ digitsToKeep;
+  int[] ps = [1];
+  int[] ids = [0];
+  bool[] signs = [false];
+
+  int countPartitions4(int digitsToKeep) {
+    terms = indexed(ps, ids);
+
+    foreach (s; signs) {
+      count = s ? count - terms.front : count + terms.front;
+    }
+
+    ids[]++;
+    if () {
+      ids ~= 0;
+    }
+    ps ~= count;
+    signs ~= signs.back ? false : true;
+
+    return count;
+  }
+
+  return &countPartitions4;
 }
 
 ulong countPartitions3(int num, int digitsToKeep) {
