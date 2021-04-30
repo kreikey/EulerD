@@ -2,50 +2,61 @@
 
 import std.stdio;
 import std.datetime.stopwatch;
+import std.range;
+import std.algorithm;
 import std.functional;
 
 void main() {
   StopWatch timer;
-  uint n = 0;
-  ulong x = 0;
   
   writeln("Coin partitions");
   timer.start();
 
-  do {
-    n++;
-    x = memoize!countPartitions4(n, 6);
-    //writeln(n, " : ", x);
-  } while (x != 0);
-
   writeln("The lowest number of coins that can be separated into a number of piles divisible by one million is:");
-  writeln(n);
+
+  countPartitions4Init(6)
+    .generate
+    .until(0, OpenRight.no)
+    .count
+    .writeln();
 
   timer.stop();
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }
 
-auto countPartitions4Init() {
-  int count = 0;
-  int digitsMod = 10 ^^ digitsToKeep;
-  int[] ps = [1];
-  int[] ids = [0];
+auto countPartitions4Init(uint digitsToKeep) {
+  uint digitsMod = 10 ^^ digitsToKeep;
+  uint[] ps = [1];
+  uint[] ids = [0];
   bool[] signs = [false];
+  auto byOnes = recurrence!((a, n) => a[n-1]+1, uint)(1);
+  auto byTwos = recurrence!((a, n) => a[n-1]+2, uint)(3);
+  auto termDiffs = roundRobin(byOnes, byTwos);
+  uint nextTerm = 0;
 
-  int countPartitions4(int digitsToKeep) {
-    terms = indexed(ps, ids);
-
-    foreach (s; signs) {
-      count = s ? count - terms.front : count + terms.front;
-    }
-
-    ids[]++;
-    if () {
-      ids ~= 0;
+  uint countPartitions4() {
+    uint count = 0;
+    auto terms = indexed(ps, ids);
+    foreach(term, sign; lockstep(terms, signs)) {
+      if (sign) {
+        count = ((count + digitsMod) - term) % digitsMod;
+      } else {
+        count = (count + term) % digitsMod;
+      }
     }
     ps ~= count;
-    signs ~= signs.back ? false : true;
-
+    nextTerm++;
+    ++ids[];
+    if (nextTerm == termDiffs.front) {
+      ids ~= 0;
+      nextTerm = 0;
+      termDiffs.popFront();
+      if (signs.length > 1) {
+        signs ~= !signs[$-2];
+      } else {
+        signs ~= false;
+      }
+    }
     return count;
   }
 
