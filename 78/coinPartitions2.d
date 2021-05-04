@@ -22,11 +22,13 @@ void main() {
   do {
     n++;
     x = memoize!countPartitions3(n);
-    writeln(n, " : ", x.digitString.tail(10));
+    //writeln(n, " : ", x.digitString.tail(10));
   } while (!(x.length > 6 && x.digitString()[$-6 .. $] == "000000"));
 
   writeln("The lowest number of coins that can be separated into a number of piles divisible by one million is:");
   writeln(n);
+  writeln("The number of piles is: ");
+  writeln(x);
 
   timer.stop();
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
@@ -43,13 +45,13 @@ BigInt countPartitions3(int num) {
   if (num == 0 || num == 1)
     return BigInt(1);
 
-  auto terms = termDiffs
+  auto termIds = termDiffs
       .cumulativeFold!((a, b) => a + b)
       .map!(a => num - a)
     .until!(a => a < 0)
     .array();
 
-  foreach (i, t; terms.enumerate(2)) {
+  foreach (i, t; termIds.enumerate(2)) {
     if ((i / 2) % 2 == 1) {
       psum += memoize!countPartitions3(t);
     } else {

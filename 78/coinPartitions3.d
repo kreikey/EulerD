@@ -14,7 +14,7 @@ void main() {
 
   writeln("The lowest number of coins that can be separated into a number of piles divisible by one million is:");
 
-  countPartitions4Init(6)
+  multiCountPartitionsInit(6)
     .generate
     .until(0, OpenRight.no)
     .count
@@ -24,39 +24,37 @@ void main() {
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }
 
-auto countPartitions4Init(uint digitsToKeep) {
+auto multiCountPartitionsInit(uint digitsToKeep) {
   uint digitsMod = 10 ^^ digitsToKeep;
   uint[] ps = [1];
   uint[] ids = [0];
-  bool[] signs = [false];
   auto byOnes = recurrence!((a, n) => a[n-1]+1, uint)(1);
   auto byTwos = recurrence!((a, n) => a[n-1]+2, uint)(3);
-  auto termDiffs = roundRobin(byOnes, byTwos);
-  uint nextTerm = 0;
+  auto appendIntervals = roundRobin(byOnes, byTwos);
+  uint sameLengthCount = 0;
 
   uint countPartitions4() {
     uint count = 0;
     auto terms = indexed(ps, ids);
-    foreach(term, sign; lockstep(terms, signs)) {
-      if (sign) {
-        count = ((count + digitsMod) - term) % digitsMod;
-      } else {
-        count = (count + term) % digitsMod;
-      }
+
+    for (auto i = 0, subtract = false; i < terms.length; i += 2, subtract = !subtract) {
+      count = subtract ? ((count + digitsMod) - terms[i]) % digitsMod : (count + terms[i]) % digitsMod;
     }
+
+    for (auto i = 1, subtract = false; i < terms.length; i += 2, subtract = !subtract) {
+      count = subtract ? ((count + digitsMod) - terms[i]) % digitsMod : (count + terms[i]) % digitsMod;
+    }
+
     ps ~= count;
-    nextTerm++;
+    sameLengthCount++;
     ++ids[];
-    if (nextTerm == termDiffs.front) {
+
+    if (sameLengthCount == appendIntervals.front) {
       ids ~= 0;
-      nextTerm = 0;
-      termDiffs.popFront();
-      if (signs.length > 1) {
-        signs ~= !signs[$-2];
-      } else {
-        signs ~= false;
-      }
+      sameLengthCount = 0;
+      appendIntervals.popFront();
     }
+
     return count;
   }
 
