@@ -38,11 +38,11 @@ auto multiCountPartitionsInit(uint digitsToKeep) {
     auto terms = indexed(ps, ids);
 
     for (auto i = 0, subtract = false; i < terms.length; i += 2, subtract = !subtract) {
-      count = subtract ? ((count + digitsMod) - terms[i]) % digitsMod : (count + terms[i]) % digitsMod;
+      count = ((count + digitsMod) + (subtract ? -terms[i] : terms[i])) % digitsMod;
     }
 
     for (auto i = 1, subtract = false; i < terms.length; i += 2, subtract = !subtract) {
-      count = subtract ? ((count + digitsMod) - terms[i]) % digitsMod : (count + terms[i]) % digitsMod;
+      count = ((count + digitsMod) + (subtract ? -terms[i] : terms[i])) % digitsMod;
     }
 
     ps ~= count;
