@@ -39,8 +39,6 @@ BigInt countPartitions3(int num) {
   auto byOnes = recurrence!((a, n) => a[n-1]+1, int)(1);
   auto byTwos = recurrence!((a, n) => a[n-1]+2, int)(3);
   auto termDiffs = only(1).chain(roundRobin(byOnes, byTwos));
-  BigInt psum = 0;
-  BigInt nsum = 0;
 
   if (num == 0 || num == 1)
     return BigInt(1);
@@ -52,14 +50,8 @@ BigInt countPartitions3(int num) {
     .array();
 
   foreach (i, t; termIds.enumerate(2)) {
-    if ((i / 2) % 2 == 1) {
-      psum += memoize!countPartitions3(t);
-    } else {
-      nsum += memoize!countPartitions3(t);
-    }
+    count += (i / 2) % 2 == 1 ? memoize!countPartitions3(t) : -memoize!countPartitions3(t);
   }
-
-  count = psum - nsum;
 
   return count;
 }
