@@ -5,6 +5,7 @@ import std.datetime.stopwatch;
 import std.range;
 import std.algorithm;
 import std.functional;
+import kreikey.util;
 
 void main() {
   StopWatch timer;
@@ -14,8 +15,8 @@ void main() {
 
   writeln("The lowest number of coins that can be separated into a number of piles divisible by one million is:");
 
-  multiCountPartitionsInit(6)
-    .generate
+  recurrence!((a, n) => a[n-1]+1, uint)(1)
+    .map!(a => memoize!countPartitions4(a, 6))
     .until(0, OpenRight.no)
     .count
     .writeln();
@@ -61,32 +62,22 @@ auto multiCountPartitionsInit(uint digitsToKeep) {
   return &countPartitions4;
 }
 
-ulong countPartitions3(int num, int digitsToKeep) {
+ulong countPartitions4(int num, int digitsToKeep) {
   ulong count = 0;
   ulong digitsMod = 10 ^^ digitsToKeep;
-  int term = num - 1;
-  ulong i = 0;
-  int a = 1;
-  int b = 3;
 
   if (num == 0 || num == 1)
     return ulong(1);
 
-  do {
-    if ((i / 2) % 2 == 0) {
-      count = (count + memoize!countPartitions3(term, digitsToKeep)) % digitsMod;
-    } else {
-      count = ((count + digitsMod) - memoize!countPartitions3(term, digitsToKeep)) % digitsMod;
-    }
-    if (i % 2 == 1) {
-      term -= b;
-      b += 2;
-    } else {
-      term -= a;
-      a++;
-    }
-    i++;
-  } while (term >= 0);
+  only(1)
+    .chain(recurrence!((a, n) => a[n-1]+1, int)(1)
+        .roundRobin(recurrence!((a, n) => a[n-1]+2, int)(3)))
+    .cumulativeFold!((a, b) => a + b)
+    .map!(a => num - a)
+    .until!(a => a < 0)
+    .map!(a => memoize!countPartitions4(a, digitsToKeep))
+    .enumerate(2)
+    .each!(a => count = (count + digitsMod + ((a[0] / 2) % 2 == 1 ? a[1] : -a[1])) % digitsMod);
 
   return count;
 }

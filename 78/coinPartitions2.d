@@ -22,7 +22,7 @@ void main() {
   do {
     n++;
     x = memoize!countPartitions3(n);
-    //writeln(n, " : ", x.digitString.tail(10));
+    writeln(n, " : ", x.digitString.tail(10));
   } while (!(x.length > 6 && x.digitString()[$-6 .. $] == "000000"));
 
   writeln("The lowest number of coins that can be separated into a number of piles divisible by one million is:");
