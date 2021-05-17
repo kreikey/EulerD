@@ -24,7 +24,7 @@ bool isAbundant(uint num) {
 }
 
 bool isAbundantSum(uint num) {
-  foreach (n; 1..num) {
+  foreach (n; 1 .. num) {
     if (memoize!isAbundant(n) && memoize!isAbundant(num - n))
       return true;
   }
