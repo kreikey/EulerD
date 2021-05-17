@@ -12,7 +12,7 @@ void main(string[] args) {
 
   timer.start();
 
-  sum = iota(1, 28124).filter!(isNonAbundantSum).sum();
+  sum = iota(1, 28124).filter!(not!isAbundantSum).sum();
 
   timer.stop();
   writefln("The sum of all the positive integers which cannot be written as the sum of two abundant numbers is: %s", sum);
@@ -20,7 +20,7 @@ void main(string[] args) {
 }
 
 bool isAbundant(uint num) {
-  return (memoize!(getProperDivisors!uint)(num).sum() > num);
+  return memoize!(getProperDivisors!uint)(num).sum() > num;
 }
 
 bool isAbundantSum(uint num) {
@@ -29,8 +29,4 @@ bool isAbundantSum(uint num) {
       return true;
   }
   return false;
-}
-
-bool isNonAbundantSum(uint num) {
-  return !isAbundantSum(num);
 }

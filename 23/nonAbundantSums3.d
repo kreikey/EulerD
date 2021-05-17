@@ -40,5 +40,5 @@ void main() {
 }
 
 bool isAbundant(uint num) {
-  return (memoize!(getProperDivisors!uint)(num).sum() > num);
+  return memoize!(getProperDivisors!uint)(num).sum() > num;
 }
