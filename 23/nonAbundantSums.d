@@ -1,4 +1,4 @@
-#!/usr/bin/env rdmd -I..
+#!/usr/bin/env rdmd -i -I..
 import std.stdio;
 import std.datetime.stopwatch;
 import std.algorithm;
@@ -14,7 +14,7 @@ void main(string[] args) {
   sum = iota(1, 28124).filter!(isNonAbundantSum).sum();
 
   timer.stop();
-  writefln("The sum of non-abundant numbers below 28124 is: %s", sum);
+  writefln("The sum of all the positive integers which cannot be written as the sum of two abundant numbers is: %s", sum);
   writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
 }
 
