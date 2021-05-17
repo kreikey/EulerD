@@ -3,6 +3,7 @@ import std.stdio;
 import std.datetime.stopwatch;
 import std.algorithm;
 import std.range;
+import std.functional;
 import kreikey.intmath;
 
 void main(string[] args) {
@@ -19,21 +20,17 @@ void main(string[] args) {
 }
 
 bool isAbundant(long num) {
-  if (reduce!((a, b) => a + b)(0L, num.getProperDivisors()) > num)
-    return true;
-  else
-    return false;
+  return (memoize!(getProperDivisors!long)(num).sum() > num);
 }
 
 bool isAbundantSum(long num) {
-  foreach (i; 1..num) {
-    if (i.isAbundant() && (num - i).isAbundant())
+  foreach (n; 1..num) {
+    if (memoize!isAbundant(n) && memoize!isAbundant(num - n))
       return true;
   }
   return false;
 }
 
 bool isNonAbundantSum(long num) {
-  writeln(num);
   return !isAbundantSum(num);
 }
