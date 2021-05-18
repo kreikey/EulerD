@@ -17,8 +17,10 @@ void main(string[] args) {
 
   timer.start();
 
-  auto nums = iota(start, end);
-  auto resTup = zip(nums, nums.map!(reptendLength)).reduce!((a, b) => a[1] > b[1] ? a : b);
+  auto resTup = iota(start, end)
+    .map!(a => a, reptendLength)
+    .fold!((a, b) => a[1] > b[1] ? a : b)();
+
   writefln("The number between %s and %s whose reciprocal has the longest reptend is:", start, end);
   writefln("denominator: %s\nreptend length: %s", resTup[0], resTup[1]);
 

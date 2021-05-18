@@ -7,7 +7,7 @@ import std.algorithm;
 import kreikey.intmath;
 import std.functional;
 
-alias distinctPrimeFactors = memoize!(distinctPrimeFactors2!ulong);
+alias distinctPrimeFactors = memoize!(getDistinctPrimeFactors2!ulong);
 //alias distinctPrimeFactors = distinctPrimeFactors2;
 
 void main() {
@@ -32,6 +32,7 @@ void main() {
 
   timer.stop();
 
-  writefln("The first number with four distinct prime factors is: %s", fourDistinctPrimeFactors);
+  writefln("The first four consequtive numbers with four distinct prime factors starts with: %s", 
+          fourDistinctPrimeFactors);
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }

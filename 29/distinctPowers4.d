@@ -23,7 +23,7 @@ void main(string[] args) {
 
   iota(2, n+ 1)
     .map!(base => iota(2, n+1)
-      .map!(exponent => base.primeFactors.replicate(exponent).asort())
+      .map!(exponent => base.getPrimeFactors.replicate(exponent).asort())
       .array
       .asort())
     .array()

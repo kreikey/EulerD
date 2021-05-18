@@ -5,6 +5,9 @@ import std.conv;
 import std.algorithm;
 import std.range;
 import kreikey.intmath;
+import std.functional;
+
+alias getProperDivisors = memoize!(kreikey.intmath.getProperDivisors!long);
 
 void main(string[] args) {
   StopWatch timer;

@@ -29,7 +29,7 @@ void main(string[] args) {
   foreach(base; 2 .. n + 1) {
     row = [];
     foreach(exponent; 2 .. n + 1) {
-      res = base.primeFactors.cycleN(exponent).sort.array();
+      res = base.getPrimeFactors.cycleN(exponent).sort.array();
       row ~= res;
     }
     sort(row);

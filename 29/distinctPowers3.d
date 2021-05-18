@@ -15,12 +15,7 @@ void main(string[] args) {
     n = args[1].parse!ulong();
 
   writeln("distinct powers");
-
   timer.start();
-
-  bool delegate(BigInt) unique = notEqualToPreviousInit(BigInt(0));
-
-  int count = 0;
 
   iota(2, n + 1)
     .map!(a => iota(2, n + 1)
@@ -36,21 +31,4 @@ void main(string[] args) {
   timer.stop();
 
   writefln("finished in %s milliseconds", timer.peek.total!"msecs"());
-}
-
-bool delegate(BigInt) notEqualToPreviousInit(BigInt previous) {
-  bool notEqualToPrevious;
-
-  bool nepfunc(BigInt current) {
-    if (current != previous)
-      notEqualToPrevious = true;
-    else
-      notEqualToPrevious = false;
-
-    previous = current;
-
-    return notEqualToPrevious;
-  }
-
-  return &nepfunc;
 }

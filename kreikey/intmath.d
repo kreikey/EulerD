@@ -24,8 +24,7 @@ alias getProperDivisors = getProperDivisors2;
 alias countFactors = countFactors2;
 alias getPrimeFactorGroups = getPrimeFactorGroups2;
 
-// modify to use IFTI for everything
-T[] getFactors2(T = ulong)(T number) if (isIntegral!T) {
+T[] getFactors2(T)(T number) if (isIntegral!T) {
   assert (number > 0);
   auto factorGroups = getPrimeFactorGroups(number);
   bool[] mask = new bool[factorGroups.length];
@@ -80,7 +79,7 @@ T[] getFactors2(T = ulong)(T number) if (isIntegral!T) {
   return result;
 }
 
-T[] getFactors1(T = ulong)(T number) if (isIntegral!T) {
+T[] getFactors1(T)(T number) if (isIntegral!T) {
   assert (number > 0);
   static T[][T] factorsCache;
   T[] factors;
@@ -116,7 +115,7 @@ T[] getProperDivisors2(T)(T number) if (isIntegral!T) {
 
 T[] getProperDivisors1(T)(T number) if (isIntegral!T) {
   assert (number > 0);
-  return getFactors(number)[0 .. $-1];
+  return getFactors1(number)[0 .. $-1];
 }
 
 T countFactors2(T)(T number) if (isIntegral!T) {
@@ -358,15 +357,6 @@ T[] distinctPrimeFactors1(T)(T number) if (isIntegral!T) {
 
   return factors;
 }
-
-//struct Factor {
-  //int factor;
-  //int multiplicity;
-//}
-
-//Factor maxMultiplicity(Factor a, Factor b) {
-  //return a.multiplicity > b.multiplicity ? a : b;
-//}
 
 T factorial(T)(T number) if (isIntegral!T) {
   assert (number >= 0);

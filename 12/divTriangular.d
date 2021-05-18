@@ -7,9 +7,6 @@ import std.range;
 import std.algorithm;
 import std.traits;
 import kreikey.intmath;
-import kreikey.combinatorics;
-
-alias nextPermutation = kreikey.combinatorics.nextPermutation;
 
 void main(string[] args) {
   StopWatch timer;
@@ -32,13 +29,11 @@ void main(string[] args) {
 
 }
 
-T triangularize(T)(T n)
-if (isIntegral!T) {
+T triangularize(T)(T n) if (isIntegral!T) {
   return n * (n + 1) / 2;
 }
 
-T countTrianFactors(T)(T n)
-if (isIntegral!T) {
+T countTrianFactors(T)(T n) if (isIntegral!T) {
   T count;
 
   alias countFactorsFast = memoize!(countFactors1!T);
