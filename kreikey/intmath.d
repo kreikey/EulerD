@@ -24,7 +24,8 @@ alias getProperDivisors = getProperDivisors2;
 alias countFactors = countFactors2;
 alias getPrimeFactorGroups = getPrimeFactorGroups2;
 
-T[] getFactors2(T)(T number) if (isIntegral!T) {
+// modify to use IFTI for everything
+T[] getFactors2(T = ulong)(T number) if (isIntegral!T) {
   assert (number > 0);
   auto factorGroups = getPrimeFactorGroups(number);
   bool[] mask = new bool[factorGroups.length];
@@ -79,7 +80,7 @@ T[] getFactors2(T)(T number) if (isIntegral!T) {
   return result;
 }
 
-T[] getFactors1(T)(T number) if (isIntegral!T) {
+T[] getFactors1(T = ulong)(T number) if (isIntegral!T) {
   assert (number > 0);
   static T[][T] factorsCache;
   T[] factors;

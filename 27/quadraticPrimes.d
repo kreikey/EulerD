@@ -20,6 +20,8 @@ static this() {
 void main() {
   StopWatch timer;
 
+  writeln("Quadratic primes");
+
   timer.start();
 
   int[] as = iota(-999, 1000, 2).array();

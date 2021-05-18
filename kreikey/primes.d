@@ -7,14 +7,11 @@ import std.math;
 import std.algorithm;
 import std.conv;
 
-auto makePrimes(T = ulong)()
-
-if (isIntegral!T) {
+auto makePrimes(T = ulong)() if (isIntegral!T) {
   return new Primes!T();
 }
 
-class Primes(T = ulong)
-if (isIntegral!T) {
+class Primes(T = ulong) if (isIntegral!T) {
 private:
   size_t ndx;
   size_t offset;    // necessary for correct semantics for countUntil with opIndex. It should work like an array.
@@ -120,16 +117,16 @@ public:
   }
 }
 
-auto isPrimeInit() {
-  Primes!ulong primes = new Primes!ulong();
+auto isPrimeInit(T = ulong)() if (isIntegral!T) {
+  Primes!T primes = new Primes!T();
 
-  bool isPrime(ulong number) {
+  bool isPrime(T number) {
     auto primesCopy = primes.save;
 
     if (number <= primesCopy.topPrime)
       return number in primesCopy.cache ? true : false;
 
-    auto root = std.math.sqrt(real(number)).to!ulong();
+    auto root = std.math.sqrt(real(number)).to!T();
     auto found = primesCopy.find!(p => number % p == 0 || p > root)().front;
 
     return found > root;
