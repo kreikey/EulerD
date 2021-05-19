@@ -15,7 +15,7 @@ import kreikey.bigint;
    x = sqrt(1 + Dy^2)
    x^2-1 = Dy^2
    sqrt(x^2-1) = sqrt(D)y
-   sqrt(x^2-1)/sqrt(D) = y
+   sqrt(x^2-1)/y = sqrt(D)
 */
 
 void main() {
