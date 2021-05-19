@@ -20,8 +20,8 @@ void main() {
   timer.start();
 
   for (ulong n = cast(ulong)(uint.max) * 1000; n > 0; n--) {
+    writeln(n);
     if(isPrime(n)) {
-      writeln(n);
       break;
     }
   }

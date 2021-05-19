@@ -31,7 +31,7 @@ void main() {
   
   auto primesArray = primes
     .find!(a => a > 999)
-    .until!(a => a > 9999)
+    .until!(a => a >= 9999)
     .array();
 
   primePermutations = primesArray

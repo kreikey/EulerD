@@ -5,7 +5,8 @@ import std.datetime.stopwatch;
 import std.range;
 import std.algorithm;
 import std.typecons;
-import kreikey.intmath;
+//import kreikey.intmath;
+import kreikey.primes;
 
 bool delegate(ulong) isPrime;
 
