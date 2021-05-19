@@ -29,3 +29,34 @@ void main() {
   timer.stop();
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }
+
+/*
+auto multiTotientsInit(T)(T topNumber) if (isIntegral!T) {
+  assert (topNumber > 0);
+  void getMultiTotients() {
+    T[] factors = makePrimes!T
+      .until!((a, b) => a >= b)(topNumber)
+      .array();
+
+    void inner(T baseNumber, T multiplier, T[] someFactors, T[] distinctFactors) {
+      T totient = multiplier * (baseNumber - memoize!(getNonCoprimeCount!T)(distinctFactors[1 .. $]));
+
+      yield(tuple(T(baseNumber * multiplier), T(totient)));
+
+      foreach (i, f; someFactors) {
+        if (baseNumber * multiplier * f > topNumber)
+          break;
+
+        if (f == distinctFactors[$-1])
+          inner(baseNumber, multiplier * f, someFactors[i .. $], distinctFactors);
+        else
+          inner(baseNumber * f, multiplier, someFactors[i .. $], distinctFactors ~ f);
+      }
+    }
+
+    inner(1, 1, factors, [1]);
+  }
+
+  return &getMultiTotients;
+}
+*/
