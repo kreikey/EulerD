@@ -26,7 +26,7 @@ alias getPrimeFactorGroups = getPrimeFactorGroups2;
 
 T[] getFactors2(T)(T number) if (isIntegral!T) {
   assert (number > 0);
-  auto factorGroups = getPrimeFactorGroups(number);
+  auto factorGroups = memoize!(getPrimeFactorGroups!T)(number);
   bool[] mask = new bool[factorGroups.length];
   Tuple!(T, T)[] chosenFactorGroups;
   T[] result = [T(1)];
@@ -121,7 +121,7 @@ T[] getProperDivisors1(T)(T number) if (isIntegral!T) {
 T countFactors2(T)(T number) if (isIntegral!T) {
   assert (number > 0);
   T count = 1;
-  auto factorGroups = getPrimeFactorGroups(number);
+  auto factorGroups = memoize!(getPrimeFactorGroups!T)(number);
   bool[] mask = new bool[factorGroups.length];
 
   foreach (k; 1 .. mask.length+1) {
@@ -458,7 +458,7 @@ auto classifyPerfectPower(T)(T number) if (isIntegral!T) {
   }
 
   //auto primeFactorGroups = number.getPrimeFactors.group.array();
-  auto primeFactorGroups = number.getPrimeFactorGroups();
+  auto primeFactorGroups = number.memoize!(getPrimeFactorGroups!T)();
   auto divisor = primeFactorGroups.map!(a => a[1]).fold!gcd();
   primeFactorGroups.each!((ref g) => g[1] /= divisor)();
   result[0] = primeFactorGroups
@@ -635,7 +635,7 @@ T getNonCoprimeCount(T)(T[] factors) if (isIntegral!T) {
 
 T getTotient(T)(T number) if (isIntegral!T) {
   assert (number > 0);
-  auto factorGroups = getPrimeFactorGroups(number);
+  auto factorGroups = memoize!(getPrimeFactorGroups!T)(number);
   auto duplicateFactorProduct = factorGroups.map!(a => a[0] ^^ (a[1] - 1)).fold!((a, b) => a * b)(T(1));
   auto factors = factorGroups.map!(a => a[0]).array();
   T nonCoprimes = memoize!(getNonCoprimeCount!T)(factors);
@@ -646,7 +646,7 @@ T getTotient(T)(T number) if (isIntegral!T) {
 
 T getTotientOld(T)(T number) if (isIntegral!T) {
   assert (number > 0);
-  T[] factors = getDistinctPrimeFactors(number);
+  T[] factors = memoize!(getDistinctPrimeFactors!T)(number);
 
   T exclusiveMultiples(T factor, T[] moreFactors) {
     T multiples = (number - 1) / factor;
@@ -688,7 +688,7 @@ T[] getCoprimes(T)(T number) if (isIntegral!T) {
   T[] result;
   T[] factors = makePrimes!T
     .until!((a, b) => a >= b)(number)
-    .setDifference(getDistinctPrimeFactors(number))
+    .setDifference(memoize!(getDistinctPrimeFactors!T)(number))
     .array();
 
   void inner(T product, T[] someFactors) {
