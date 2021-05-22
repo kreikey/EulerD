@@ -3,12 +3,12 @@
 import std.stdio;
 import std.algorithm;
 import std.range;
-import kreikey.intmath;
-import kreikey.bytemath;
-import kreikey.primes;
 import std.functional;
-import kreikey.combinatorics;
 import std.datetime.stopwatch;
+import kreikey.combinatorics;
+import kreikey.intmath;
+import kreikey.primes;
+import kreikey.digits;
 
 alias nextPermutation = kreikey.intmath.nextPermutation;
 alias permutations = kreikey.combinatorics.permutations;

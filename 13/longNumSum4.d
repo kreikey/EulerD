@@ -4,7 +4,7 @@ import std.datetime.stopwatch;
 import std.array;
 import std.algorithm;
 import std.conv;
-import kreikey.bytemath;
+import kreikey.digits;
 import kreikey.bigint;
 
 void main(string[] args) {

@@ -5,7 +5,7 @@ import std.range;
 import std.algorithm;
 import std.datetime.stopwatch;
 import kreikey.intmath;
-import kreikey.bytemath;
+import kreikey.digits;
 import kreikey.combinatorics;
 import kreikey.primes;
 import std.functional;

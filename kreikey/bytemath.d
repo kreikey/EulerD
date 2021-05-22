@@ -4,7 +4,6 @@ import std.range;
 import std.algorithm;
 import std.stdio;
 import std.traits;
-import kreikey.util;
 
 alias isNotEqualTo = (const(ubyte)[] left, const(ubyte)[] right) => left.compare(right) != 0;
 alias isEqualTo = (const(ubyte)[] left, const(ubyte)[] right) => left.compare(right) == 0;
@@ -209,82 +208,21 @@ ref ubyte[] shiftBigInPlace(ref ubyte[] digits, ulong amount) {
   return digits;
 }
 
-uint[] toDigits(alias base = 10)(ulong source)
-if (isIntegral!(typeof(base))) {
-  uint[] result;
-
-  while (source != 0) {
-    result ~= cast(uint)(source % base);
-    source /= base;
-  }
-
-  reverse(result);
-
-  return result;
-}
-
-uint[] toDigits(const char[] source) {
-  return source.map!(a => a - '0').array();
-}
-
-ulong toNumber(alias base = 10)(uint[] digits) 
-if (isIntegral!(typeof(base))) {
-  ulong result;
-
-  for (size_t i = 0; i < digits.length; i++) {
-    result += digits[i] * base ^^ (digits.length - i - 1);
-  }
-
-  return result;
-}
-
-string toString(uint[] digits) {
-  return digits.map!(a => cast(immutable(char))(a + '0')).array();
-}
-
 ubyte[] rbytes(const char[] value) {
   return value.retro.map!(a => cast(ubyte)(a - '0')).array();
 }
 
 ubyte[] rbytes(ulong value) {
-  return value.toDigits.retro.map!(a => cast(ubyte)(a)).array();
+  ubyte[] result;
+
+  while (value != 0) {
+    result ~= cast(ubyte)(value % 10);
+    value /= 10;
+  }
+
+  return result;
 }
 
 string rstr(const ubyte[] value) {
   return value.retro.map!(a => cast(immutable(char))(a + '0')).array();
 }
-
-T[] dror(T)(T[] digits) {
-  T temp = digits[$-1];
-
-  for (size_t i = digits.length-1; i > 0; i--)
-    digits[i] = digits[i-1];
-
-  digits[0] = temp;
-
-  return digits;
-}
-
-ulong dror(T)(T source)
-if(isIntegral!T) {
-  return source.toDigits.dror.toNumber();
-}
-
-T[] drol(T)(T[] digits) {
-  T temp = digits[0];
-
-  for (size_t i = 0; i < digits.length-1; i++)
-    digits[i] = digits[i+1];
-
-  digits[$-1] = temp;
-
-  return digits;
-}
-
-ulong drol(T)(T source)
-if(isIntegral!T) {
-  return source.toDigits.drol.toNumber();
-}
-alias asort = (a) {a.sort(); return a;};
-alias asortDescending = (a) {a.sort!((b, c) => c < b)(); return a;};
-

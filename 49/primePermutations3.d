@@ -6,14 +6,9 @@ import std.range;
 import std.algorithm;
 import std.conv;
 import kreikey.primes;
-import kreikey.intmath;
-//import kreikey.bytemath;
 import kreikey.digits;
 import kreikey.util;
-import kreikey.combinatorics;
-import kreikey.linkedlist;
 
-alias permutations = kreikey.combinatorics.permutations;
 typeof(isPrimeInit()) isPrime;
 
 static this() {

@@ -7,7 +7,7 @@ import std.algorithm;
 import std.conv;
 import std.typecons;
 import kreikey.intmath;
-import kreikey.bytemath;
+import kreikey.digits;
 import kreikey.combinatorics;
 
 alias nextPermutation = kreikey.combinatorics.nextPermutation;

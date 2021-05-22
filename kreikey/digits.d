@@ -4,9 +4,6 @@ import std.range;
 import std.algorithm;
 import std.stdio;
 import std.traits;
-import kreikey.util;
-import kreikey.bigint;
-import std.traits;
 
 ulong countDigits(uint base = 10)(ulong source) {
   ulong count = 0;
@@ -32,9 +29,11 @@ uint[] toDigits(uint base = 10)(ulong source) {
   return result;
 }
 
+
 uint[] toDigits(const char[] source) {
   return source.map!(a => a - '0').array();
 }
+
 
 ulong toNumber(ulong base = 10)(uint[] digits) 
 if (isIntegral!(typeof(base))) {
@@ -45,6 +44,10 @@ if (isIntegral!(typeof(base))) {
   }
 
   return result;
+}
+
+uint[] toString(uint base = 10)(ulong source) {
+  return source.toDigits!base(source).toString();
 }
 
 string toString(uint[] digits) {
