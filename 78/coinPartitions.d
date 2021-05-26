@@ -14,7 +14,7 @@ void main() {
 
   do {
     n++;
-    x = memoize!countPartitions3(n, 6);
+    x = memoize!countPartitions(n, 6);
     //writeln(n, " : ", x);
   } while (x != 0);
 
@@ -25,7 +25,7 @@ void main() {
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }
 
-ulong countPartitions3(int num, int digitsToKeep) {
+ulong countPartitions(int num, int digitsToKeep) {
   ulong count = 0;
   ulong digitsMod = 10 ^^ digitsToKeep;
   int term = num - 1;
@@ -38,9 +38,9 @@ ulong countPartitions3(int num, int digitsToKeep) {
 
   do {
     if ((i / 2) % 2 == 0) {
-      count = (count + memoize!countPartitions3(term, digitsToKeep)) % digitsMod;
+      count = (count + memoize!countPartitions(term, digitsToKeep)) % digitsMod;
     } else {
-      count = ((count + digitsMod) - memoize!countPartitions3(term, digitsToKeep)) % digitsMod;
+      count = ((count + digitsMod) - memoize!countPartitions(term, digitsToKeep)) % digitsMod;
     }
     if (i % 2 == 1) {
       term -= b;
@@ -51,45 +51,6 @@ ulong countPartitions3(int num, int digitsToKeep) {
     }
     i++;
   } while (term >= 0);
-
-  return count;
-}
-
-uint countPartitions2(uint num) {
-  return memoize!countPartitionsWithSize(num, num);
-}
-
-uint countPartitionsWithSize(uint num, uint limit) {
-  uint count = 0;
-
-  if (num == 0 || num == 1 || limit == 1)
-    return 1;
-
-  foreach (n; num - limit .. num) {
-    count = (count + memoize!countPartitionsWithSize(n, (num - n) > n ? n : (num - n))) % 1000000;
-  }
-
-  return count;
-}
-
-ulong countPartitions1(uint num) {
-  ulong count = 0;
-
-  void inner(uint[] numbers, uint total) {
-    if (total >= num) {
-      if (total == num) {
-        //writeln(numbers);
-        count++;
-      }
-      return;
-    }
-
-    for (uint n = numbers[$-1]; n > 0; n--) {
-      inner(numbers ~ n, total + n);
-    }
-  }
-
-  inner([num], 0);
 
   return count;
 }

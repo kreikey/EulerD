@@ -17,12 +17,13 @@ void main() {
   BigInt x = 0;
   
   writeln("Coin partitions");
+  writeln("Please wait for about a minute...");
   timer.start();
 
   do {
     n++;
-    x = memoize!countPartitions3(n);
-    writeln(n, " : ", x.digitString.tail(10));
+    x = memoize!countPartitions(n);
+    //writeln(n, " : ", x.digitString.tail(10));
   } while (!(x.length > 6 && x.digitString()[$-6 .. $] == "000000"));
 
   writeln("The lowest number of coins that can be separated into a number of piles divisible by one million is:");
@@ -34,7 +35,7 @@ void main() {
   writefln("Finished in %s milliseconds.", timer.peek.total!"msecs"());
 }
 
-BigInt countPartitions3(int num) {
+BigInt countPartitions(int num) {
   BigInt count = 0;
   auto byOnes = recurrence!((a, n) => a[n-1]+1, int)(1);
   auto byTwos = recurrence!((a, n) => a[n-1]+2, int)(3);
@@ -50,50 +51,7 @@ BigInt countPartitions3(int num) {
     .array();
 
   foreach (i, t; termIds.enumerate(2)) {
-    count += (i / 2) % 2 == 1 ? memoize!countPartitions3(t) : -memoize!countPartitions3(t);
-  }
-
-  return count;
-}
-
-long countPartitions1(long num) {
-  long count = 0;
-
-  void inner(long[] numbers, long total) {
-    if (total >= num) {
-      if (total == num) {
-        //writeln(numbers);
-        count++;
-      }
-      return;
-    }
-
-    for (long n = numbers[$-1]; n > 0; n--) {
-      inner(numbers ~ n, total + n);
-    }
-  }
-
-  if (num == 0)
-    return 1;
-
-  inner([num], 0);
-
-  return count;
-}
-
-ulong countPartitions2(ulong num) {
-  return memoize!countPartitionsWithSize(num, num);
-}
-
-ulong countPartitionsWithSize(ulong num, ulong limit) {
-  ulong count = 0;
-
-  if (num == 0 || num == 1 || limit == 1)
-    return 1;
-
-  foreach (n; num - limit .. num) {
-    //count = (count + memoize!countPartitionsWithSize(n, (num - n) > n ? n : (num - n))) % 1000000;
-    count += memoize!countPartitionsWithSize(n, (num - n) > n ? n : (num - n));
+    count += (i / 2) % 2 == 1 ? memoize!countPartitions(t) : -memoize!countPartitions(t);
   }
 
   return count;
